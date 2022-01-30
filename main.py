@@ -20,7 +20,7 @@ class MainLayout(BoxLayout):
     def on_submit_word(self, widget):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_words(widget.text)
-        x = random.randint(0, 6)
+        x = random.randint(0, 2)
         print(x)
         print(output_res)
         self.results_print_str = output_res[x][0]
