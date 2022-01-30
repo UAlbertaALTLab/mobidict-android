@@ -32,7 +32,7 @@ class MainLayout(BoxLayout):
 
 class MorphodictApp(App):
     def build(self):
-        Window.clearcolor = (1, 1, 1, 1)
+        Window.clearcolor = (0.933, 1, 0.92, 1)
 
         # Create DB or connect to one
         conn = sqlite3.connect("wordtest_db.db")
