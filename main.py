@@ -9,7 +9,7 @@ from kivy.core.window import Window
 from kivy.properties import StringProperty
 from kivymd.app import MDApp
 
-from backend import get_words
+from backend import get_main_page_results_list
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
@@ -19,11 +19,11 @@ class MainLayout(BoxLayout):
 
     def on_submit_word(self, widget):
         # To get access to the input, you could also go TextinputId.text directly.
-        output_res = get_words(widget.text)
-        x = random.randint(0, 6)
+        output_res = get_main_page_results_list(widget.text)
+        x = random.randint(0, 2)
         print(x)
         print(output_res)
-        self.results_print_str = output_res[x][0]
+        self.results_print_str = str(output_res[x])
         # self.root.ids.result_label.text = output_res does the same thing as the above line
 
 
@@ -32,7 +32,7 @@ class MainLayout(BoxLayout):
 
 class MorphodictApp(App):
     def build(self):
-        Window.clearcolor = (1, 1, 1, 1)
+        Window.clearcolor = (0.933, 1, 0.92, 1)
 
         # Create DB or connect to one
         conn = sqlite3.connect("wordtest_db.db")
