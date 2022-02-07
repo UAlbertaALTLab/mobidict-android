@@ -10,7 +10,6 @@ from core.runner import search
 #     # Create a cursor
 #     c = conn.cursor()
 
-#     # Create a table
 #     c.execute(""" SELECT * FROM words""")
 #     res = c.fetchall()
 
