@@ -1,6 +1,6 @@
 import re
 
-from CreeDictionary.API.search.affix import (
+from .affix import (
     do_source_language_affix_search,
     do_target_language_affix_search,
     query_would_return_too_many_results,

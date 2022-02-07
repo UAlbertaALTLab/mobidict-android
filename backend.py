@@ -2,6 +2,7 @@ import re
 import sqlite3
 import snowballstemmer
 from typing import Set
+from core.runner import search
 # def get_main_page_results_list(word):
 #     # Create DB or connect to one
 #     conn = sqlite3.connect("wordtest_db.db")
