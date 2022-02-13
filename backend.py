@@ -24,7 +24,7 @@ from core.runner import search
 def get_main_page_results_list(query: str):
     # user_query is the input word from the user
     user_query = query[:]
-    print(user_query)
+    print("USER QUERY: ", user_query)
 
     dict_source = None
 
