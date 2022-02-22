@@ -1,5 +1,9 @@
 from .query import Query
 
+from typing import Iterable, Callable, Any, Optional, Union
+
+WordformKey = Union[int, tuple[str, str]]
+
 
 class SearchRun:
     """
@@ -16,7 +20,11 @@ class SearchRun:
             self.query.auto, include_auto_definitions, default=False
         )
         self._results = {}
-        self._verbose_messages = []
+
+    include_auto_definition: bool
+    _results: dict[WordformKey, types.Result]
+    VerboseMessage = dict[str, str]
+    _verbose_messages: list[VerboseMessage]
 
     def add_result(self, result: types.Result):
         if not isinstance(result, types.Result):
@@ -47,54 +55,52 @@ class SearchRun:
             results.sort()
         return results
 
-    def presentation_results(
-        self,
-        display_mode=DisplayMode.default,
-        animate_emoji=AnimateEmoji.default,
-        dict_source=None,
-    ) -> list[presentation.PresentationResult]:
-        results = self.sorted_results()
-        prefetch_related_objects(
-            [r.wordform for r in results],
-            "lemma__definitions__citations",
-            "definitions__citations",
-        )
-        return [
-            presentation.PresentationResult(
-                r,
-                search_run=self,
-                display_mode=display_mode,
-                animate_emoji=animate_emoji,
-                dict_source=dict_source,
-            )
-            for r in results
-        ]
+    # def presentation_results(
+    #     self,
+    #     display_mode=DisplayMode.default,
+    #     animate_emoji=AnimateEmoji.default,
+    #     dict_source=None,
+    # ) -> list[presentation.PresentationResult]:
+    #     results = self.sorted_results()
+    #     prefetch_related_objects(
+    #         [r.wordform for r in results],
+    #         "lemma__definitions__citations",
+    #         "definitions__citations",
+    #     )
+    #     return [
+    #         presentation.PresentationResult(
+    #             r,
+    #             search_run=self,
+    #             display_mode=display_mode,
+    #             animate_emoji=animate_emoji,
+    #             dict_source=dict_source,
+    #         )
+    #         for r in results
+    #     ]
 
-    def serialized_presentation_results(
-        self,
-        display_mode=DisplayMode.default,
-        animate_emoji=AnimateEmoji.default,
-        dict_source=None,
-    ):
-        results = self.presentation_results(
-            display_mode=display_mode,
-            animate_emoji=animate_emoji,
-            dict_source=dict_source,
-        )
-        serialized = [r.serialize() for r in results]
+    # def serialized_presentation_results(
+    #     self,
+    #     dict_source=None,
+    # ):
+    #     results = self.presentation_results(
+    #         display_mode=display_mode,
+    #         animate_emoji=animate_emoji,
+    #         dict_source=dict_source,
+    #     )
+    #     serialized = [r.serialize() for r in results]
 
-        def has_definition(r):
-            # does the entry itself have a definition?
-            if r["definitions"]:
-                return True
-            # is it a form of a word that has a definition?
-            if "lemma_wordform" in r:
-                if "definitions" in r["lemma_wordform"]:
-                    if r["lemma_wordform"]["definitions"]:
-                        return True
-            return False
+    #     def has_definition(r):
+    #         # does the entry itself have a definition?
+    #         if r["definitions"]:
+    #             return True
+    #         # is it a form of a word that has a definition?
+    #         if "lemma_wordform" in r:
+    #             if "definitions" in r["lemma_wordform"]:
+    #                 if r["lemma_wordform"]["definitions"]:
+    #                     return True
+    #         return False
 
-        return [r for r in serialized if has_definition(r)]
+    #     return [r for r in serialized if has_definition(r)]
 
     def add_verbose_message(self, message=None, **messages):
         """

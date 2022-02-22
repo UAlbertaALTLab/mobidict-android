@@ -5,7 +5,7 @@ from .affix import (
     do_target_language_affix_search,
     query_would_return_too_many_results,
 )
-from CreeDictionary.API.search.core import SearchRun
+import SearchRun
 from CreeDictionary.API.search.espt import EsptSearch
 from CreeDictionary.API.search.lookup import fetch_results
 from CreeDictionary.API.search.query import CvdSearchType
@@ -28,30 +28,14 @@ def search(
         query=query, include_auto_definitions=include_auto_definitions
     )
 
-    if search_run.query.espt:
-        espt_search = EsptSearch(search_run)
-        espt_search.analyze_query()
-
-    if settings.MORPHODICT_ENABLE_CVD:
-        cvd_search_type = cast_away_optional(
-            first_non_none_value(search_run.query.cvd,
-                                 default=CvdSearchType.DEFAULT)
-        )
-
-        # For when you type 'cvd:exclusive' in a query to debug ONLY CVD results!
-        if cvd_search_type == CvdSearchType.EXCLUSIVE:
-
-            def sort_by_cvd(r: Result):
-                return r.cosine_vector_distance
-
-            search_run.sort_function = sort_by_cvd
-            do_cvd_search(search_run)
-            return search_run
+    # if search_run.query.espt:
+    #     espt_search = EsptSearch(search_run)
+    #     espt_search.analyze_query()
 
     fetch_results(search_run)
 
     if (
-        settings.MORPHODICT_ENABLE_AFFIX_SEARCH
+        True
         and include_affixes
         and not query_would_return_too_many_results(search_run.internal_query)
     ):

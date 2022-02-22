@@ -8,6 +8,7 @@ from itertools import chain
 
 import unicodedata
 from unicodedata import normalize
+import SearchRun
 
 SimplifiedForm = NewType("SimplifiedForm", str)
 
@@ -69,7 +70,7 @@ class AffixSearcher:
         return SimplifiedForm(to_source_language_keyword(query.lower()))
 
 
-def do_source_language_affix_search(search_run: core.SearchRun):
+def do_source_language_affix_search(search_run: SearchRun):
     matching_words = do_affix_search(
         search_run.internal_query,
         source_language_affix_searcher(),
