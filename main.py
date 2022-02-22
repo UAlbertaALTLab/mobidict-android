@@ -21,8 +21,6 @@ class MainLayout(BoxLayout):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_main_page_results_list(widget.text)
         x = random.randint(0, 2)
-        print(x)
-        print(output_res)
         self.results_print_str = str(output_res[x])
         # self.root.ids.result_label.text = output_res does the same thing as the above line
 
