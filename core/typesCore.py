@@ -1,8 +1,18 @@
+from __future__ import annotations
+
 import dataclasses
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+from enum import Enum
+
+import json
 
 from typing import NewType, Optional
+
+from core.WordForm import Wordform
+
+from . import ranking
 
 Preverb = Wordform
 Lemma = NewType("Lemma", Wordform)
@@ -56,9 +66,7 @@ class Result:
                 "must include edit distance on source language matches")
 
         if self.morpheme_ranking is None:
-            self.morpheme_ranking = wordform_cache.MORPHEME_RANKINGS.get(
-                self.wordform.text, None
-            ) or wordform_cache.MORPHEME_RANKINGS.get(self.lemma_wordform.text, None)
+            self.morpheme_ranking = 1  # Morpheme ranking = 1 for all words
 
     def add_features_from(self, other: Result):
         """Add the features from `other` into this object
@@ -70,7 +78,7 @@ class Result:
         assert self.wordform.key == other.wordform.key
         self._copy_features_from(other)
 
-    def _copy_features_from(self, other: Result):
+    def _copy_features_from(self, other):
         for field_name, other_value in other.features().items():
             if other_value is not None:
                 self_value = getattr(self, field_name)
@@ -181,7 +189,7 @@ class Result:
     def assign_default_relevance_score(self):
         ranking.assign_relevance_score(self)
 
-    def __lt__(self, other: Result):
+    def __lt__(self, other):
         assert self.relevance_score is not None
         assert other.relevance_score is not None
         return self.relevance_score > other.relevance_score

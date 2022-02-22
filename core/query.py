@@ -4,7 +4,8 @@ from typing import Optional
 
 import marshmallow.fields
 
-import runner
+# import runner
+from cree_sro_syllabics import syllabics2sro
 
 
 class CvdSearchType(Enum):
@@ -35,6 +36,20 @@ def treat_query(query_string):
     query_string = query_string.replace("7", "ʔ")
     query_string = to_sro_circumflex(query_string)
     return query_string
+
+
+def to_sro_circumflex(text: str) -> str:
+    """
+    Convert text to Plains Cree SRO with circumflexes (êîôâ).
+
+    >>> to_sro_circumflex("tān'si")
+    "tân'si"
+    >>> to_sro_circumflex("ᑖᓂᓯ")
+    'tânisi'
+    """
+    text = text.replace("ā", "â").replace(
+        "ē", "ê").replace("ī", "î").replace("ō", "ô")
+    return syllabics2sro(text)
 
 
 class Query:

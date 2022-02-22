@@ -8,7 +8,9 @@ from itertools import chain
 
 import unicodedata
 from unicodedata import normalize
-import SearchRun
+from core.SearchRun import SearchRun
+from core.typesCore import Result
+
 
 SimplifiedForm = NewType("SimplifiedForm", str)
 
@@ -70,21 +72,21 @@ class AffixSearcher:
         return SimplifiedForm(to_source_language_keyword(query.lower()))
 
 
-def do_source_language_affix_search(search_run: SearchRun):
-    matching_words = do_affix_search(
-        search_run.internal_query,
-        source_language_affix_searcher(),
-    )
-    for word in matching_words:
-        search_run.add_result(
-            Result(
-                word,
-                source_language_affix_match=True,
-                query_wordform_edit_distance=get_modified_distance(
-                    word.text, search_run.internal_query
-                ),
-            )
-        )
+# def do_source_language_affix_search(search_run: SearchRun):
+#     matching_words = do_affix_search(
+#         search_run.internal_query,
+#         source_language_affix_searcher(),
+#     )
+#     for word in matching_words:
+#         search_run.add_result(
+#             Result(
+#                 word,
+#                 source_language_affix_match=True,
+#                 query_wordform_edit_distance=get_modified_distance(
+#                     word.text, search_run.internal_query
+#                 ),
+#             )
+#         )
 
 # This is going to help with "cache.language_affix_searcher" in the top method
 # Also, wherever WordForm is used, just use a direct DB call rather

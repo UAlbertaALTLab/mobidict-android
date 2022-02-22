@@ -1,8 +1,13 @@
 from .query import Query
 
-from typing import Iterable, Callable, Any, Optional, Union
+from typing import Iterable, Callable, Any, Optional, Union, TypeVar
+
+import core.typesCore as types
 
 WordformKey = Union[int, tuple[str, str]]
+
+
+T = TypeVar("T")
 
 
 class SearchRun:

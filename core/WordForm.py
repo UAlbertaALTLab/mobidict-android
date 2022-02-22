@@ -11,7 +11,7 @@ FST_DIR = "resourcesFST"
 WordformKey = Union[int, tuple[str, str]]
 
 
-class WordForm:
+class Wordform:
     def __init__(self) -> None:
         text = ""
         raw_analysis = ""
