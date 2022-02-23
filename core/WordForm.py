@@ -12,7 +12,7 @@ WordformKey = Union[int, tuple[str, str]]
 
 
 class Wordform:
-    def __init__(self) -> None:
+    def __init__(self, inputDict=None) -> None:
         text = ""
         raw_analysis = ""
         fst_lemma = ""
@@ -22,6 +22,17 @@ class Wordform:
         slug = ""
         linguist_info = None
         import_hash = None
+
+        if inputDict is not None:
+            text = inputDict['text']
+            raw_analysis = inputDict['raw_analysis']
+            fst_lemma = inputDict['fst_lemma']
+            paradigm = inputDict['paradigm']
+            is_lemma = inputDict['is_lemma']
+            lemma = inputDict['lemma']
+            slug = inputDict['slug']
+            linguist_info = inputDict['linguist_info']
+            import_hash = inputDict['import_hash']
 
     def __str__(self):
         return self.text
