@@ -61,6 +61,12 @@ def strict_analyzer():
     return TransducerFile(FST_DIR / STRICT_ANALYZER_FST_FILENAME)
 
 
+def rich_analyze_relaxed(text):
+    return list(
+        RichAnalysis(r) for r in relaxed_analyzer().lookup_lemma_with_affixes(text)
+    )
+
+
 class RichAnalysis:
     """The one true FST analysis class.
 
