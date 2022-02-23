@@ -1,5 +1,7 @@
 To start the code,
 
+(Assumes virtualenv is installed)- if not, go "pip3 install virtualenv"
+
 1. Type 'source venv/bin/activate'
 2. Open the folder in VSCode
 3. Run with the ">" button OR python3 main.py in shell.
