@@ -10,10 +10,13 @@ from core.WordForm import rich_analyze_relaxed
 from core.english_keyword_extraction import stem_keywords
 
 from core.SearchRun import SearchRun
+from core.WordForm import Wordform
 
 
 def fetch_results(search_run: SearchRun):
     fetch_results_from_target_language_keywords(search_run)
+
+    print("Done #1", search_run._results)
     # fetch_results_from_source_language_keywords(search_run)
 
     # # Use the spelling relaxation to try to decipher the query
@@ -113,15 +116,14 @@ def fetch_results_from_target_language_keywords(search_run):
         c.execute(queryToExecute)
 
         results = c.fetchall()
-        print("OUTPUT!", dict(results[0]))
+        for wordform in results:
+            data = dict(wordform)
+            print("Data dict ", data)
+            # ---BLOCKER----- : Lemma - a foreign key in Wordform that is recursive
+            # Need to define that in data somehow before putting it in WordForm
+            search_run.add_result(
+                Result(Wordform(data), target_language_keyword_match=[
+                    stemmed_keyword])
+            )
 
     conn.close()
-
-    # for stemmed_keyword in stem_keywords(search_run.internal_query):
-    #     for wordform in Wordform.objects.filter(
-    #         target_language_keyword__text__iexact=stemmed_keyword
-    #     ):
-    #         search_run.add_result(
-    #             Result(wordform, target_language_keyword_match=[
-    #                    stemmed_keyword])
-    #         )

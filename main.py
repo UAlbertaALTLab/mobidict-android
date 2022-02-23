@@ -32,30 +32,30 @@ class MorphodictApp(App):
     def build(self):
         Window.clearcolor = (0.933, 1, 0.92, 1)
 
-        # Create DB or connect to one
-        conn = sqlite3.connect("wordtest_db.db")
+        # # Create DB or connect to one
+        # conn = sqlite3.connect("wordtest_db.db")
 
-        # Create a cursor
-        c = conn.cursor()
+        # # Create a cursor
+        # c = conn.cursor()
 
-        # Create a table
-        c.execute(""" CREATE TABLE if not exists words(name text) """)
+        # # Create a table
+        # c.execute(""" CREATE TABLE if not exists words(name text) """)
 
-        # Add sample data
-        c.execute(""" INSERT into words VALUES (:first) """,
-                  {'first': "Talking"})
+        # # Add sample data
+        # c.execute(""" INSERT into words VALUES (:first) """,
+        #           {'first': "Talking"})
 
-        c.execute(""" INSERT into words VALUES (:first) """,
-                  {'first': "Walking"})
+        # c.execute(""" INSERT into words VALUES (:first) """,
+        #           {'first': "Walking"})
 
-        c.execute(""" INSERT into words VALUES (:first) """,
-                  {'first': "Running"})
+        # c.execute(""" INSERT into words VALUES (:first) """,
+        #           {'first': "Running"})
 
-        # Commit our changes
-        conn.commit()
+        # # Commit our changes
+        # conn.commit()
 
-        # Close the connection
-        conn.close()
+        # # Close the connection
+        # conn.close()
 
         return MainLayout()
 
