@@ -7,7 +7,7 @@ import re
 # )
 from core.SearchRun import SearchRun
 # from CreeDictionary.API.search.espt import EsptSearch
-# from CreeDictionary.API.search.lookup import fetch_results
+from core.lookup import fetch_results
 # from CreeDictionary.API.search.query import CvdSearchType
 # from CreeDictionary.API.search.types import Result
 # from CreeDictionary.API.search.util import first_non_none_value
@@ -34,7 +34,7 @@ def search(
     #     espt_search = EsptSearch(search_run)
     #     espt_search.analyze_query()
 
-    # fetch_results(search_run)
+    fetch_results(search_run)
 
     # if (
     #     True
