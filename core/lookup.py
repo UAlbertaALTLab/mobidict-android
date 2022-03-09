@@ -119,11 +119,70 @@ def fetch_results_from_target_language_keywords(search_run):
         for wordform in results:
             data = dict(wordform)
             print("Data dict ", data)
-            # ---BLOCKER----- : Lemma - a foreign key in Wordform that is recursive
-            # Need to define that in data somehow before putting it in WordForm
+
+            wfCopy = data
+
+            while True:
+                if wfCopy['is_lemma']:
+                    wfCopy['lemma'] = wfCopy.copy()
+                    print("Recursive calls made")
+                    break
+                wfCopy['lemma'] = {}
+
+                queryToSearch = f""" SELECT * FROM lexicon_wordform 
+                    WHERE id = \"{wfCopy['lemma_id']}\"
+                """
+
+                c.execute(queryToSearch)
+
+                res = c.fetchone()
+                wfFetched = dict(res)
+                print("Fetched something!", wfFetched)
+                wfCopy['lemma'] = wfFetched
+                wfCopy = wfCopy['lemma']
+
+            # finalDictToAdd = build_nested_wordform(wfCopy)
+            finalWordFormToAdd = build_nested_wordform(data)
+
             search_run.add_result(
-                Result(Wordform(data), target_language_keyword_match=[
+                Result(finalWordFormToAdd, target_language_keyword_match=[
                     stemmed_keyword])
             )
 
     conn.close()
+
+
+inputDictTest = {'id': 1, 'x': 2, 'is_lemma': 0, 'lemma': {'id': 2, 'x': 3, 'is_lemma': 0, 'lemma': {
+    'id': 3, 'x': 4, 'is_lemma': 1, 'lemma': {'id': 3, 'x': 4, 'is_lemma': 1}}}}
+
+
+def build_nested_wordform(inputDict):
+    inputDictCopy = inputDict
+
+    print("Going to 'test' class::: ", inputDictCopy)
+    inputDictCopy = Wordform(inputDictCopy)
+    inputDictToReturn = inputDictCopy
+
+    while True:
+        if inputDictCopy.is_lemma:
+            # base case
+            print("Going to 'test' class final::: ",
+                  inputDictCopy, type(inputDictCopy))
+            inputDictCopy.lemma = inputDictCopy
+            break
+        print("Going to 'test' class::: ", inputDictCopy.lemma)
+        inputDictCopy.lemma = Wordform(inputDictCopy.lemma)
+        inputDictCopy = inputDictCopy.lemma
+    print("Returning now!::", inputDictToReturn)
+    return inputDictToReturn
+
+# Test class made for testing purposes
+
+
+class test:
+
+    def __init__(self, inputDict) -> None:
+        self.x = inputDict['x']
+        self.id = inputDict['id']
+        self.lemma = None if 'lemma' not in inputDict else inputDict['lemma']
+        self.is_lemma = inputDict['is_lemma']
