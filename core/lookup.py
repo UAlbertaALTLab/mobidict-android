@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 import os
+import json
 
 from core.typesCore import Result
 
@@ -19,36 +20,56 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def fetch_results(search_run: SearchRun):
+    
+    # Connect to the DB
+    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+    conn.row_factory = sqlite3.Row
+
+    c = conn.cursor()
+    
     fetch_results_from_target_language_keywords(search_run)
-    print("Done #1", search_run._results)
 
     fetch_results_from_source_language_keywords(search_run)
-    print("Done #2")
 
     # Use the spelling relaxation to try to decipher the query
     #   e.g., "atchakosuk" becomes "acâhkos+N+A+Pl" --
     #         thus, we can match "acâhkos" in the dictionary!
     fst_analyses = set(rich_analyze_relaxed(search_run.internal_query))
-    print("FST ANALYSIS:::", fst_analyses)
 
-    # db_matches = list(
-    #     Wordform.objects.filter(
-    #         raw_analysis__in=[a.tuple for a in fst_analyses])
-    # )
+    print("Next DS:::", [a.tuple for a in fst_analyses])
+    fst_analyses_list = [a.tuple for a in fst_analyses]
 
-    # for wf in db_matches:
-    #     search_run.add_result(
-    #         Result(
-    #             wf,
-    #             source_language_match=wf.text,
-    #             query_wordform_edit_distance=get_modified_distance(
-    #                 wf.text, search_run.internal_query
-    #             ),
-    #         )
-    #     )
+    query_list = []
+    for analyses in fst_analyses_list:
+        query_list.append(json.dumps([list(analyses.prefixes), analyses.lemma, list(analyses.suffixes)], ensure_ascii=False))
+    print("FINAL QUERY LIST: ", tuple(query_list))
+    
+    queryToExecute = f""" SELECT * FROM lexicon_wordform
+                    WHERE raw_analysis in {str(tuple(query_list))}
+                """
 
-    #     # An exact match here means we’re done with this analysis.
-    #     fst_analyses.discard(wf.analysis)
+    c.execute(queryToExecute)
+    
+    db_matches = c.fetchall()
+    
+    print("DB MATCHES:::", db_matches)
+    
+    for wf in db_matches:
+        data = dict(wf)
+        finalWordFormToAdd = make_wordform_dict(data)
+        search_run.add_result(
+            Result(
+                finalWordFormToAdd,
+                source_language_match=finalWordFormToAdd.text,
+                query_wordform_edit_distance=get_modified_distance(
+                    finalWordFormToAdd.text, search_run.internal_query
+                ),
+            )
+        )
+
+        # An exact match here means we’re done with this analysis.
+        fst_analyses.discard(finalWordFormToAdd.analysis)
 
     # # fst_analyses has now been thinned by calls to `fst_analyses.remove()`
     # # above; remaining items are analyses which are not in the database,
