@@ -11,18 +11,25 @@ from core.english_keyword_extraction import stem_keywords
 
 from core.SearchRun import SearchRun
 from core.WordForm import Wordform
+from core.affix import to_source_language_keyword
+
+from core.cree_lev_dist import get_modified_distance
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def fetch_results(search_run: SearchRun):
     fetch_results_from_target_language_keywords(search_run)
-
     print("Done #1", search_run._results)
-    # fetch_results_from_source_language_keywords(search_run)
 
-    # # Use the spelling relaxation to try to decipher the query
-    # #   e.g., "atchakosuk" becomes "acâhkos+N+A+Pl" --
-    # #         thus, we can match "acâhkos" in the dictionary!
-    # fst_analyses = set(rich_analyze_relaxed(search_run.internal_query))
+    fetch_results_from_source_language_keywords(search_run)
+    print("Done #2")
+
+    # Use the spelling relaxation to try to decipher the query
+    #   e.g., "atchakosuk" becomes "acâhkos+N+A+Pl" --
+    #         thus, we can match "acâhkos" in the dictionary!
+    fst_analyses = set(rich_analyze_relaxed(search_run.internal_query))
+    print("FST ANALYSIS:::", fst_analyses)
 
     # db_matches = list(
     #     Wordform.objects.filter(
@@ -95,8 +102,6 @@ def fetch_results_from_target_language_keywords(search_run):
 
     stem_keys = stem_keywords(search_run.internal_query)
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
     # Connect to the DB
     conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
 
@@ -120,29 +125,7 @@ def fetch_results_from_target_language_keywords(search_run):
             data = dict(wordform)
             print("Data dict ", data)
 
-            wfCopy = data
-
-            while True:
-                if wfCopy['is_lemma']:
-                    wfCopy['lemma'] = wfCopy.copy()
-                    print("Recursive calls made")
-                    break
-                wfCopy['lemma'] = {}
-
-                queryToSearch = f""" SELECT * FROM lexicon_wordform 
-                    WHERE id = \"{wfCopy['lemma_id']}\"
-                """
-
-                c.execute(queryToSearch)
-
-                res = c.fetchone()
-                wfFetched = dict(res)
-                print("Fetched something!", wfFetched)
-                wfCopy['lemma'] = wfFetched
-                wfCopy = wfCopy['lemma']
-
-            # finalDictToAdd = build_nested_wordform(wfCopy)
-            finalWordFormToAdd = build_nested_wordform(data)
+            finalWordFormToAdd = make_wordform_dict(data)
 
             search_run.add_result(
                 Result(finalWordFormToAdd, target_language_keyword_match=[
@@ -156,33 +139,100 @@ inputDictTest = {'id': 1, 'x': 2, 'is_lemma': 0, 'lemma': {'id': 2, 'x': 3, 'is_
     'id': 3, 'x': 4, 'is_lemma': 1, 'lemma': {'id': 3, 'x': 4, 'is_lemma': 1}}}}
 
 
+def make_wordform_dict(data):
+    '''
+    Given a dict, returns a WordForm object to be added.
+    '''
+    # Connect to the DB
+    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+    conn.row_factory = sqlite3.Row
+
+    c = conn.cursor()
+
+    wfCopy = data
+
+    while True:
+        if wfCopy['is_lemma']:
+            wfCopy['lemma'] = wfCopy.copy()
+            print("Recursive calls made")
+            break
+        wfCopy['lemma'] = {}
+
+        queryToSearch = f""" SELECT * FROM lexicon_wordform 
+            WHERE id = \"{wfCopy['lemma_id']}\"
+        """
+
+        c.execute(queryToSearch)
+
+        res = c.fetchone()
+        wfFetched = dict(res)
+        print("Fetched something!", wfFetched)
+        wfCopy['lemma'] = wfFetched
+        wfCopy = wfCopy['lemma']
+
+    # finalDictToAdd = build_nested_wordform(wfCopy)
+    finalWordFormToAdd = build_nested_wordform(data)
+    return finalWordFormToAdd
+
+
 def build_nested_wordform(inputDict):
     inputDictCopy = inputDict
 
-    print("Going to 'test' class::: ", inputDictCopy)
     inputDictCopy = Wordform(inputDictCopy)
     inputDictToReturn = inputDictCopy
 
     while True:
         if inputDictCopy.is_lemma:
             # base case
-            print("Going to 'test' class final::: ",
-                  inputDictCopy, type(inputDictCopy))
             inputDictCopy.lemma = inputDictCopy
             break
-        print("Going to 'test' class::: ", inputDictCopy.lemma)
         inputDictCopy.lemma = Wordform(inputDictCopy.lemma)
         inputDictCopy = inputDictCopy.lemma
-    print("Returning now!::", inputDictToReturn)
     return inputDictToReturn
 
-# Test class made for testing purposes
 
+def fetch_results_from_source_language_keywords(search_run):
 
-class test:
+    keyword = to_source_language_keyword(search_run.internal_query)
+    print("Inside #2: ", keyword, type(keyword))
 
-    def __init__(self, inputDict) -> None:
-        self.x = inputDict['x']
-        self.id = inputDict['id']
-        self.lemma = None if 'lemma' not in inputDict else inputDict['lemma']
-        self.is_lemma = inputDict['is_lemma']
+    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+    conn.row_factory = sqlite3.Row
+
+    c = conn.cursor()
+
+    queryToExecute = f""" SELECT * FROM lexicon_sourcelanguagekeyword
+                    WHERE text = \"{keyword}\"
+                """
+
+    c.execute(queryToExecute)
+
+    results = c.fetchall()
+
+    print("RESULTS!", results, len(results))
+
+    for res in results:
+        f_res = dict(res)
+
+        queryToRun = f""" SELECT * FROM lexicon_wordform
+                    WHERE id = \"{f_res['wordform_id']}\"
+                """
+        c.execute(queryToRun)
+
+        wordform = c.fetchone()
+
+        data = dict(wordform)
+
+        finalWordFormToAdd = make_wordform_dict(data)
+
+        search_run.add_result(
+            Result(
+                finalWordFormToAdd,
+                source_language_keyword_match=[f_res['text']],
+                query_wordform_edit_distance=get_modified_distance(
+                    search_run.internal_query, finalWordFormToAdd.text
+                ),
+            )
+        )

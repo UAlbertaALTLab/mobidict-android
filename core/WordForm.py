@@ -1,12 +1,14 @@
+import os
 from tkinter import N
 from hfst_optimized_lookup import TransducerFile, Analysis
-from functools import cache
 
 from typing import Dict, Literal, Union
 
 from general import STRICT_ANALYZER_FST_FILENAME, RELAXED_ANALYZER_FST_FILENAME, STRICT_GENERATOR_FST_FILENAME
 
-FST_DIR = "resourcesFST"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+FST_DIR = BASE_DIR + "/resourcesFST"
 
 WordformKey = Union[int, tuple[str, str]]
 
@@ -61,15 +63,15 @@ class Wordform:
 
 
 def strict_generator():
-    return TransducerFile(FST_DIR / STRICT_GENERATOR_FST_FILENAME)
+    return TransducerFile(FST_DIR + "/" + STRICT_GENERATOR_FST_FILENAME)
 
 
 def relaxed_analyzer():
-    return TransducerFile(FST_DIR / RELAXED_ANALYZER_FST_FILENAME)
+    return TransducerFile(FST_DIR + "/" + RELAXED_ANALYZER_FST_FILENAME)
 
 
 def strict_analyzer():
-    return TransducerFile(FST_DIR / STRICT_ANALYZER_FST_FILENAME)
+    return TransducerFile(FST_DIR + "/" + STRICT_ANALYZER_FST_FILENAME)
 
 
 def rich_analyze_relaxed(text):
