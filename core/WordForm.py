@@ -1,6 +1,7 @@
 import os
 from tkinter import N
 from hfst_optimized_lookup import TransducerFile, Analysis
+from functools import cache
 
 from typing import Dict, Literal, Union
 
@@ -62,14 +63,17 @@ class Wordform:
         return (self.text, self.analysis)
 
 
+@cache
 def strict_generator():
     return TransducerFile(FST_DIR + "/" + STRICT_GENERATOR_FST_FILENAME)
 
 
+@cache
 def relaxed_analyzer():
     return TransducerFile(FST_DIR + "/" + RELAXED_ANALYZER_FST_FILENAME)
 
 
+@cache
 def strict_analyzer():
     return TransducerFile(FST_DIR + "/" + STRICT_ANALYZER_FST_FILENAME)
 
