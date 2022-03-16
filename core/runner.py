@@ -44,13 +44,10 @@ def search(
     #     do_source_language_affix_search(search_run)
     #     do_target_language_affix_search(search_run)
 
-    # if settings.MORPHODICT_ENABLE_CVD:
-    #     if cvd_search_type.should_do_search() and not is_almost_certainly_cree(
-    #         search_run
-    #     ):
-    #         do_cvd_search(search_run)
+    if False:
+        if cvd_search_type.should_do_search() and not is_almost_certainly_cree(
+            search_run
+        ):
+            do_cvd_search(search_run)
 
-    # if search_run.query.espt:
-    #     espt_search.inflect_search_results()
-
-    # return search_run
+    return search_run

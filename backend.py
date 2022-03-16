@@ -38,7 +38,7 @@ def get_main_page_results_list(query: str):
             include_auto_definitions=include_auto_definitions,
         )
 
-    return [1, 2, 3, 4]
+    return search_run
 
 
 def search_with_affixes(query: str, include_auto_definitions=False):

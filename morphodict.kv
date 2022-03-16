@@ -74,8 +74,13 @@ MainLayout:
             Rectangle: 
                 pos: self.pos
                 size: self.size
+    ScrollView:
+        id: results_scroll_view
+
     Label:
         text: ""
+        size_hint: 1, None
+        height: "1dp"
     FitImage:
         # source: 'images/footer.jpg'
         canvas.before:
