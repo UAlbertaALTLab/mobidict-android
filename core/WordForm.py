@@ -1,4 +1,5 @@
 import os
+import ast
 from tkinter import N
 from hfst_optimized_lookup import TransducerFile, Analysis
 from functools import cache
@@ -30,7 +31,12 @@ class Wordform:
         if inputDict is not None:
             self.id = None if 'id' not in inputDict else inputDict['id']
             self.text = inputDict['text']
-            self.raw_analysis = inputDict['raw_analysis']
+            if inputDict['raw_analysis'] is None:
+                self.raw_analysis = None
+            elif type(inputDict['raw_analysis']) == str:
+                self.raw_analysis = ast.literal_eval(inputDict['raw_analysis'])
+            else: 
+                self.raw_analysis = inputDict['raw_analysis']
             self.fst_lemma = None if 'fst_lemma' not in inputDict else inputDict['fst_lemma']
             self.paradigm = None if 'paradigm' not in inputDict else inputDict['paradigm']
             self.is_lemma = 0 if 'is_lemma' not in inputDict else inputDict['is_lemma']

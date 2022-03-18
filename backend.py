@@ -32,7 +32,6 @@ def get_main_page_results_list(query: str):
 
     if user_query:
         include_auto_definitions = False
-        # TODO: Need to get this working
         search_run = search_with_affixes(
             user_query,
             include_auto_definitions=include_auto_definitions,
