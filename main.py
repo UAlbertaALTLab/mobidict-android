@@ -16,6 +16,14 @@ from backend import get_main_page_results_list
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
+def print_presentable_output(search_run):
+    x = search_run._results.items()
+    counter = 1
+    for y in x:
+        print(f'''Output [{counter}]: ''', y)
+        counter += 1
+        print("-"*80)
+        
 
 class MainLayout(BoxLayout):
     # results_print_str = StringProperty("")
@@ -23,6 +31,7 @@ class MainLayout(BoxLayout):
     def on_submit_word(self, widget):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_main_page_results_list(widget.text)
+        print_presentable_output(output_res)
         resultToPrint = output_res._results.items()
         x = random.randint(0, 2)
         # self.results_print_str = "Hello"
@@ -34,7 +43,6 @@ class MainLayout(BoxLayout):
         
         for data in data_list:
             # Need to fix the error here.
-            print("Inside loooppp!!", data)
             item = TwoLineListItem(text = data[0] if type(data[0]) == str else data[0][0], secondary_text = 'Placeholder')
             result_list_view.add_widget(item)
         

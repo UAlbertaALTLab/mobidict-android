@@ -1,10 +1,9 @@
 import re
 
-# from core.affix import (
-#     do_source_language_affix_search,
-#     do_target_language_affix_search,
-#     query_would_return_too_many_results,
-# )
+from core.affix import (
+    do_source_language_affix_search,
+    do_target_language_affix_search
+)
 from core.SearchRun import SearchRun
 # from CreeDictionary.API.search.espt import EsptSearch
 from core.lookup import fetch_results
@@ -35,14 +34,17 @@ def search(
     #     espt_search.analyze_query()
 
     fetch_results(search_run)
+    
+    print("SO BEFORE::::", len(search_run._results.items()))
 
-    # if (
-    #     True
-    #     and include_affixes
-    #     and not query_would_return_too_many_results(search_run.internal_query)
-    # ):
-    #     do_source_language_affix_search(search_run)
-    #     do_target_language_affix_search(search_run)
+    if (
+        True
+        and include_affixes
+    ):
+        do_source_language_affix_search(search_run)
+        do_target_language_affix_search(search_run)
+    
+    print("SO AFTER::::", len(search_run._results.items()))
 
     if False:
         if cvd_search_type.should_do_search() and not is_almost_certainly_cree(

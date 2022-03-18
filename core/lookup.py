@@ -43,11 +43,19 @@ def fetch_results(search_run: SearchRun):
     query_list = []
     for analyses in fst_analyses_list:
         query_list.append(json.dumps([list(analyses.prefixes), analyses.lemma, list(analyses.suffixes)], ensure_ascii=False))
-    print("FINAL QUERY LIST: ", tuple(query_list))
+
+    fqueryList = str(tuple(query_list))
+    
+    if len(query_list) == 1:
+        fqueryList = fqueryList[:len(fqueryList) - 2] + ')'
+    
+    print("FINAL QUERY LIST 2: ", fqueryList)
     
     queryToExecute = f""" SELECT * FROM lexicon_wordform
-                    WHERE raw_analysis in {str(tuple(query_list))}
+                    WHERE raw_analysis in {fqueryList}
                 """
+                
+    print("THIS QUERY FAILS:::", queryToExecute)
 
     c.execute(queryToExecute)
     
