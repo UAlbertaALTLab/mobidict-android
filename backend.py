@@ -3,6 +3,8 @@ import sqlite3
 import snowballstemmer
 from typing import Set
 from core.runner import search
+from core.preferences import DisplayMode, AnimateEmoji
+
 # def get_main_page_results_list(word):
 #     # Create DB or connect to one
 #     conn = sqlite3.connect("wordtest_db.db")
@@ -35,6 +37,10 @@ def get_main_page_results_list(query: str):
         search_run = search_with_affixes(
             user_query,
             include_auto_definitions=include_auto_definitions,
+        )
+        
+        search_results = search_run.serialized_presentation_results(
+            dict_source=dict_source
         )
 
     return search_run
