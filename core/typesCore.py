@@ -8,11 +8,18 @@ from enum import Enum
 
 import json
 
-from typing import NewType, Optional
+from typing import NewType, Optional, TypeVar
 
 from core.WordForm import Wordform
 
 from . import ranking
+
+
+T = TypeVar("T")
+
+def cast_away_optional(arg: Optional[T]) -> T:
+    assert arg is not None
+    return arg
 
 Preverb = Wordform
 Lemma = NewType("Lemma", Wordform)

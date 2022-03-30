@@ -37,7 +37,6 @@ def fetch_results(search_run: SearchRun):
     #         thus, we can match "acâhkos" in the dictionary!
     fst_analyses = set(rich_analyze_relaxed(search_run.internal_query))
 
-    print("Next DS:::", [a.tuple for a in fst_analyses])
     fst_analyses_list = [a.tuple for a in fst_analyses]
 
     query_list = []
@@ -49,19 +48,13 @@ def fetch_results(search_run: SearchRun):
     if len(query_list) == 1:
         fqueryList = fqueryList[:len(fqueryList) - 2] + ')'
     
-    print("FINAL QUERY LIST 2: ", fqueryList)
-    
     queryToExecute = f""" SELECT * FROM lexicon_wordform
                     WHERE raw_analysis in {fqueryList}
                 """
-                
-    print("THIS QUERY FAILS:::", queryToExecute)
 
     c.execute(queryToExecute)
     
     db_matches = c.fetchall()
-    
-    print("DB MATCHES:::", db_matches)
     
     for wf in db_matches:
         data = dict(wf)
@@ -114,8 +107,6 @@ def fetch_results(search_run: SearchRun):
             data = dict(w)
             wfToAdd = make_wordform_dict(data)
             wfListToPass.append(wfToAdd)
-        
-        print("LIST of wfs:::", wfListToPass)
         
 
         possible_lemma_wordforms = best_lemma_matches(
