@@ -39,9 +39,14 @@ def get_main_page_results_list(query: str):
             include_auto_definitions=include_auto_definitions,
         )
         
+        print("SEARCH RESULTS BEFORE:::", search_run._results)
+        print("-"*100)
+        
         search_results = search_run.serialized_presentation_results(
             dict_source=dict_source
         )
+        
+        print("SEARCH RESULTS AFTER:::", search_results, len(search_results))
 
     return search_run
 

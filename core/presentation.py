@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import sqlite3
+import os
+
+from core.models import Definition
 from core.typesCore import Result
-from core.SearchRun import SearchRun
+# from core.SearchRun import SearchRun
 from core.preferences import AnimateEmoji, DisplayMode
 from core.relabelling import Relabelling, read_labels
 from general import MORPHODICT_TAG_STYLE
@@ -16,6 +20,8 @@ from core.cree_lev_dist import get_modified_distance
 
 Preverb = Wordform
 LexicalEntryType = Literal["Preverb", "Reduplication", "Initial Change"]
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class SerializedRelabelling(TypedDict):
     """
@@ -85,7 +91,7 @@ class PresentationResult:
         self,
         result: Result,
         *,
-        search_run: SearchRun,
+        search_run: core.SearchRun.SearchRun,
         display_mode="community",
         animate_emoji=AnimateEmoji.default,
         dict_source=None,
@@ -151,6 +157,26 @@ class PresentationResult:
         )
 
     def serialize(self) -> SerializedPresentationResult:
+        
+        conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+        conn.row_factory = sqlite3.Row
+
+        c = conn.cursor()
+        
+        queryToExecute = f""" SELECT * FROM lexicon_definition 
+                WHERE wordform_id = {self.wordform.id}
+            """
+            
+        c.execute(queryToExecute)
+        
+        lex_defs = c.fetchall()
+        
+        lex_defs_list = []
+        
+        for l in lex_defs:
+            lex_defs_list.append(Definition(dict(l)))
+        
         ret: SerializedPresentationResult = {
             "lemma_wordform": serialize_wordform(
                 self.lemma_wordform, self._animate_emoji, self.dict_source
@@ -158,7 +184,7 @@ class PresentationResult:
             "wordform_text": self.wordform.text,
             "is_lemma": self.is_lemma,
             "definitions": serialize_definitions(
-                self.wordform.definitions.all(),
+                lex_defs_list,
                 # This is the only place include_auto_definitions is used,
                 # because we only auto-translate non-lemmas, and this is the
                 # only place where a non-lemma search result appears.
@@ -277,15 +303,40 @@ def serialize_wordform(
     :return: json parsable result
     """
     result = vars(wordform)
+    
+    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+    conn.row_factory = sqlite3.Row
+
+    c = conn.cursor()
+    
+    queryToExecute = f""" SELECT * FROM lexicon_definition 
+            WHERE wordform_id = {wordform.id}
+        """
+        
+    c.execute(queryToExecute)
+    
+    lex_defs = c.fetchall()
+    
+    lex_defs_list = []
+    
+    for l in lex_defs:
+        lex_defs_list.append(Definition(dict(l)))
+    
     result["definitions"] = serialize_definitions(
-        wordform.definitions.all(), dict_source=dict_source
+        lex_defs_list, dict_source=dict_source
     )
-    result["lemma_url"] = wordform.get_absolute_url()
+    # result["lemma_url"] = wordform.get_absolute_url()
+    
+    print("HERE'S THE WORDFORM AYYOOOO:::", wordform.linguist_info, type(wordform.linguist_info))
 
     if wordform.linguist_info:
-        if inflectional_category := wordform.linguist_info.get(
-            "inflectional_category", None
-        ):
+        
+        inflectional_category = wordform.linguist_info["inflectional_category"]
+        
+        print("YOOOO:::", type(inflectional_category))
+        
+        if inflectional_category:
             result.update(
                 {
                     "inflectional_category_plain_english": read_labels().english.get(
