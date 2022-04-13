@@ -327,14 +327,10 @@ def serialize_wordform(
         lex_defs_list, dict_source=dict_source
     )
     # result["lemma_url"] = wordform.get_absolute_url()
-    
-    print("HERE'S THE WORDFORM AYYOOOO:::", wordform.linguist_info, type(wordform.linguist_info))
 
     if wordform.linguist_info:
         
         inflectional_category = wordform.linguist_info["inflectional_category"]
-        
-        print("YOOOO:::", type(inflectional_category))
         
         if inflectional_category:
             result.update(
