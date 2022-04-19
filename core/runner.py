@@ -27,15 +27,12 @@ def search(
         query=query, include_auto_definitions=include_auto_definitions
     )
 
-    print("YESSS!", search_run)
-
     # if search_run.query.espt:
     #     espt_search = EsptSearch(search_run)
     #     espt_search.analyze_query()
 
     fetch_results(search_run)
     
-    print("SO BEFORE::::", len(search_run._results.items()))
 
     if (
         True
@@ -44,7 +41,6 @@ def search(
         do_source_language_affix_search(search_run)
         do_target_language_affix_search(search_run)
     
-    print("SO AFTER::::", len(search_run._results.items()))
 
     if False:
         if cvd_search_type.should_do_search() and not is_almost_certainly_cree(

@@ -42,7 +42,7 @@ class Wordform:
             self.is_lemma = 0 if 'is_lemma' not in inputDict else inputDict['is_lemma']
             self.lemma = None if 'lemma' not in inputDict else inputDict['lemma']
             self.slug = None if 'slug' not in inputDict else inputDict['slug']
-            self.linguist_info = None if 'linguist_info' not in inputDict else inputDict['linguist_info']
+            self.linguist_info = None if 'linguist_info' not in inputDict else ast.literal_eval(inputDict['linguist_info'])
             self.import_hash = None if 'import_hash' not in inputDict else inputDict['import_hash']
 
     def __str__(self):

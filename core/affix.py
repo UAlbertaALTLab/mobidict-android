@@ -37,7 +37,6 @@ def make_wordform_dict(data):
     while True:
         if wfCopy['is_lemma']:
             wfCopy['lemma'] = wfCopy.copy()
-            print("Recursive calls made")
             break
         wfCopy['lemma'] = {}
 
@@ -49,7 +48,6 @@ def make_wordform_dict(data):
 
         res = c.fetchone()
         wfFetched = dict(res)
-        print("Fetched something!", wfFetched)
         wfCopy['lemma'] = wfFetched
         wfCopy = wfCopy['lemma']
 
@@ -137,8 +135,6 @@ def do_affix_search(query: InternalForm, affixes: AffixSearcher) -> Iterable[Wor
     matched_ids = set(affixes.search_by_prefix(query))
     matched_ids |= set(affixes.search_by_suffix(query))
     
-    print("Wow maybe it just works:::", matched_ids)
-    
     conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
     
     conn.row_factory = sqlite3.Row
@@ -177,7 +173,6 @@ def make_search_query_using_set(inputSet: set) -> str:
         
 
 def do_source_language_affix_search(search_run: SearchRun):
-    print("SEARCH RUN::", search_run.internal_query)
     matching_words = do_affix_search(
         search_run.internal_query,
         source_language_affix_searcher(),
@@ -199,9 +194,7 @@ def do_target_language_affix_search(search_run: SearchRun):
         target_language_affix_searcher()
     )
     for word in matching_words:
-        print("ADDING RESULT!!")
         search_run.add_result(Result(word, target_language_affix_match=True))
-        print(len(search_run._results.items()))
 
 # This is going to help with "cache.language_affix_searcher" in the top method
 # Also, wherever WordForm is used, just use a direct DB call rather

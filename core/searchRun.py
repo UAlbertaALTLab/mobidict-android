@@ -28,6 +28,7 @@ class SearchRun:
             self.query.auto, include_auto_definitions, default=False
         )
         self._results = {}
+        self.sort_function = None
 
     include_auto_definition: bool
     _results: dict[WordformKey, types.Result]
@@ -70,13 +71,13 @@ class SearchRun:
         dict_source=None,
     ) -> list[PresentationResult]:
         results = self.sorted_results()
-        prefetch_related_objects(
-            [r.wordform for r in results],
-            "lemma__definitions__citations",
-            "definitions__citations",
-        )
+        # prefetch_related_objects(
+        #     [r.wordform for r in results],
+        #     "lemma__definitions__citations",
+        #     "definitions__citations",
+        # )
         return [
-            presentation.PresentationResult(
+            PresentationResult(
                 r,
                 search_run=self,
                 display_mode=display_mode,

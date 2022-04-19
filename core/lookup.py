@@ -174,7 +174,6 @@ def best_lemma_matches(analysis, possible_lemmas) -> list[Wordform]:
 
 
 def fetch_results_from_target_language_keywords(search_run):
-    print("STEM keyword!!: ", stem_keywords(search_run.internal_query))
 
     stem_keys = stem_keywords(search_run.internal_query)
 
@@ -187,8 +186,6 @@ def fetch_results_from_target_language_keywords(search_run):
 
     for stemmed_keyword in stem_keys:
 
-        print("Stemmed keyword: ", stemmed_keyword)
-
         queryToExecute = f""" SELECT * FROM lexicon_wordform INNER JOIN lexicon_targetlanguagekeyword
                     ON lexicon_targetlanguagekeyword.wordform_id = lexicon_wordform.id
                     WHERE lexicon_targetlanguagekeyword.text = \"{stemmed_keyword}\"
@@ -199,7 +196,6 @@ def fetch_results_from_target_language_keywords(search_run):
         results = c.fetchall()
         for wordform in results:
             data = dict(wordform)
-            print("Data dict ", data)
 
             finalWordFormToAdd = make_wordform_dict(data)
 
@@ -231,7 +227,6 @@ def make_wordform_dict(data):
     while True:
         if wfCopy['is_lemma']:
             wfCopy['lemma'] = wfCopy.copy()
-            print("Recursive calls made")
             break
         wfCopy['lemma'] = {}
 
@@ -243,7 +238,6 @@ def make_wordform_dict(data):
 
         res = c.fetchone()
         wfFetched = dict(res)
-        print("Fetched something!", wfFetched)
         wfCopy['lemma'] = wfFetched
         wfCopy = wfCopy['lemma']
 
@@ -271,7 +265,6 @@ def build_nested_wordform(inputDict):
 def fetch_results_from_source_language_keywords(search_run):
 
     keyword = to_source_language_keyword(search_run.internal_query)
-    print("Inside #2: ", keyword, type(keyword))
 
     conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
 
@@ -286,8 +279,6 @@ def fetch_results_from_source_language_keywords(search_run):
     c.execute(queryToExecute)
 
     results = c.fetchall()
-
-    print("RESULTS!", results, len(results))
 
     for res in results:
         f_res = dict(res)

@@ -1,5 +1,6 @@
 import re
 import sqlite3
+import sys
 import snowballstemmer
 from typing import Set
 from core.runner import search
@@ -54,7 +55,7 @@ def get_main_page_results_list(query: str):
     
     
 
-    return search_run
+    return search_results
 
 
 def search_with_affixes(query: str, include_auto_definitions=False):
@@ -87,3 +88,7 @@ def should_show_form_of(search_results, dict_source, include_auto_definitions):
             r["show_form_of"] = True
 
     return search_results
+
+if __name__ == "__main__":
+    output = get_main_page_results_list(sys.argv[1])
+    print(output)

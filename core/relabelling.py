@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pathlib import Path
 import csv
 import os
 from typing import Iterable, Optional, TextIO, Tuple, TypedDict, NewType
@@ -15,7 +16,7 @@ def _find_altlabel_file():
     If a language-specific file exists, use that; otherwise fall back to the
     default crk one.
     """
-    return BASE_DIR / "resourcesTSV" / "crk.altlabel.tsv"
+    return Path(BASE_DIR + "/resourcesTSV" + "/crk.altlabel.tsv")
 
 ALTERNATE_LABELS_FILE = _find_altlabel_file()
 
