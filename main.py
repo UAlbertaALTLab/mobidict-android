@@ -3,6 +3,7 @@ import json
 import sqlite3
 import random
 from kivymd.uix.label import MDLabel
+from kivy.uix.label import Label
 from sys import displayhook
 from kivy.app import App
 from kivy.lang import Builder
@@ -13,8 +14,11 @@ from kivy.core.window import Window
 from kivy.properties import StringProperty
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
+from kivy.uix.recycleview import RecycleView
 
 from backend import get_main_page_results_list
+
+initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
@@ -44,29 +48,48 @@ class MainLayout(BoxLayout):
     def display_result_list(self, data_list):
         result_list_view = MDList()
         
+        initial_result_list = []
+        
         for data in data_list:
             
             def_list = MDList()
             
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
-            item = OneLineListItem(text = title)
+            initial_result_list.append({'title': title})
+            
+            item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", 
+                           markup=True, size_hint_y = None, height = 50, 
+                           pos_hint ={'x': 1})
+            
+            # item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", markup=True)
             
             result_list_view.add_widget(item)
             
-            for definition in data['lemma_wordform']['definitions']:
-                def_row =  MDLabel(text = definition['text'])
-                def_list.add_widget(def_row)
+            # for definition in data['lemma_wordform']['definitions']:
+            #     def_row =  MDLabel(text = definition['text'])
+            #     def_list.add_widget(def_row)
             
-            result_list_view.add_widget(def_list)
+            # result_list_view.add_widget(def_list)
             
-            def_list.clear_widgets()
+            # def_list.clear_widgets()
+        
+        root = App.get_running_app().root
+        
+        root.ids.result_list_main.update_data(initial_result_list)
         
         self.ids.results_scroll_view.clear_widgets()
         self.ids.results_scroll_view.add_widget(result_list_view)
 
 # Builder.load_file("morphodict.kv")
 
+class ResultView(RecycleView):
+    def __init__(self, **kwargs):
+        super(ResultView, self).__init__(**kwargs)
+        self.data = initial_result_list
+    
+    def update_data(self, data):
+        self.data = data.copy()
 
 class MorphodictApp(MDApp):
     def build(self):
