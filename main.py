@@ -1,23 +1,25 @@
 from cgitb import text
-import imp
+import json
 import sqlite3
 import random
+from kivymd.uix.label import MDLabel
 from sys import displayhook
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.properties import StringProperty
 from kivymd.app import MDApp
-from kivymd.uix.list import OneLineListItem, MDList, TwoLineListItem
+from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
 
 from backend import get_main_page_results_list
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
-def print_presentable_output(search_run):
-    x = search_run._results.items()
+def print_presentable_output(output):
+    x = output.copy()
     counter = 1
     for y in x:
         print(f'''Output [{counter}]: ''', y)
@@ -32,8 +34,9 @@ class MainLayout(BoxLayout):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_main_page_results_list(widget.text)
         print_presentable_output(output_res)
-        resultToPrint = output_res._results.items()
-        x = random.randint(0, 2)
+        print("OUTPUT::::::::", output_res)
+        
+        resultToPrint = output_res.copy()
         # self.results_print_str = "Hello"
         self.display_result_list(resultToPrint)
         # self.root.ids.result_label.text = output_res does the same thing as the above line
@@ -42,9 +45,22 @@ class MainLayout(BoxLayout):
         result_list_view = MDList()
         
         for data in data_list:
-            # Need to fix the error here.
-            item = TwoLineListItem(text = data[0] if type(data[0]) == str else data[0][0], secondary_text = 'Placeholder')
+            
+            def_list = MDList()
+            
+            title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
+            
+            item = OneLineListItem(text = title)
+            
             result_list_view.add_widget(item)
+            
+            for definition in data['lemma_wordform']['definitions']:
+                def_row =  MDLabel(text = definition['text'])
+                def_list.add_widget(def_row)
+            
+            result_list_view.add_widget(def_list)
+            
+            def_list.clear_widgets()
         
         self.ids.results_scroll_view.clear_widgets()
         self.ids.results_scroll_view.add_widget(result_list_view)
