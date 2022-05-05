@@ -1,5 +1,21 @@
 MainLayout:
 
+<CustomWidget@BoxLayout>:
+    title: ''
+    data_list: []
+    orientation: 'vertical'
+    MDLabel:
+        text: root.title
+
+<ResultView>:
+    viewclass: 'CustomWidget'
+    RecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
 <MainLayout>:
     orientation: "vertical"
     BoxLayout:
@@ -76,7 +92,10 @@ MainLayout:
                 size: self.size
     ScrollView:
         id: results_scroll_view
-
+    
+    ResultView:
+        id: result_list_main
+        title: ''
     Label:
         text: ""
         size_hint: 1, None
@@ -88,5 +107,7 @@ MainLayout:
                 pos: self.pos
                 size: self.size
                 source: 'images/footer.jpg'
+
+
         
 

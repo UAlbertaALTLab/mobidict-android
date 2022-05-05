@@ -30,6 +30,8 @@ def get_main_page_results_list(query: str):
     dict_source = None
 
     search_run = None
+    
+    search_results = []
 
     if user_query:
         include_auto_definitions = False
@@ -51,10 +53,8 @@ def get_main_page_results_list(query: str):
     else:
         search_results = []
         did_search = False
-    
-    
 
-    return search_run
+    return search_results
 
 
 def search_with_affixes(query: str, include_auto_definitions=False):
