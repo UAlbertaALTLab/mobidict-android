@@ -18,7 +18,7 @@ from kivy.uix.recycleview import RecycleView
 
 from backend import get_main_page_results_list
 
-initial_result_list = []
+initial_data_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
@@ -38,7 +38,7 @@ class MainLayout(BoxLayout):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_main_page_results_list(widget.text)
         print_presentable_output(output_res)
-        print("OUTPUT::::::::", output_res)
+        print("OUTPUT:::", output_res)
         
         resultToPrint = output_res.copy()
         # self.results_print_str = "Hello"
@@ -47,49 +47,46 @@ class MainLayout(BoxLayout):
     
     def display_result_list(self, data_list):
         result_list_view = MDList()
-        
         initial_result_list = []
         
         for data in data_list:
             
-            def_list = MDList()
-            
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
-            initial_result_list.append({'title': title})
+            ic, emoji = data['lemma_wordform']['inflectional_category_plain_english'], data['lemma_wordform']['wordclass_emoji']
             
-            item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", 
-                           markup=True, size_hint_y = None, height = 50, 
-                           pos_hint ={'x': 1})
+            emojis = ""
+            subtitle = ""
             
-            # item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", markup=True)
+            if emoji:
+                emojis += emoji
             
-            result_list_view.add_widget(item)
+            if ic and emoji:
+                subtitle += "-"
             
-            # for definition in data['lemma_wordform']['definitions']:
-            #     def_row =  MDLabel(text = definition['text'])
-            #     def_list.add_widget(def_row)
+            if ic:
+                subtitle += ic
             
-            # result_list_view.add_widget(def_list)
-            
-            # def_list.clear_widgets()
+            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle})
         
         root = App.get_running_app().root
         
+        # root.ids.results_scroll_view.result_list_main.update_data(initial_result_list)
         root.ids.result_list_main.update_data(initial_result_list)
         
-        self.ids.results_scroll_view.clear_widgets()
-        self.ids.results_scroll_view.add_widget(result_list_view)
+        # self.ids.results_scroll_view.clear_widgets()
+        # self.ids.results_scroll_view.add_widget(result_list_view)
 
 # Builder.load_file("morphodict.kv")
 
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
         super(ResultView, self).__init__(**kwargs)
-        self.data = initial_result_list
+        self.data = initial_data_list
     
     def update_data(self, data):
         self.data = data.copy()
+        print("Damn, HERE!!", data)
 
 class MorphodictApp(MDApp):
     def build(self):
