@@ -90,40 +90,8 @@ class ResultView(RecycleView):
 
 class MorphodictApp(MDApp):
     def build(self):
+        # self.theme_cls.theme_style = "Dark"  # "Light"
         Window.clearcolor = (0.933, 1, 0.92, 1)
-
-        # # Create DB or connect to one
-        # conn = sqlite3.connect("wordtest_db.db")
-
-        # # Create a cursor
-        # c = conn.cursor()
-
-        # # Create a table
-        # c.execute(""" CREATE TABLE if not exists words(name text) """)
-
-        # # Add sample data
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Talking"})
-
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Walking"})
-
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Running"})
-
-        # # Commit our changes
-        # conn.commit()
-
-        # # Close the connection
-        # conn.close()
-
-        return MainLayout()
-
-# class MorphodictApp(MDApp):
-#     def build(self):
-#         self.theme_cls.theme_style = "Light"
-#         self.theme_cls.primary_palette = "BlueGray"
-#         return MainLayout()
 
 
 if __name__ == '__main__':
