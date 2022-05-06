@@ -58,6 +58,8 @@ class MainLayout(BoxLayout):
             emojis = ""
             subtitle = ""
             
+            defs = []
+            
             if emoji:
                 emojis += emoji
             
@@ -67,7 +69,14 @@ class MainLayout(BoxLayout):
             if ic:
                 subtitle += ic
             
-            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle})
+            flag = 1
+                
+            for definition in data['definitions']:
+                defs.append(str(flag) + ". " + definition['text'])
+                flag += 1
+            print(defs)
+            
+            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defs.copy()})
         
         root = App.get_running_app().root
         
