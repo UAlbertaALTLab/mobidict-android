@@ -90,7 +90,7 @@ class ResultView(RecycleView):
 
 class MorphodictApp(MDApp):
     def build(self):
-        # self.theme_cls.theme_style = "Dark"  # "Light"
+        # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
 
 

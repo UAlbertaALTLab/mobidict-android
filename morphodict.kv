@@ -1,3 +1,4 @@
+#: import MDLabel kivymd.uix.label.MDLabel
 MainScreen:
 
 <ResultWidget@BoxLayout>:
@@ -10,6 +11,8 @@ MainScreen:
         text: "[u][color=4C0121]" + root.title + "[/color][/u]"
         markup: True
     BoxLayout:
+        on_parent:
+            [self.add_widget(MDLabel(text="Label " + str(i))) for i in range(9)];
         MDLabel:
             markup: True
             text: "[size=14]" + root.emojis + "[/size]"
@@ -22,7 +25,7 @@ MainScreen:
 <ResultView>:
     viewclass: 'ResultWidget'
     RecycleBoxLayout:
-        default_size: None, dp(56)
+        default_size: None, dp(60)
         default_size_hint: 1, None
         default_pos_hint: {'x': 0.1}
         size_hint_y: None
@@ -123,7 +126,3 @@ MainScreen:
                     pos: self.pos
                     size: self.size
                     source: 'images/footer.jpg'
-
-
-        
-
