@@ -3,6 +3,10 @@ from __future__ import annotations
 import sqlite3
 import os
 
+import core
+
+from core.common import make_wordform_dict
+
 from core.models import Definition
 from core.typesCore import Result
 # from core.SearchRun import SearchRun
@@ -310,11 +314,14 @@ def serialize_wordform(
 
     c = conn.cursor()
     
-    queryToExecute = f""" SELECT * FROM lexicon_definition 
-            WHERE wordform_id = {wordform.id}
-        """
-        
-    c.execute(queryToExecute)
+    queryToExecute = ""
+    
+    if wordform.id is not None:
+        queryToExecute = f""" SELECT * FROM lexicon_definition 
+                WHERE wordform_id = {wordform.id}
+            """
+            
+        c.execute(queryToExecute)
     
     lex_defs = c.fetchall()
     
@@ -450,9 +457,32 @@ def get_lexical_info(
             if ling_short:
                 # convert to "âpihci" by dropping prefix and last character
                 normative_preverb_text = ling_short[len("Preverb: ") :]
-                preverb_results = Wordform.objects.filter(
-                    text=normative_preverb_text, raw_analysis__isnull=True
-                )
+                
+                conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+
+                conn.row_factory = sqlite3.Row
+
+                c = conn.cursor()
+                
+                queryToExecute = f""" SELECT * FROM lexicon_wordform WHERE text= \"{normative_preverb_text}\" 
+                        AND raw_analysis is null
+                    """
+                    
+                c.execute(queryToExecute)
+                
+                wordform_list = c.fetchall()
+                
+                preverb_results = []
+                
+                for wf in wordform_list:
+                    data = dict(wf)
+                    final_wf = make_wordform_dict(data)
+                    preverb_results.append(final_wf)
+                
+                
+                # preverb_results = Wordform.objects.filter(
+                #     text=normative_preverb_text, raw_analysis__isnull=True
+                # )
 
                 # find the one that looks the most similar
                 if preverb_results:
@@ -470,7 +500,7 @@ def get_lexical_info(
                     # ê-kî-nitawi-kâh-kîmôci-kotiskâwêyâhk, as the test database
                     # lacks lacks ê and kî.
                     preverb_result = Wordform(
-                        text=normative_preverb_text, is_lemma=True
+                        { 'text':normative_preverb_text, 'is_lemma':1 }
                     )
 
         if reduplication_string is not None:
