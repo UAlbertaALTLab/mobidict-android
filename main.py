@@ -2,6 +2,7 @@ from cgitb import text
 import json
 import sqlite3
 import random
+import emoji
 from kivymd.uix.label import MDLabel
 from kivy.uix.label import Label
 from sys import displayhook
@@ -15,10 +16,12 @@ from kivy.properties import StringProperty
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
 from kivy.uix.recycleview import RecycleView
+from kivy.clock import Clock
 
 from backend import get_main_page_results_list
 
 initial_data_list = []
+initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
@@ -74,13 +77,15 @@ class MainLayout(BoxLayout):
             for definition in data['definitions']:
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
-            print(defs)
+
+            defsToPass = defs.copy()
             
-            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defs.copy()})
+            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
         
         root = App.get_running_app().root
         
-        # root.ids.results_scroll_view.result_list_main.update_data(initial_result_list)
+        print("INITIAL RES LIST::", initial_result_list)
+        
         root.ids.result_list_main.update_data(initial_result_list)
         
         # self.ids.results_scroll_view.clear_widgets()
@@ -95,7 +100,13 @@ class ResultView(RecycleView):
     
     def update_data(self, data):
         self.data = data.copy()
-        print("Damn, HERE!!", data)
+        # root = App.get_running_app().root
+        # root.ids.result_list_main.refresh_from_data()
+        self.refresh_from_data()
+
+class ResultWidget(BoxLayout):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
 
 class MorphodictApp(MDApp):
     def build(self):

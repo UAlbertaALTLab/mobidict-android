@@ -1,12 +1,11 @@
 #: import MDLabel kivymd.uix.label.MDLabel
 MainScreen:
 
-<ResultWidget@BoxLayout>:
+<ResultWidget>:
     title: ''
     subtitle: ''
     emojis: ''
     definitions: []
-    data_list: []
     orientation: 'vertical'
     MDLabel:
         text: "[u][color=4C0121]" + root.title + "[/color][/u]"
@@ -15,14 +14,16 @@ MainScreen:
         MDLabel:
             markup: True
             text: "[size=14]" + root.emojis + "[/size]"
-            size_hint: 0.1, 1
+            size_hint: 0.2, 1
             font_name: "NotoEmoji-Regular.ttf"
+
         MDLabel:
             markup: True
             text: "[size=14]" + root.subtitle + "[/size]"
     BoxLayout:
         orientation: 'vertical'
         on_parent:
+            print("SHOT:::", root.definitions)
             [self.add_widget(MDLabel(text=desc)) for desc in root.definitions]
             #[self.add_widget(MDLabel(text="1")) for _ in range(5)]
         
@@ -81,8 +82,6 @@ MainScreen:
                     halign: 'left'
                     valign: 'top'
                     pos_hint: {"x": 0.01}
-
-                
             
         MDTextField:
             id: input_word
