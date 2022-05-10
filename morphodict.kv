@@ -2,37 +2,38 @@
 MainScreen:
 
 <ResultWidget>:
-    title: ''
-    subtitle: ''
-    emojis: ''
-    definitions: []
+    id: res
+    # title: ''
+    # subtitle: ''
+    # emojis: ''
+    # definitions: []
     orientation: 'vertical'
-    MDLabel:
-        text: "[u][color=4C0121]" + root.title + "[/color][/u]"
-        markup: True
-    BoxLayout:
-        MDLabel:
-            markup: True
-            text: "[size=14]" + root.emojis + "[/size]"
-            size_hint: 0.2, 1
-            font_name: "NotoEmoji-Regular.ttf"
+    # MDLabel:
+    #     text: "[u][color=4C0121]" + root.title + "[/color][/u]"
+    #     markup: True
+    # BoxLayout:
+    #     MDLabel:
+    #         markup: True
+    #         text: "[size=14]" + root.emojis + "[/size]"
+    #         size_hint: 0.2, 1
+    #         font_name: "NotoEmoji-Regular.ttf"
 
-        MDLabel:
-            markup: True
-            text: "[size=14]" + root.subtitle + "[/size]"
-    BoxLayout:
-        orientation: 'vertical'
-        on_parent:
-            print("SHOT:::", root.definitions)
-            [self.add_widget(MDLabel(text=desc)) for desc in root.definitions]
-            #[self.add_widget(MDLabel(text="1")) for _ in range(5)]
+    #     MDLabel:
+    #         markup: True
+    #         text: "[size=14]" + root.subtitle + "[/size]"
+    # BoxLayout:
+    #     orientation: 'vertical'
+    #     on_parent:
+    #         print("SHOT:::", root.definitions)
+    #         [self.add_widget(MDLabel(text=desc)) for desc in root.definitions]
+    #         #[self.add_widget(MDLabel(text="1")) for _ in range(5)]
         
 
 
 <ResultView>:
     viewclass: 'ResultWidget'
     RecycleBoxLayout:
-        default_size: None, dp(100)
+        default_size: None, dp(130)
         default_size_hint: 1, None
         default_pos_hint: {'x': 0.1}
         size_hint_y: None

@@ -1,9 +1,10 @@
-from cgitb import text
+from functools import partial
 import json
 import sqlite3
 import random
 import emoji
 from kivymd.uix.label import MDLabel
+from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
 from sys import displayhook
 from kivy.app import App
@@ -64,7 +65,8 @@ class MainLayout(BoxLayout):
             defs = []
             
             if emoji:
-                emojis += emoji
+                updated_emoji = emoji.replace("🧑🏽", "🧑")
+                emojis += updated_emoji
             
             if ic and emoji:
                 subtitle += "-"
@@ -105,8 +107,71 @@ class ResultView(RecycleView):
         self.refresh_from_data()
 
 class ResultWidget(BoxLayout):
+    title = ObjectProperty()
+    subtitle = ObjectProperty()
+    emojis = ObjectProperty()
+    definitions = ObjectProperty()
+    
+    # BUG: When you search a new word, the results currently don't get updated.
+    
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        Clock.schedule_once(self.row_initialization, 0)
+    
+    def row_initialization(self, dp):
+        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        
+        description_box_layout = BoxLayout()
+        
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        self.add_widget(description_box_layout)
+        
+        definitions_box_layout = BoxLayout(orientation="vertical")
+        
+        for definition in self.definitions:
+            definition_label = MDLabel(text=definition)
+            # self.add_widget(definition_label)
+            definitions_box_layout.add_widget(definition_label)
+        
+        self.add_widget(definitions_box_layout)
+        
+        self.bind(definitions = self.update_row)
+    
+    def update_row(self, *args):
+        print("-"*100)
+        
+        print("=> title: ", self.title)
+        print("=> subtitle: ", self.subtitle)
+        print("=> emojis", self.emojis)
+        print("=> definitions", self.definitions)
+        
+        self.clear_widgets()
+        
+        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        
+        description_box_layout = BoxLayout()
+        
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        self.add_widget(description_box_layout)
+        
+        definitions_box_layout = BoxLayout()
+        
+        for definition in self.definitions:
+            definition_label = MDLabel(text=definition)
+            self.add_widget(definition_label)
+        
+        
+        
 
 class MorphodictApp(MDApp):
     def build(self):
