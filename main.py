@@ -1,8 +1,10 @@
-from cgitb import text
+from functools import partial
 import json
 import sqlite3
 import random
+import emoji
 from kivymd.uix.label import MDLabel
+from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
 from sys import displayhook
 from kivy.app import App
@@ -15,9 +17,11 @@ from kivy.properties import StringProperty
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
 from kivy.uix.recycleview import RecycleView
+from kivy.clock import Clock
 
 from backend import get_main_page_results_list
 
+initial_data_list = []
 initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
@@ -38,7 +42,7 @@ class MainLayout(BoxLayout):
         # To get access to the input, you could also go TextinputId.text directly.
         output_res = get_main_page_results_list(widget.text)
         print_presentable_output(output_res)
-        print("OUTPUT::::::::", output_res)
+        print("OUTPUT:::", output_res)
         
         resultToPrint = output_res.copy()
         # self.results_print_str = "Hello"
@@ -47,86 +51,132 @@ class MainLayout(BoxLayout):
     
     def display_result_list(self, data_list):
         result_list_view = MDList()
-        
         initial_result_list = []
         
         for data in data_list:
             
-            def_list = MDList()
-            
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
-            initial_result_list.append({'title': title})
+            ic, emoji = data['lemma_wordform']['inflectional_category_plain_english'], data['lemma_wordform']['wordclass_emoji']
             
-            item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", 
-                           markup=True, size_hint_y = None, height = 50, 
-                           pos_hint ={'x': 1})
+            emojis = ""
+            subtitle = ""
             
-            # item = MDLabel(text = f"[u][color=630c23]{title}[/color][/u]", markup=True)
+            defs = []
             
-            result_list_view.add_widget(item)
+            if emoji:
+                updated_emoji = emoji.replace("🧑🏽", "🧑")
+                emojis += updated_emoji
             
-            # for definition in data['lemma_wordform']['definitions']:
-            #     def_row =  MDLabel(text = definition['text'])
-            #     def_list.add_widget(def_row)
+            if ic and emoji:
+                subtitle += "-"
             
-            # result_list_view.add_widget(def_list)
+            if ic:
+                subtitle += ic
             
-            # def_list.clear_widgets()
+            flag = 1
+                
+            for definition in data['definitions']:
+                defs.append(str(flag) + ". " + definition['text'])
+                flag += 1
+
+            defsToPass = defs.copy()
+            
+            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
         
         root = App.get_running_app().root
         
+        print("INITIAL RES LIST::", initial_result_list)
+        
         root.ids.result_list_main.update_data(initial_result_list)
         
-        self.ids.results_scroll_view.clear_widgets()
-        self.ids.results_scroll_view.add_widget(result_list_view)
+        # self.ids.results_scroll_view.clear_widgets()
+        # self.ids.results_scroll_view.add_widget(result_list_view)
 
 # Builder.load_file("morphodict.kv")
 
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
         super(ResultView, self).__init__(**kwargs)
-        self.data = initial_result_list
+        self.data = initial_data_list
     
     def update_data(self, data):
         self.data = data.copy()
+        # root = App.get_running_app().root
+        # root.ids.result_list_main.refresh_from_data()
+        self.refresh_from_data()
+
+class ResultWidget(BoxLayout):
+    title = ObjectProperty()
+    subtitle = ObjectProperty()
+    emojis = ObjectProperty()
+    definitions = ObjectProperty()
+    
+    # BUG: When you search a new word, the results currently don't get updated.
+    
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self.row_initialization, 0)
+    
+    def row_initialization(self, dp):
+        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        
+        description_box_layout = BoxLayout()
+        
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        self.add_widget(description_box_layout)
+        
+        definitions_box_layout = BoxLayout(orientation="vertical")
+        
+        for definition in self.definitions:
+            definition_label = MDLabel(text=definition)
+            # self.add_widget(definition_label)
+            definitions_box_layout.add_widget(definition_label)
+        
+        self.add_widget(definitions_box_layout)
+        
+        self.bind(definitions = self.update_row)
+    
+    def update_row(self, *args):
+        print("-"*100)
+        
+        print("=> title: ", self.title)
+        print("=> subtitle: ", self.subtitle)
+        print("=> emojis", self.emojis)
+        print("=> definitions", self.definitions)
+        
+        self.clear_widgets()
+        
+        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        
+        description_box_layout = BoxLayout()
+        
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        self.add_widget(description_box_layout)
+        
+        definitions_box_layout = BoxLayout()
+        
+        for definition in self.definitions:
+            definition_label = MDLabel(text=definition)
+            self.add_widget(definition_label)
+        
+        
+        
 
 class MorphodictApp(MDApp):
     def build(self):
+        # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
-
-        # # Create DB or connect to one
-        # conn = sqlite3.connect("wordtest_db.db")
-
-        # # Create a cursor
-        # c = conn.cursor()
-
-        # # Create a table
-        # c.execute(""" CREATE TABLE if not exists words(name text) """)
-
-        # # Add sample data
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Talking"})
-
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Walking"})
-
-        # c.execute(""" INSERT into words VALUES (:first) """,
-        #           {'first': "Running"})
-
-        # # Commit our changes
-        # conn.commit()
-
-        # # Close the connection
-        # conn.close()
-
-        return MainLayout()
-
-# class MorphodictApp(MDApp):
-#     def build(self):
-#         self.theme_cls.theme_style = "Light"
-#         self.theme_cls.primary_palette = "BlueGray"
-#         return MainLayout()
 
 
 if __name__ == '__main__':

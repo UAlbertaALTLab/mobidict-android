@@ -31,7 +31,9 @@ class Wordform:
         if inputDict is not None:
             self.id = None if 'id' not in inputDict else inputDict['id']
             self.text = inputDict['text']
-            if inputDict['raw_analysis'] is None:
+            if 'raw_analysis' not in inputDict:
+                self.raw_analysis = None
+            elif inputDict['raw_analysis'] is None:
                 self.raw_analysis = None
             elif type(inputDict['raw_analysis']) == str:
                 self.raw_analysis = ast.literal_eval(inputDict['raw_analysis'])
@@ -42,7 +44,11 @@ class Wordform:
             self.is_lemma = 0 if 'is_lemma' not in inputDict else inputDict['is_lemma']
             self.lemma = None if 'lemma' not in inputDict else inputDict['lemma']
             self.slug = None if 'slug' not in inputDict else inputDict['slug']
-            self.linguist_info = None if 'linguist_info' not in inputDict else ast.literal_eval(inputDict['linguist_info'])
+            
+            if 'linguist_info' not in inputDict or inputDict['linguist_info'] is None:
+                self.linguist_info = None
+            else:
+                self.linguist_info = ast.literal_eval(inputDict['linguist_info'])
             self.import_hash = None if 'import_hash' not in inputDict else inputDict['import_hash']
 
     def __str__(self):

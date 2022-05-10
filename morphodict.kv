@@ -1,113 +1,137 @@
-MainLayout:
+#: import MDLabel kivymd.uix.label.MDLabel
+MainScreen:
 
-<CustomWidget@BoxLayout>:
-    title: ''
-    data_list: []
+<ResultWidget>:
+    id: res
+    # title: ''
+    # subtitle: ''
+    # emojis: ''
+    # definitions: []
     orientation: 'vertical'
-    MDLabel:
-        text: root.title
+    # MDLabel:
+    #     text: "[u][color=4C0121]" + root.title + "[/color][/u]"
+    #     markup: True
+    # BoxLayout:
+    #     MDLabel:
+    #         markup: True
+    #         text: "[size=14]" + root.emojis + "[/size]"
+    #         size_hint: 0.2, 1
+    #         font_name: "NotoEmoji-Regular.ttf"
+
+    #     MDLabel:
+    #         markup: True
+    #         text: "[size=14]" + root.subtitle + "[/size]"
+    # BoxLayout:
+    #     orientation: 'vertical'
+    #     on_parent:
+    #         print("SHOT:::", root.definitions)
+    #         [self.add_widget(MDLabel(text=desc)) for desc in root.definitions]
+    #         #[self.add_widget(MDLabel(text="1")) for _ in range(5)]
+        
+
 
 <ResultView>:
-    viewclass: 'CustomWidget'
+    viewclass: 'ResultWidget'
     RecycleBoxLayout:
-        default_size: None, dp(56)
+        default_size: None, dp(130)
         default_size_hint: 1, None
+        default_pos_hint: {'x': 0.1}
         size_hint_y: None
+        size_hint_x: 0.8
+        pos_hint: {'x': 0.1}
         height: self.minimum_height
         orientation: 'vertical'
+        # canvas.before:
+        #     Color:
+        #         rgba: (1, 1, 1, 1)
+        #     Rectangle: 
+        #         pos: self.pos
+        #         size: self.size
 
-<MainLayout>:
-    orientation: "vertical"
-    BoxLayout:
-        size_hint: 1, 0.3
+<MainScreen@MDScreen>:
+    MainLayout:
+        id: main_box_layout
+        orientation: "vertical"
+        BoxLayout:
+            size_hint: 1, 0.3
+            Label:
+                text: ""
+                size_hint: 0.1, None
+                height: "40dp"
+            Image:
+                source: 'images/itwewina.png'
+                size_hint: None, None
+                height: "35dp"
+                width: "40dp"
+                pos_hint: {"y": 0.25}
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.8
+                Label:
+                    text: "itwêwina"
+                    font_size: 20
+                    text_size: self.size
+                    color: (0.635, 0.105, 0.105, 1)
+                    halign: 'left'
+                    valign: 'bottom'
+                    pos_hint: {"x": 0.01}
+                Label:
+                    text: "Plains Cree Dictionary"
+                    color: (0, 0, 0, 1)
+                    font_size: 11
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'top'
+                    pos_hint: {"x": 0.01}
+            
+        MDTextField:
+            id: input_word
+            mode: 'rectangle'
+            multiline: False
+            size_hint: 0.8, None
+            height: "35dp"
+            pos_hint: {"center_x": 0.5}
+            hint_text: "Search in Cree or English"
+            on_text_validate: root.ids.main_box_layout.on_submit_word(self)
+        Label:
+            text:''
+            size_hint: 1, 0.05
+        Label:
+            text: "This is an intelligent dictionary for Plains Cree, made by the [color=0000ff][ref=https://altlab.ualberta.ca][u]Alberta Language Technology Lab (ALTLab)[/u].[/ref][/color]"
+            color: (0, 0, 0, 1)
+            text_size: self.width, None
+            markup: True
+            on_ref_press:
+                import webbrowser
+                webbrowser.open("https://altlab.ualberta.ca")
+            halign: 'center'
+            valign: 'center'
+            size_hint: 0.8, None
+            height: self.texture_size[1] + 20
+            width: self.texture_size[0] + 20
+            font_size: 13
+            pos_hint: {"x": 0.1}
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 1)
+                Rectangle: 
+                    pos: self.pos
+                    size: self.size
+        Label:
+            text:''
+            size_hint: 1, 0.05
+        ScrollView:
+            id: results_scroll_view
+            ResultView:
+                id: result_list_main
         Label:
             text: ""
-            size_hint: 0.1, None
-            height: "40dp"
-        Image:
-            source: 'images/itwewina.png'
-            size_hint: None, None
-            height: "35dp"
-            width: "40dp"
-            pos_hint: {"y": 0.25}
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: 1, 0.8
-            Label:
-                text: "itwêwina"
-                font_size: 20
-                text_size: self.size
-                color: (0.635, 0.105, 0.105, 1)
-                halign: 'left'
-                valign: 'bottom'
-                pos_hint: {"x": 0.01}
-            Label:
-                text: "Plains Cree Dictionary"
-                color: (0, 0, 0, 1)
-                font_size: 11
-                text_size: self.size
-                halign: 'left'
-                valign: 'top'
-                pos_hint: {"x": 0.01}
-
-            
-        
-    TextInput:
-        id: input_word
-        multiline: False
-        size_hint: 0.8, None
-        height: "35dp"
-        pos_hint: {"center_x": 0.5}
-        hint_text: "Search in Cree or English"
-        on_text_validate: root.on_submit_word(self)
-    # Label:
-    #     id: result_label
-    #     text: root.results_print_str
-    #     bold: True
-    #     font_size: 20
-    #     color: (0, 0, 0, 1)
-    Label:
-        text:''
-        size_hint: 1, 0.05
-    Label:
-        text: "This is an intelligent dictionary for Plains Cree, made by the [color=0000ff][ref=https://altlab.ualberta.ca][u]Alberta Language Technology Lab (ALTLab)[/u].[/ref][/color]"
-        color: (0, 0, 0, 1)
-        text_size: self.width, None
-        markup: True
-        on_ref_press:
-            import webbrowser
-            webbrowser.open("https://altlab.ualberta.ca")
-        halign: 'center'
-        valign: 'center'
-        size_hint: 0.8, None
-        height: self.texture_size[1] + 20
-        width: self.texture_size[0] + 20
-        font_size: 13
-        pos_hint: {"x": 0.1}
-        canvas.before:
-            Color:
-                rgba: (1, 1, 1, 1)
-            Rectangle: 
-                pos: self.pos
-                size: self.size
-    ScrollView:
-        id: results_scroll_view
-    
-    ResultView:
-        id: result_list_main
-        title: ''
-    Label:
-        text: ""
-        size_hint: 1, None
-        height: "1dp"
-    FitImage:
-        # source: 'images/footer.jpg'
-        canvas.before:
-            Rectangle:
-                pos: self.pos
-                size: self.size
-                source: 'images/footer.jpg'
-
-
-        
-
+            size_hint: 1, None
+            height: "1dp"
+        FitImage:
+            # source: 'images/footer.jpg'
+            canvas.before:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: 'images/footer.jpg'
