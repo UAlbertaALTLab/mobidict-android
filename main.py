@@ -19,6 +19,7 @@ from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineLis
 from kivy.uix.recycleview import RecycleView
 from kivy.clock import Clock
 
+
 from backend import get_main_page_results_list
 
 initial_data_list = []
@@ -32,8 +33,7 @@ def print_presentable_output(output):
     for y in x:
         print(f'''Output [{counter}]: ''', y)
         counter += 1
-        print("-"*80)
-        
+        print("-" * 80)
 
 class MainLayout(BoxLayout):
     # results_print_str = StringProperty("")
@@ -52,6 +52,8 @@ class MainLayout(BoxLayout):
     def display_result_list(self, data_list):
         result_list_view = MDList()
         initial_result_list = []
+        
+        result_id_counter = 0
         
         for data in data_list:
             
@@ -82,7 +84,9 @@ class MainLayout(BoxLayout):
 
             defsToPass = defs.copy()
             
-            initial_result_list.append({'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
+            initial_result_list.append({'index': result_id_counter, 'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
+            
+            result_id_counter += 1
         
         root = App.get_running_app().root
         
@@ -107,12 +111,11 @@ class ResultView(RecycleView):
         self.refresh_from_data()
 
 class ResultWidget(BoxLayout):
+    index = ObjectProperty()
     title = ObjectProperty()
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
     definitions = ObjectProperty()
-    
-    # BUG: When you search a new word, the results currently don't get updated.
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -171,7 +174,11 @@ class ResultWidget(BoxLayout):
             self.add_widget(definition_label)
         
         
-        
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            # The touch has occurred inside the widgets area. Do stuff!
+            print("CLICKED, index: ", self.index)
+        return super(ResultWidget, self).on_touch_down(touch)
 
 class MorphodictApp(MDApp):
     def build(self):
