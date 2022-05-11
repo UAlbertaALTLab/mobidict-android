@@ -134,14 +134,14 @@ class ResultWidget(BoxLayout):
         
         self.add_widget(description_box_layout)
         
-        definitions_box_layout = BoxLayout(orientation="vertical")
+        # definitions_box_layout = BoxLayout(orientation="vertical")
         
         for definition in self.definitions:
             definition_label = MDLabel(text=definition)
-            # self.add_widget(definition_label)
-            definitions_box_layout.add_widget(definition_label)
+            self.add_widget(definition_label)
+            # definitions_box_layout.add_widget(definition_label)
         
-        self.add_widget(definitions_box_layout)
+        # self.add_widget(definitions_box_layout)
         
         self.bind(definitions = self.update_row)
     
@@ -167,11 +167,14 @@ class ResultWidget(BoxLayout):
         
         self.add_widget(description_box_layout)
         
-        definitions_box_layout = BoxLayout()
+        # definitions_box_layout = BoxLayout(orientation="vertical")
         
         for definition in self.definitions:
             definition_label = MDLabel(text=definition)
             self.add_widget(definition_label)
+            # definitions_box_layout.add_widget(definition_label)
+        
+        # self.add_widget(definitions_box_layout)
         
         
     def on_touch_down(self, touch):
