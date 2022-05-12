@@ -130,6 +130,8 @@ class ResultWidget(BoxLayout):
     
     def row_initialization(self, dp):
         if self.index != -1:
+            # Results were found!
+            
             self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
             
             description_box_layout = BoxLayout()
@@ -156,6 +158,7 @@ class ResultWidget(BoxLayout):
                 self.add_widget(definition_label)
         
         else:
+            # No results found, index = -1
             self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
         
         self.bind(definitions = self.update_row)

@@ -1,4 +1,5 @@
 #: import MDLabel kivymd.uix.label.MDLabel
+#:import get_color_from_hex kivy.utils.get_color_from_hex
 MainScreen:
 
 <ResultWidget>:
@@ -30,89 +31,104 @@ MainScreen:
         #         size: self.size
 
 <MainScreen@MDScreen>:
-    MainLayout:
-        id: main_box_layout
-        orientation: "vertical"
-        BoxLayout:
-            size_hint: 1, 0.3
-            Label:
-                text: ""
-                size_hint: 0.1, None
-                height: "40dp"
-            Image:
-                source: 'images/itwewina.png'
-                size_hint: None, None
-                height: "35dp"
-                width: "40dp"
-                pos_hint: {"y": 0.25}
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint: 1, 0.8
+    MDBottomNavigation:
+        panel_color: get_color_from_hex("#eeeaea")
+        selected_color_background: get_color_from_hex("#97ecf8")
+        text_color_active: 0, 0, 0, 1
+
+        MDBottomNavigationItem:
+            name: 'screen 1'
+            text: 'Search'
+            icon: 'magnify'
+            badge_icon: "numeric-10"
+            MainLayout:
+                id: main_box_layout
+                orientation: "vertical"
+                BoxLayout:
+                    size_hint: 1, 0.3
+                    Label:
+                        text: ""
+                        size_hint: 0.1, None
+                        height: "40dp"
+                    Image:
+                        source: 'images/itwewina.png'
+                        size_hint: None, None
+                        height: "35dp"
+                        width: "40dp"
+                        pos_hint: {"y": 0.25}
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 1, 0.8
+                        Label:
+                            text: "itwêwina"
+                            font_size: 20
+                            text_size: self.size
+                            color: (0.635, 0.105, 0.105, 1)
+                            halign: 'left'
+                            valign: 'bottom'
+                            pos_hint: {"x": 0.01}
+                        Label:
+                            text: "Plains Cree Dictionary"
+                            color: (0, 0, 0, 1)
+                            font_size: 11
+                            text_size: self.size
+                            halign: 'left'
+                            valign: 'top'
+                            pos_hint: {"x": 0.01}
+                    
+                MDTextField:
+                    id: input_word
+                    mode: 'rectangle'
+                    multiline: False
+                    size_hint: 0.8, None
+                    height: "35dp"
+                    pos_hint: {"center_x": 0.5}
+                    hint_text: "Search in Cree or English"
+                    on_text_validate: root.ids.main_box_layout.on_submit_word(self)
                 Label:
-                    text: "itwêwina"
-                    font_size: 20
-                    text_size: self.size
-                    color: (0.635, 0.105, 0.105, 1)
-                    halign: 'left'
-                    valign: 'bottom'
-                    pos_hint: {"x": 0.01}
+                    text:''
+                    size_hint: 1, 0.05
                 Label:
-                    text: "Plains Cree Dictionary"
+                    text: "This is an intelligent dictionary for Plains Cree, made by the [color=0000ff][ref=https://altlab.ualberta.ca][u]Alberta Language Technology Lab (ALTLab)[/u].[/ref][/color]"
                     color: (0, 0, 0, 1)
-                    font_size: 11
-                    text_size: self.size
-                    halign: 'left'
-                    valign: 'top'
-                    pos_hint: {"x": 0.01}
-            
-        MDTextField:
-            id: input_word
-            mode: 'rectangle'
-            multiline: False
-            size_hint: 0.8, None
-            height: "35dp"
-            pos_hint: {"center_x": 0.5}
-            hint_text: "Search in Cree or English"
-            on_text_validate: root.ids.main_box_layout.on_submit_word(self)
-        Label:
-            text:''
-            size_hint: 1, 0.05
-        Label:
-            text: "This is an intelligent dictionary for Plains Cree, made by the [color=0000ff][ref=https://altlab.ualberta.ca][u]Alberta Language Technology Lab (ALTLab)[/u].[/ref][/color]"
-            color: (0, 0, 0, 1)
-            text_size: self.width, None
-            markup: True
-            on_ref_press:
-                import webbrowser
-                webbrowser.open("https://altlab.ualberta.ca")
-            halign: 'center'
-            valign: 'center'
-            size_hint: 0.8, None
-            height: self.texture_size[1] + 20
-            width: self.texture_size[0] + 20
-            font_size: 13
-            pos_hint: {"x": 0.1}
-            canvas.before:
-                Color:
-                    rgba: (1, 1, 1, 1)
-                Rectangle: 
-                    pos: self.pos
-                    size: self.size
-        Label:
-            text:''
-            size_hint: 1, 0.05
-        ScrollView:
-            id: results_scroll_view
-            ResultView:
-                id: result_list_main
-        Label:
-            text: ""
-            size_hint: 1, None
-            height: "1dp"
-        FitImage:
-            # source: 'images/footer.jpg'
-            canvas.before:
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-                    source: 'images/footer.jpg'
+                    text_size: self.width, None
+                    markup: True
+                    on_ref_press:
+                        import webbrowser
+                        webbrowser.open("https://altlab.ualberta.ca")
+                    halign: 'center'
+                    valign: 'center'
+                    size_hint: 0.8, None
+                    height: self.texture_size[1] + 20
+                    width: self.texture_size[0] + 20
+                    font_size: 13
+                    pos_hint: {"x": 0.1}
+                    canvas.before:
+                        Color:
+                            rgba: (1, 1, 1, 1)
+                        Rectangle: 
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    text:''
+                    size_hint: 1, 0.05
+                ScrollView:
+                    id: results_scroll_view
+                    ResultView:
+                        id: result_list_main
+                Label:
+                    text: ""
+                    size_hint: 1, None
+                    height: "1dp"
+                FitImage:
+                    # source: 'images/footer.jpg'
+                    canvas.before:
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                            source: 'images/footer.jpg'
+        MDBottomNavigationItem:
+            name: 'screen 2'
+            text: 'Settings'
+            icon: 'cog'
+            badge_icon: "numeric-5"
