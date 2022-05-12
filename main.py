@@ -92,6 +92,9 @@ class MainLayout(BoxLayout):
             
             result_id_counter += 1
         
+        if len(initial_result_list) == 0:
+            initial_result_list.append({'index': -1, 'definitions': []})
+        
         root = App.get_running_app().root
         
         print("INITIAL RES LIST::", initial_result_list)
@@ -126,35 +129,34 @@ class ResultWidget(BoxLayout):
         Clock.schedule_once(self.row_initialization, 0)
     
     def row_initialization(self, dp):
-        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        if self.index != -1:
+            self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+            
+            description_box_layout = BoxLayout()
+            
+            additional_emoji_margin = 0 if not self.emojis else 10
+            
+            # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+            emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+            emoji_label._label.refresh()
+            emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+                                markup=True,
+                                size_hint=(None, 1),
+                                width=emoji_label._label.texture.size[0] + additional_emoji_margin)
         
-        description_box_layout = BoxLayout()
+            desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+            
+            description_box_layout.add_widget(emoji_label)
+            description_box_layout.add_widget(desc_label)
+            
+            self.add_widget(description_box_layout)
+            
+            for definition in self.definitions:
+                definition_label = MDLabel(text=definition)
+                self.add_widget(definition_label)
         
-        additional_emoji_margin = 0 if not self.emojis else 10
-        
-        # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
-        emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
-                              markup=True,
-                              size_hint=(None, 1),
-                              width=emoji_label._label.texture.size[0] + additional_emoji_margin)
-    
-        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
-        
-        description_box_layout.add_widget(emoji_label)
-        description_box_layout.add_widget(desc_label)
-        
-        self.add_widget(description_box_layout)
-        
-        # definitions_box_layout = BoxLayout(orientation="vertical")
-        
-        for definition in self.definitions:
-            definition_label = MDLabel(text=definition)
-            self.add_widget(definition_label)
-            # definitions_box_layout.add_widget(definition_label)
-        
-        # self.add_widget(definitions_box_layout)
+        else:
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
         
         self.bind(definitions = self.update_row)
     
@@ -168,6 +170,10 @@ class ResultWidget(BoxLayout):
         
         self.clear_widgets()
         
+        if self.index == -1:
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
+            return
+            
         self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
         
         description_box_layout = BoxLayout()
@@ -176,7 +182,6 @@ class ResultWidget(BoxLayout):
         
         emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        print("WOW:::", emoji_label._label.texture.size)
         emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                               markup=True,
                               size_hint=(None, 1),
