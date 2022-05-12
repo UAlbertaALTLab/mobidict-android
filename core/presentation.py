@@ -168,9 +168,12 @@ class PresentationResult:
 
         c = conn.cursor()
         
-        queryToExecute = f""" SELECT * FROM lexicon_definition 
-                WHERE wordform_id = {self.wordform.id}
-            """
+        queryToExecute = ""
+        
+        if self.wordform.id is not None:
+            queryToExecute = f""" SELECT * FROM lexicon_definition 
+                    WHERE wordform_id = {self.wordform.id}
+                """
             
         c.execute(queryToExecute)
         
