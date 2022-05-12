@@ -6,6 +6,7 @@ import emoji
 from kivymd.uix.label import MDLabel
 from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
+from kivymd.uix.card import MDCard
 from sys import displayhook
 from kivy.app import App
 from kivy.lang import Builder
@@ -18,7 +19,10 @@ from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
 from kivy.uix.recycleview import RecycleView
 from kivy.clock import Clock
+from kivymd.uix.tooltip import MDTooltip
+from kivymd.uix.button import MDIconButton
 
+from kivy.metrics import dp
 
 from backend import get_main_page_results_list
 
@@ -126,7 +130,16 @@ class ResultWidget(BoxLayout):
         
         description_box_layout = BoxLayout()
         
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        additional_emoji_margin = 0 if not self.emojis else 10
+        
+        # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label._label.refresh()
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+                              markup=True,
+                              size_hint=(None, 1),
+                              width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+    
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
         
         description_box_layout.add_widget(emoji_label)
@@ -159,7 +172,16 @@ class ResultWidget(BoxLayout):
         
         description_box_layout = BoxLayout()
         
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        additional_emoji_margin = 0 if not self.emojis else 10
+        
+        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label._label.refresh()
+        print("WOW:::", emoji_label._label.texture.size)
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+                              markup=True,
+                              size_hint=(None, 1),
+                              width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+        
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
         
         description_box_layout.add_widget(emoji_label)
