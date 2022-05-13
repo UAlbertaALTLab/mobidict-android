@@ -220,7 +220,6 @@ class ResultWidget(BoxLayout):
             # The touch has occurred inside the widgets area. Do stuff!
             print("CLICKED, index: ", self.index)
             root = App.get_running_app().root
-            # BUG: The below line doesn't work
             root.ids.screen_manager.switch_to_result_screen()
             
         return super(ResultWidget, self).on_touch_down(touch)
