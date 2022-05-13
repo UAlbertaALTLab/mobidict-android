@@ -1,26 +1,23 @@
-from functools import partial
-import json
-import sqlite3
-import random
-import emoji
-from kivymd.uix.label import MDLabel
 from kivy.properties import ObjectProperty
-from kivy.uix.label import Label
-from kivymd.uix.card import MDCard
-from sys import displayhook
+from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.properties import StringProperty
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.recycleview import RecycleView
+from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.label import Label
 from kivy.core.window import Window
-from kivy.properties import StringProperty
+
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
-from kivy.uix.recycleview import RecycleView
-from kivy.clock import Clock
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.card import MDCard
 from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
+from kivymd.uix.label import MDLabel
 
 from kivy.metrics import dp
 
@@ -30,6 +27,20 @@ initial_data_list = []
 initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
+
+class WindowManager(ScreenManager):
+    def __init__(self, **kwargs):
+        super(WindowManager, self).__init__(**kwargs)
+    
+    def switch_to_result_screen(self):
+        self.current = "Result"
+
+class HomeScreen(MDScreen):
+    pass
+
+class ResultScreen(MDScreen):
+    pass
+
 
 def print_presentable_output(output):
     x = output.copy()
@@ -208,6 +219,10 @@ class ResultWidget(BoxLayout):
         if self.collide_point(*touch.pos):
             # The touch has occurred inside the widgets area. Do stuff!
             print("CLICKED, index: ", self.index)
+            root = App.get_running_app().root
+            # BUG: The below line doesn't work
+            root.ids.screen_manager.switch_to_result_screen()
+            
         return super(ResultWidget, self).on_touch_down(touch)
 
 class MorphodictApp(MDApp):
