@@ -53,6 +53,9 @@ class ResultScreen(MDScreen):
 class ResultPageMainLayout(MDBoxLayout):
     pass
 
+class ContentNavigationDrawer(MDBoxLayout):
+    pass
+
 def print_presentable_output(output):
     x = output.copy()
     counter = 1
@@ -115,7 +118,7 @@ class MainLayout(BoxLayout):
             result_id_counter += 1
         
         if len(initial_result_list) == 0:
-            initial_result_list.append({'index': -1, 'definitions': []})
+            initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': []})
         
         root = App.get_running_app().root
         

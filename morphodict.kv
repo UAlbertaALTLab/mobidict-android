@@ -39,12 +39,19 @@ MainScreen:
                 MainLayout:
                     id: main_box_layout
                     orientation: "vertical"
+                    MDToolbar:
+                        title: "Search"
+                        elevation: 5
+                        pos_hint: {"top": 1}
+                        md_bg_color: get_color_from_hex("#8B0000")
+                        specific_text_color: get_color_from_hex("#F5F2D0")
+                        left_action_items:
+                            [['menu', lambda x: nav_drawer.set_state("open")]]
                     BoxLayout:
                         size_hint: 1, 0.3
                         Label:
                             text: ""
-                            size_hint: 0.1, None
-                            height: "40dp"
+                            size_hint: 0.1, 0.1
                         Image:
                             source: 'images/itwewina.png'
                             size_hint: None, None
@@ -80,6 +87,7 @@ MainScreen:
                         pos_hint: {"center_x": 0.5}
                         hint_text: "Search in Cree or English"
                         on_text_validate: root.ids.main_box_layout.on_submit_word(self)
+                        line_color_focus: get_color_from_hex("#8B0000")
                     Label:
                         text:''
                         size_hint: 1, 0.05
@@ -115,13 +123,6 @@ MainScreen:
                         text: ""
                         size_hint: 1, None
                         height: "1dp"
-                    FitImage:
-                        # source: 'images/footer.jpg'
-                        canvas.before:
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                                source: 'images/footer.jpg'
             ResultScreen: 
                 name: "Result"
                 ResultPageMainLayout:
@@ -136,4 +137,37 @@ MainScreen:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     MDLabel:
                         id: option_clicked
+        MDNavigationDrawer:
+            id: nav_drawer
+            md_bg_color: get_color_from_hex("#f7f4e7")
+
+            ContentNavigationDrawer:
+                MDBoxLayout:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 1, 0.8
+                        Label:
+                            text: "itwêwina"
+                            font_size: 20
+                            text_size: self.size
+                            color: (0.635, 0.105, 0.105, 1)
+                            halign: 'left'
+                            valign: 'bottom'
+                            pos_hint: {"x": 0.01}
+                        Label:
+                            text: "Plains Cree Dictionary"
+                            color: (0, 0, 0, 1)
+                            font_size: 11
+                            text_size: self.size
+                            halign: 'left'
+                            valign: 'top'
+                            pos_hint: {"x": 0.01}
+                        FitImage:
+                            canvas.before:
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                                    source: 'images/footer.jpg'
+                        
+
                 
