@@ -18,6 +18,7 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
+from kivymd.uix.boxlayout import MDBoxLayout
 
 from kivy.metrics import dp
 
@@ -32,8 +33,15 @@ class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
-    def switch_to_result_screen(self):
+    def switch_to_result_screen(self, index):
+        root = App.get_running_app().root
+        root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
+        self.transition.direction = "left"
         self.current = "Result"
+    
+    def switch_back_home_screen(self):
+        self.transition.direction = "right"
+        self.current = "Home"
 
 class HomeScreen(MDScreen):
     pass
@@ -41,6 +49,9 @@ class HomeScreen(MDScreen):
 class ResultScreen(MDScreen):
     pass
 
+
+class ResultPageMainLayout(MDBoxLayout):
+    pass
 
 def print_presentable_output(output):
     x = output.copy()
@@ -134,6 +145,7 @@ class ResultWidget(BoxLayout):
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
     definitions = ObjectProperty()
+    last_index_pressed = ObjectProperty()
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -220,7 +232,7 @@ class ResultWidget(BoxLayout):
             # The touch has occurred inside the widgets area. Do stuff!
             print("CLICKED, index: ", self.index)
             root = App.get_running_app().root
-            root.ids.screen_manager.switch_to_result_screen()
+            root.ids.screen_manager.switch_to_result_screen(self.index)
             
         return super(ResultWidget, self).on_touch_down(touch)
 
