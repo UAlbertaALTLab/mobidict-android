@@ -8,6 +8,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
 
@@ -29,6 +30,15 @@ initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
+class ClickableLabel(ButtonBehavior, MDLabel):
+    pass
+
+class InfoTooltipButton(MDIconButton, MDTooltip):
+    '''
+    Class for the tooltip icon next to title
+    '''
+    pass
+
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
@@ -42,6 +52,7 @@ class WindowManager(ScreenManager):
     def switch_back_home_screen(self):
         self.transition.direction = "right"
         self.current = "Home"
+
 
 class HomeScreen(MDScreen):
     pass
@@ -156,7 +167,20 @@ class ResultWidget(BoxLayout):
     
     def row_initialization(self, dp):
         if self.index != -1:
-            self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+            title_icon_box_layout = BoxLayout()
+            
+            title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+            title_label._label.refresh()
+            title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+                                            markup=True,
+                                            on_release=self.on_click_label,
+                                            size_hint=(None, 1),
+                                            width = title_label._label.texture.size[0] + 10)
+
+            title_icon_box_layout.add_widget(title_label)
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="language-python", tooltip_text= "Hello"))
+            
+            self.add_widget(title_icon_box_layout)
             
             description_box_layout = BoxLayout()
             
@@ -180,6 +204,8 @@ class ResultWidget(BoxLayout):
             for definition in self.definitions:
                 definition_label = MDLabel(text=definition)
                 self.add_widget(definition_label)
+            
+            self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
         else:
             self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
@@ -200,7 +226,21 @@ class ResultWidget(BoxLayout):
             self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
             return
             
-        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        title_icon_box_layout = BoxLayout()
+
+        title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+        title_label._label.refresh()
+        title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+                                        markup=True,
+                                        on_release=self.on_click_label,
+                                        size_hint=(None, 1),
+                                        width = title_label._label.texture.size[0] + 10)
+
+        title_icon_box_layout.add_widget(title_label)
+        
+        title_icon_box_layout.add_widget(InfoTooltipButton(icon="language-python", tooltip_text= "Hello"))
+        
+        self.add_widget(title_icon_box_layout)
         
         description_box_layout = BoxLayout()
         
@@ -227,17 +267,23 @@ class ResultWidget(BoxLayout):
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
-        # self.add_widget(definitions_box_layout)
+        self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
-        
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            # The touch has occurred inside the widgets area. Do stuff!
-            print("CLICKED, index: ", self.index)
-            root = App.get_running_app().root
-            root.ids.screen_manager.switch_to_result_screen(self.index)
+    # This method works if you want to detect a touch anywhere in the entire widget    
+    # def on_touch_down(self, touch):
+    #     if self.collide_point(*touch.pos):
+    #         # The touch has occurred inside the widgets area.
+    #         print("CLICKED, index: ", self.index)
+    #         root = App.get_running_app().root
+    #         root.ids.screen_manager.switch_to_result_screen(self.index)
             
-        return super(ResultWidget, self).on_touch_down(touch)
+    #     return super(ResultWidget, self).on_touch_down(touch)
+        
+    def on_click_label(self, touch):
+        root = App.get_running_app().root
+        root.ids.screen_manager.switch_to_result_screen(self.index)
+    
+    
 
 class MorphodictApp(MDApp):
     def build(self):
