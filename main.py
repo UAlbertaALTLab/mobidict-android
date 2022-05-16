@@ -124,7 +124,15 @@ class MainLayout(BoxLayout):
 
             defsToPass = defs.copy()
             
-            initial_result_list.append({'index': result_id_counter, 'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
+            initial_result_list.append({'index': result_id_counter, 
+                                        'title': title, 
+                                        'emojis': emojis, 
+                                        'subtitle': subtitle,
+                                        'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
+                                        'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
+                                        'relabelled_fst_analysis': data['relabelled_fst_analysis'],
+                                        'definitions': defsToPass
+                                        })
             
             result_id_counter += 1
         
@@ -158,8 +166,12 @@ class ResultWidget(BoxLayout):
     title = ObjectProperty()
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
+    friendly_linguistic_breakdown_head = ObjectProperty()
+    friendly_linguistic_breakdown_tail = ObjectProperty()
+    relabelled_fst_analysis = ObjectProperty()
+    
+    # Any new properties should be added above definitions for proper rendering
     definitions = ObjectProperty()
-    last_index_pressed = ObjectProperty()
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -178,7 +190,10 @@ class ResultWidget(BoxLayout):
                                             width = title_label._label.texture.size[0] + 10)
 
             title_icon_box_layout.add_widget(title_label)
-            title_icon_box_layout.add_widget(InfoTooltipButton(icon="language-python", tooltip_text= "Hello"))
+            
+            if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+                title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", tooltip_text= "Hello",
+                                                                   user_font_size="20dp"))
             
             self.add_widget(title_icon_box_layout)
             
@@ -238,7 +253,10 @@ class ResultWidget(BoxLayout):
 
         title_icon_box_layout.add_widget(title_label)
         
-        title_icon_box_layout.add_widget(InfoTooltipButton(icon="language-python", tooltip_text= "Hello"))
+        if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                                                               tooltip_text= "Hello",
+                                                               user_font_size="20dp"))
         
         self.add_widget(title_icon_box_layout)
         
