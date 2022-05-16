@@ -142,13 +142,22 @@ MainScreen:
             md_bg_color: get_color_from_hex("#f7f4e7")
 
             ContentNavigationDrawer:
+                orientation: 'vertical'
+                
                 MDBoxLayout:
+                    orientation: 'horizontal'
+                    size_hint: 1, 0.1
+                    Image:
+                        source: 'images/itwewina.png'
+                        size_hint: 0.2, 0.7
+                        # height: "35dp"
+                        # width: "40dp"
                     BoxLayout:
                         orientation: 'vertical'
                         size_hint: 1, 0.8
                         Label:
                             text: "itwêwina"
-                            font_size: 20
+                            font_size: 18
                             text_size: self.size
                             color: (0.635, 0.105, 0.105, 1)
                             halign: 'left'
@@ -162,12 +171,12 @@ MainScreen:
                             halign: 'left'
                             valign: 'top'
                             pos_hint: {"x": 0.01}
-                        FitImage:
-                            canvas.before:
-                                Rectangle:
-                                    pos: self.pos
-                                    size: self.size
-                                    source: 'images/footer.jpg'
+                FitImage:
+                    canvas.before:
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                            source: 'images/footer.jpg'
                         
 
                 
