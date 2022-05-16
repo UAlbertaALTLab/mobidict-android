@@ -192,8 +192,19 @@ class ResultWidget(BoxLayout):
             title_icon_box_layout.add_widget(title_label)
             
             if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+                tooltip_content = ""
+                
+                for chunk in self.relabelled_fst_analysis:
+                    chunk_label = chunk['label']
+                    if len(chunk_label) > 0:
+                        chunk_label = chunk_label.replace("→", "->")
+                    tooltip_content += chunk_label + "\n"
+                
+                if len(tooltip_content) > 0:
+                    tooltip_content = tooltip_content[:-1]
+                
                 title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
-                                                                   tooltip_text= "[u]Hello[/u]\n[u]World[/u]",
+                                                                   tooltip_text= tooltip_content,
                                                                    user_font_size="20dp"))
             
             self.add_widget(title_icon_box_layout)
@@ -255,8 +266,17 @@ class ResultWidget(BoxLayout):
         title_icon_box_layout.add_widget(title_label)
         
         if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+            tooltip_content = ""
+            for chunk in self.relabelled_fst_analysis:
+                chunk_label = chunk['label']
+                if len(chunk_label) > 0:
+                    chunk_label = chunk_label.replace("→", "->")
+                tooltip_content += chunk_label + "\n"
+            
+            if len(tooltip_content) > 0:
+                tooltip_content = tooltip_content[:-1]
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
-                                                               tooltip_text= "[u]Hello[/u]\n[u]world[/u]",
+                                                               tooltip_text= tooltip_content,
                                                                user_font_size="20dp"))
         
         self.add_widget(title_icon_box_layout)
