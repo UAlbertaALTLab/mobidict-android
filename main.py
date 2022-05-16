@@ -137,7 +137,8 @@ class MainLayout(BoxLayout):
             result_id_counter += 1
         
         if len(initial_result_list) == 0:
-            initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': []})
+            root = App.get_running_app().root
+            initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': [root.ids.input_word.text]})
         
         root = App.get_running_app().root
         
@@ -235,7 +236,10 @@ class ResultWidget(BoxLayout):
             self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
         else:
-            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
+            root = App.get_running_app().root
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found for [b][i]<<" + root.ids.input_word.text + ">>" + "[/i][/b][/color]", 
+                                    markup=True,
+                                    halign= 'center'))
         
         self.bind(definitions = self.update_row)
     
@@ -250,7 +254,10 @@ class ResultWidget(BoxLayout):
         self.clear_widgets()
         
         if self.index == -1:
-            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
+            root = App.get_running_app().root
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found for [b][i]<<" + root.ids.input_word.text + ">>" + "[/i][/b][/color]", 
+                                    markup=True,
+                                    halign= 'center'))
             return
             
         title_icon_box_layout = BoxLayout()
