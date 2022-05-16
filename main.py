@@ -192,7 +192,8 @@ class ResultWidget(BoxLayout):
             title_icon_box_layout.add_widget(title_label)
             
             if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
-                title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", tooltip_text= "Hello",
+                title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                                                                   tooltip_text= "[u]Hello[/u]\n[u]World[/u]",
                                                                    user_font_size="20dp"))
             
             self.add_widget(title_icon_box_layout)
@@ -255,7 +256,7 @@ class ResultWidget(BoxLayout):
         
         if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
-                                                               tooltip_text= "Hello",
+                                                               tooltip_text= "[u]Hello[/u]\n[u]world[/u]",
                                                                user_font_size="20dp"))
         
         self.add_widget(title_icon_box_layout)
