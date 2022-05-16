@@ -8,6 +8,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
 
@@ -29,6 +30,15 @@ initial_result_list = []
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
+class ClickableLabel(ButtonBehavior, MDLabel):
+    pass
+
+class InfoTooltipButton(MDIconButton, MDTooltip):
+    '''
+    Class for the tooltip icon next to title
+    '''
+    pass
+
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
@@ -43,6 +53,7 @@ class WindowManager(ScreenManager):
         self.transition.direction = "right"
         self.current = "Home"
 
+
 class HomeScreen(MDScreen):
     pass
 
@@ -51,6 +62,9 @@ class ResultScreen(MDScreen):
 
 
 class ResultPageMainLayout(MDBoxLayout):
+    pass
+
+class ContentNavigationDrawer(MDBoxLayout):
     pass
 
 def print_presentable_output(output):
@@ -110,12 +124,21 @@ class MainLayout(BoxLayout):
 
             defsToPass = defs.copy()
             
-            initial_result_list.append({'index': result_id_counter, 'title': title, 'emojis': emojis, 'subtitle': subtitle, 'definitions': defsToPass})
+            initial_result_list.append({'index': result_id_counter, 
+                                        'title': title, 
+                                        'emojis': emojis, 
+                                        'subtitle': subtitle,
+                                        'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
+                                        'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
+                                        'relabelled_fst_analysis': data['relabelled_fst_analysis'],
+                                        'definitions': defsToPass
+                                        })
             
             result_id_counter += 1
         
         if len(initial_result_list) == 0:
-            initial_result_list.append({'index': -1, 'definitions': []})
+            root = App.get_running_app().root
+            initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': [root.ids.input_word.text]})
         
         root = App.get_running_app().root
         
@@ -144,8 +167,12 @@ class ResultWidget(BoxLayout):
     title = ObjectProperty()
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
+    friendly_linguistic_breakdown_head = ObjectProperty()
+    friendly_linguistic_breakdown_tail = ObjectProperty()
+    relabelled_fst_analysis = ObjectProperty()
+    
+    # Any new properties should be added above definitions for proper rendering
     definitions = ObjectProperty()
-    last_index_pressed = ObjectProperty()
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -153,7 +180,35 @@ class ResultWidget(BoxLayout):
     
     def row_initialization(self, dp):
         if self.index != -1:
-            self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+            title_icon_box_layout = BoxLayout()
+            
+            title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+            title_label._label.refresh()
+            title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+                                            markup=True,
+                                            on_release=self.on_click_label,
+                                            size_hint=(None, 1),
+                                            width = title_label._label.texture.size[0] + 10)
+
+            title_icon_box_layout.add_widget(title_label)
+            
+            if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+                tooltip_content = ""
+                
+                for chunk in self.relabelled_fst_analysis:
+                    chunk_label = chunk['label']
+                    if len(chunk_label) > 0:
+                        chunk_label = chunk_label.replace("→", "->")
+                    tooltip_content += chunk_label + "\n"
+                
+                if len(tooltip_content) > 0:
+                    tooltip_content = tooltip_content[:-1]
+                
+                title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                                                                   tooltip_text= tooltip_content,
+                                                                   user_font_size="20dp"))
+            
+            self.add_widget(title_icon_box_layout)
             
             description_box_layout = BoxLayout()
             
@@ -177,9 +232,14 @@ class ResultWidget(BoxLayout):
             for definition in self.definitions:
                 definition_label = MDLabel(text=definition)
                 self.add_widget(definition_label)
+            
+            self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
         else:
-            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
+            root = App.get_running_app().root
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found for [b][i]<<" + root.ids.input_word.text + ">>" + "[/i][/b][/color]", 
+                                    markup=True,
+                                    halign= 'center'))
         
         self.bind(definitions = self.update_row)
     
@@ -194,10 +254,39 @@ class ResultWidget(BoxLayout):
         self.clear_widgets()
         
         if self.index == -1:
-            self.add_widget(MDLabel(text="[color=800000]" + "No results found!" + "[/color]", markup=True))
+            root = App.get_running_app().root
+            self.add_widget(MDLabel(text="[color=800000]" + "No results found for [b][i]<<" + root.ids.input_word.text + ">>" + "[/i][/b][/color]", 
+                                    markup=True,
+                                    halign= 'center'))
             return
             
-        self.add_widget(MDLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True))
+        title_icon_box_layout = BoxLayout()
+
+        title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+        title_label._label.refresh()
+        title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+                                        markup=True,
+                                        on_release=self.on_click_label,
+                                        size_hint=(None, 1),
+                                        width = title_label._label.texture.size[0] + 10)
+
+        title_icon_box_layout.add_widget(title_label)
+        
+        if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
+            tooltip_content = ""
+            for chunk in self.relabelled_fst_analysis:
+                chunk_label = chunk['label']
+                if len(chunk_label) > 0:
+                    chunk_label = chunk_label.replace("→", "->")
+                tooltip_content += chunk_label + "\n"
+            
+            if len(tooltip_content) > 0:
+                tooltip_content = tooltip_content[:-1]
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                                                               tooltip_text= tooltip_content,
+                                                               user_font_size="20dp"))
+        
+        self.add_widget(title_icon_box_layout)
         
         description_box_layout = BoxLayout()
         
@@ -224,17 +313,23 @@ class ResultWidget(BoxLayout):
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
-        # self.add_widget(definitions_box_layout)
+        self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
-        
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            # The touch has occurred inside the widgets area. Do stuff!
-            print("CLICKED, index: ", self.index)
-            root = App.get_running_app().root
-            root.ids.screen_manager.switch_to_result_screen(self.index)
+    # This method works if you want to detect a touch anywhere in the entire widget    
+    # def on_touch_down(self, touch):
+    #     if self.collide_point(*touch.pos):
+    #         # The touch has occurred inside the widgets area.
+    #         print("CLICKED, index: ", self.index)
+    #         root = App.get_running_app().root
+    #         root.ids.screen_manager.switch_to_result_screen(self.index)
             
-        return super(ResultWidget, self).on_touch_down(touch)
+    #     return super(ResultWidget, self).on_touch_down(touch)
+        
+    def on_click_label(self, touch):
+        root = App.get_running_app().root
+        root.ids.screen_manager.switch_to_result_screen(self.index)
+    
+    
 
 class MorphodictApp(MDApp):
     def build(self):
