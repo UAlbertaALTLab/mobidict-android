@@ -1,7 +1,10 @@
+import webbrowser
+
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.utils import get_color_from_hex
 from kivy.properties import StringProperty
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -13,7 +16,8 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 
 from kivymd.app import MDApp
-from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
+from kivymd.theming import ThemableBehavior
+from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.tooltip import MDTooltip
@@ -74,6 +78,9 @@ def print_presentable_output(output):
         print(f'''Output [{counter}]: ''', y)
         counter += 1
         print("-" * 80)
+
+class DrawerList(MDList):
+    pass
 
 class MainLayout(BoxLayout):
     # results_print_str = StringProperty("")
@@ -232,8 +239,6 @@ class ResultWidget(BoxLayout):
             for definition in self.definitions:
                 definition_label = MDLabel(text=definition)
                 self.add_widget(definition_label)
-            
-            self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
         else:
             root = App.get_running_app().root
@@ -313,8 +318,6 @@ class ResultWidget(BoxLayout):
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
-        self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
-        
     # This method works if you want to detect a touch anywhere in the entire widget    
     # def on_touch_down(self, touch):
     #     if self.collide_point(*touch.pos):
@@ -335,6 +338,24 @@ class MorphodictApp(MDApp):
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
+    
+    def on_start(self):
+        # Preload these things
+        
+        def on_release_help(arg):
+            webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
+        
+        drawer_items_list = [{'text': 'Help', 'icon': "help-circle", 'callback': on_release_help},
+                             {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_help},
+                             {'text': 'About', 'icon': "account-group", 'callback': on_release_help},
+                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_help},
+                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_help}]
+        
+        for drawer_item in drawer_items_list:
+            row_item = OneLineIconListItem(text=drawer_item['text'], on_release=drawer_item['callback'])
+            row_item.add_widget(IconLeftWidget(icon=drawer_item['icon']))
+            self.root.ids.navigation_drawer_list.add_widget(row_item)
+        return super().on_start()
 
 
 if __name__ == '__main__':
