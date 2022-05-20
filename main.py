@@ -26,7 +26,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 
-from kivy.metrics import dp
+from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 
@@ -89,9 +89,10 @@ class DrawerList(MDList):
 class MainLayout(BoxLayout):
     # results_print_str = StringProperty("")
 
-    def on_submit_word(self, widget):
+    def on_submit_word(self, widget= None):
         # To get access to the input, you could also go TextinputId.text directly.
-        output_res = get_main_page_results_list(widget.text)
+        root = App.get_running_app().root
+        output_res = get_main_page_results_list(root.ids.input_word.text)
         print_presentable_output(output_res)
         print("OUTPUT:::", output_res)
         
@@ -105,6 +106,8 @@ class MainLayout(BoxLayout):
         initial_result_list = []
         
         result_id_counter = 0
+        
+        app = App.get_running_app()
         
         for data in data_list:
             
@@ -121,8 +124,8 @@ class MainLayout(BoxLayout):
                 updated_emoji = emoji.replace("🧑🏽", "🧑")
                 emojis += updated_emoji
             
-            if ic and emoji:
-                subtitle += "-"
+            # if ic and emoji:
+            #     subtitle += "-"
             
             if ic:
                 subtitle += ic
@@ -133,10 +136,9 @@ class MainLayout(BoxLayout):
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
 
-            defsToPass = defs.copy()
-            
+            defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter, 
-                                        'title': title, 
+                                        'title': title if app.index_selected != 2 else sro2syllabics(title), 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
@@ -193,9 +195,9 @@ class ResultWidget(BoxLayout):
         if self.index != -1:
             title_icon_box_layout = BoxLayout()
             
-            title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
             title_label._label.refresh()
-            title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+            title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
                                             markup=True,
                                             on_release=self.on_click_label,
                                             size_hint=(None, 1),
@@ -271,9 +273,9 @@ class ResultWidget(BoxLayout):
             
         title_icon_box_layout = BoxLayout()
 
-        title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
         title_label._label.refresh()
-        title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+        title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
                                         markup=True,
                                         on_release=self.on_click_label,
                                         size_hint=(None, 1),
@@ -342,6 +344,7 @@ class MorphodictApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.menu = None
+        self.index_selected = 0
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -386,13 +389,17 @@ class MorphodictApp(MDApp):
                                  "text_color": (0, 0, 0, 1)}]
         if text_item == "Syllabics":
             label_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 2
         elif text_item == "SRO(ēīōā)":
             label_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 1
         else:
             label_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 0
         
         self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
+        self.root.ids.main_box_layout.on_submit_word()
         self.menu.dismiss()
     
     def on_start(self):
