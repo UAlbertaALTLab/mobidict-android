@@ -373,6 +373,9 @@ class MorphodictApp(MDApp):
         )
     
     def set_item(self, text_item):
+        if self.root.ids.label_settings_dropdown.current_item == text_item:
+            # Same option chosen, don't do anything
+            return
         label_settings_items = [{'index': 0, 
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
