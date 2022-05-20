@@ -348,17 +348,50 @@ class MorphodictApp(MDApp):
         Window.clearcolor = (0.933, 1, 0.92, 1)
         
         # Label Settings Menu
-        label_settings_items = [{'index': 0, 'text': "SRO(êîôâ)", "viewclass": "OneLineListItem", "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x)},
-                                {'index': 1, 'text': "SRO(ēīōā)", "viewclass": "OneLineListItem", "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x)},
-                                {'index': 2, 'text': "Syllabics", "viewclass": "OneLineListItem", "on_release": lambda x=f"Syllabics": self.set_item(x)}]
+        label_settings_items = [{'index': 0, 
+                                 'text': "SRO(êîôâ)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
+                                 "text_color": (0, 0, 1, 1)},
+                                {'index': 1, 'text': "SRO(ēīōā)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "Syllabics", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Syllabics": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)}]
         
         self.menu = MDDropdownMenu(
             caller=self.root.ids.label_settings_dropdown,
             items=label_settings_items,
-            width_mult=4
+            width_mult=4,
         )
     
     def set_item(self, text_item):
+        label_settings_items = [{'index': 0, 
+                                 'text': "SRO(êîôâ)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 1, 'text': "SRO(ēīōā)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "Syllabics", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Syllabics": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        if text_item == "Syllabics":
+            label_settings_items[2]["text_color"] = (0, 0, 1, 1)
+        elif text_item == "SRO(ēīōā)":
+            label_settings_items[1]["text_color"] = (0, 0, 1, 1)
+        else:
+            label_settings_items[0]["text_color"] = (0, 0, 1, 1)
+        
+        self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
         self.menu.dismiss()
     
