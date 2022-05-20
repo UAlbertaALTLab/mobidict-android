@@ -24,6 +24,7 @@ from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.menu import MDDropdownMenu
 
 from kivy.metrics import dp
 
@@ -70,6 +71,9 @@ class ResultPageMainLayout(MDBoxLayout):
 
 class ContentNavigationDrawer(MDBoxLayout):
     pass
+
+class LabelSettingsItem(OneLineListItem):
+    text = StringProperty()
 
 def print_presentable_output(output):
     x = output.copy()
@@ -332,24 +336,46 @@ class ResultWidget(BoxLayout):
         root = App.get_running_app().root
         root.ids.screen_manager.switch_to_result_screen(self.index)
     
-    
 
 class MorphodictApp(MDApp):
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.menu = None
+    
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
+        
+        # Label Settings Menu
+        label_settings_items = [{'index': 0, 'text': "SRO(êîôâ)", "viewclass": "OneLineListItem", "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x)},
+                                {'index': 1, 'text': "SRO(ēīōā)", "viewclass": "OneLineListItem", "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x)},
+                                {'index': 2, 'text': "Syllabics", "viewclass": "OneLineListItem", "on_release": lambda x=f"Syllabics": self.set_item(x)}]
+        
+        self.menu = MDDropdownMenu(
+            caller=self.root.ids.label_settings_dropdown,
+            items=label_settings_items,
+            width_mult=4
+        )
+    
+    def set_item(self, text_item):
+        self.root.ids.label_settings_dropdown.set_item(text_item)
+        self.menu.dismiss()
     
     def on_start(self):
         # Preload these things
         
         def on_release_help(arg):
             webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
+            
+        def on_release_settings(arg):
+            print("Settings pressed!")
         
         drawer_items_list = [{'text': 'Help', 'icon': "help-circle", 'callback': on_release_help},
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_help},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_help},
                              {'text': 'Contact us', 'icon': "email", 'callback': on_release_help},
-                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_help}]
+                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
         
         for drawer_item in drawer_items_list:
             row_item = OneLineIconListItem(text=drawer_item['text'], on_release=drawer_item['callback'])
