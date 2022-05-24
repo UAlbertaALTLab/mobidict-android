@@ -1,7 +1,11 @@
+# Release testing to see how much memory we currently occupy/for future purposes.
+import webbrowser
+
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.utils import get_color_from_hex
 from kivy.properties import StringProperty
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -13,15 +17,17 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 
 from kivymd.app import MDApp
-from kivymd.uix.list import OneLineListItem, MDList, OneLineListItem, TwoLineListItem
+from kivymd.theming import ThemableBehavior
+from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.menu import MDDropdownMenu
 
-from kivy.metrics import dp
+from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 
@@ -67,6 +73,9 @@ class ResultPageMainLayout(MDBoxLayout):
 class ContentNavigationDrawer(MDBoxLayout):
     pass
 
+class LabelSettingsItem(OneLineListItem):
+    text = StringProperty()
+
 def print_presentable_output(output):
     x = output.copy()
     counter = 1
@@ -75,12 +84,32 @@ def print_presentable_output(output):
         counter += 1
         print("-" * 80)
 
+def replace_hats_to_lines_SRO(string):
+    
+    string = string.replace("ê", "ē")
+    string = string.replace("î", "ī")
+    string = string.replace("ô", "ō")
+    string = string.replace("â", "ā")
+    
+    return string
+
+class DrawerList(MDList):
+    pass
+
 class MainLayout(BoxLayout):
     # results_print_str = StringProperty("")
 
-    def on_submit_word(self, widget):
+    def on_submit_word(self, widget= None):
         # To get access to the input, you could also go TextinputId.text directly.
-        output_res = get_main_page_results_list(widget.text)
+        root = App.get_running_app().root
+        current_query = root.ids.input_word.text
+        
+        if not current_query:
+            # Empty query
+            print("Empty query")
+            return
+        
+        output_res = get_main_page_results_list(current_query)
         print_presentable_output(output_res)
         print("OUTPUT:::", output_res)
         
@@ -94,6 +123,8 @@ class MainLayout(BoxLayout):
         initial_result_list = []
         
         result_id_counter = 0
+        
+        app = App.get_running_app()
         
         for data in data_list:
             
@@ -110,8 +141,8 @@ class MainLayout(BoxLayout):
                 updated_emoji = emoji.replace("🧑🏽", "🧑")
                 emojis += updated_emoji
             
-            if ic and emoji:
-                subtitle += "-"
+            # if ic and emoji:
+            #     subtitle += "-"
             
             if ic:
                 subtitle += ic
@@ -121,9 +152,15 @@ class MainLayout(BoxLayout):
             for definition in data['definitions']:
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
-
-            defsToPass = defs.copy()
             
+            if app.index_selected == 2:
+                # Syllabics selected
+                title = sro2syllabics(title)
+            elif app.index_selected == 1:
+                # ēīōā selected
+                title = replace_hats_to_lines_SRO(title)
+
+            defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter, 
                                         'title': title, 
                                         'emojis': emojis, 
@@ -182,9 +219,9 @@ class ResultWidget(BoxLayout):
         if self.index != -1:
             title_icon_box_layout = BoxLayout()
             
-            title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
             title_label._label.refresh()
-            title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+            title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
                                             markup=True,
                                             on_release=self.on_click_label,
                                             size_hint=(None, 1),
@@ -232,8 +269,6 @@ class ResultWidget(BoxLayout):
             for definition in self.definitions:
                 definition_label = MDLabel(text=definition)
                 self.add_widget(definition_label)
-            
-            self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
         
         else:
             root = App.get_running_app().root
@@ -262,9 +297,9 @@ class ResultWidget(BoxLayout):
             
         title_icon_box_layout = BoxLayout()
 
-        title_label = Label(text="[u][color=4C0121]" + self.title + "[/color][/u]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
         title_label._label.refresh()
-        title_label = ClickableLabel(text="[u][color=4C0121]" + self.title + "[/color][/u]", 
+        title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
                                         markup=True,
                                         on_release=self.on_click_label,
                                         size_hint=(None, 1),
@@ -313,8 +348,6 @@ class ResultWidget(BoxLayout):
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
-        self.add_widget(MDLabel(text="", size_hint= (1, 0.08)))
-        
     # This method works if you want to detect a touch anywhere in the entire widget    
     # def on_touch_down(self, touch):
     #     if self.collide_point(*touch.pos):
@@ -329,12 +362,93 @@ class ResultWidget(BoxLayout):
         root = App.get_running_app().root
         root.ids.screen_manager.switch_to_result_screen(self.index)
     
-    
 
 class MorphodictApp(MDApp):
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.menu = None
+        self.index_selected = 0
+    
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
+        
+        # Label Settings Menu
+        label_settings_items = [{'index': 0, 
+                                 'text': "SRO(êîôâ)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
+                                 "text_color": (0, 0, 1, 1)},
+                                {'index': 1, 'text': "SRO(ēīōā)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "Syllabics", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Syllabics": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        
+        self.menu = MDDropdownMenu(
+            caller=self.root.ids.label_settings_dropdown,
+            items=label_settings_items,
+            width_mult=4,
+        )
+    
+    def set_item(self, text_item):
+        if self.root.ids.label_settings_dropdown.current_item == text_item:
+            # Same option chosen, don't do anything
+            return
+        label_settings_items = [{'index': 0, 
+                                 'text': "SRO(êîôâ)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 1, 'text': "SRO(ēīōā)", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "Syllabics", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Syllabics": self.set_item(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        if text_item == "Syllabics":
+            label_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 2
+        elif text_item == "SRO(ēīōā)":
+            label_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 1
+        else:
+            label_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            self.index_selected = 0
+        
+        self.menu.items = label_settings_items
+        self.root.ids.label_settings_dropdown.set_item(text_item)
+        self.root.ids.main_box_layout.on_submit_word()
+        self.menu.dismiss()
+    
+    def on_start(self):
+        # Preload these things
+        
+        def on_release_help(arg):
+            webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
+            
+        def on_release_settings(arg):
+            print("Settings pressed!")
+        
+        drawer_items_list = [{'text': 'Help', 'icon': "help-circle", 'callback': on_release_help},
+                             {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_help},
+                             {'text': 'About', 'icon': "account-group", 'callback': on_release_help},
+                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_help},
+                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
+        
+        for drawer_item in drawer_items_list:
+            row_item = OneLineIconListItem(text=drawer_item['text'], on_release=drawer_item['callback'])
+            row_item.add_widget(IconLeftWidget(icon=drawer_item['icon']))
+            self.root.ids.navigation_drawer_list.add_widget(row_item)
+        return super().on_start()
 
 
 if __name__ == '__main__':

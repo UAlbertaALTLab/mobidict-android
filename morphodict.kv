@@ -7,7 +7,7 @@ MainScreen:
     orientation: 'vertical'
     # canvas.before:
     #     Color:
-    #         rgb: 0.83, 0.83, 0.83
+    #         rgba: (1, 0, 0, 1)
     #     Rectangle:
     #         pos: self.pos
     #         size: self.size
@@ -15,6 +15,7 @@ MainScreen:
 <ResultView>:
     viewclass: 'ResultWidget'
     RecycleBoxLayout:
+        spacing: "15dp"
         default_size: None, dp(150)
         default_size_hint: 1, None
         default_pos_hint: {'x': 0.1}
@@ -25,10 +26,16 @@ MainScreen:
         orientation: 'vertical'
         # canvas.before:
         #     Color:
-        #         rgba: (1, 1, 1, 1)
+        #         rgba: (1, 0, 0, 1)
         #     Rectangle: 
         #         pos: self.pos
         #         size: self.size
+
+
+<LabelSettingsItem>:
+    text: root.text
+    theme_text_color: "Custom"
+    text_color:  (1, 0, 0, 1)
 
 <MainScreen@MDScreen>:
     MDNavigationLayout:
@@ -39,6 +46,8 @@ MainScreen:
                 MainLayout:
                     id: main_box_layout
                     orientation: "vertical"
+                    # padding: "10dp"
+                    # spacing: "10dp"
                     MDToolbar:
                         title: "Search"
                         elevation: 5
@@ -88,6 +97,7 @@ MainScreen:
                         hint_text: "Search in Cree or English"
                         on_text_validate: root.ids.main_box_layout.on_submit_word(self)
                         line_color_focus: get_color_from_hex("#8B0000")
+                        font_name: 'bjcrus.ttf'
                     Label:
                         text:''
                         size_hint: 1, 0.05
@@ -137,27 +147,34 @@ MainScreen:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     MDLabel:
                         id: option_clicked
+                        font_name: 'bjcrus.ttf'
         MDNavigationDrawer:
             id: nav_drawer
             md_bg_color: get_color_from_hex("#f7f4e7")
 
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                
+                spacing: "10dp"
+                padding: "10dp"
+
+                # MDLabel:
+                #     text: ""
+                #     size_hint: 1, 0.05
                 MDBoxLayout:
                     orientation: 'horizontal'
-                    size_hint: 1, 0.1
+                    size_hint: 1, 0.25
                     Image:
                         source: 'images/itwewina.png'
-                        size_hint: 0.2, 0.7
-                        # height: "35dp"
-                        # width: "40dp"
+                        size_hint: None, None
+                        height: "35dp"
+                        width: "40dp"
+                        pos_hint: {"y": 0.01}
                     BoxLayout:
                         orientation: 'vertical'
                         size_hint: 1, 0.8
                         Label:
                             text: "itwêwina"
-                            font_size: 18
+                            font_size: 15
                             text_size: self.size
                             color: (0.635, 0.105, 0.105, 1)
                             halign: 'left'
@@ -171,12 +188,28 @@ MainScreen:
                             halign: 'left'
                             valign: 'top'
                             pos_hint: {"x": 0.01}
-                FitImage:
+                DrawerList:
+                    id: navigation_drawer_list
+                
+                MDDropDownItem:
+                    id: label_settings_dropdown
+                    text: "SRO(êîôâ)"
+                    on_release: app.menu.open()
+
+                MDLabel:
+                    # text: "ᐃᑘᐏᓇ"
+                    text: ""
+                    font_name: 'bjcrus.ttf'
+                    size_hint: 1, 0.01
+                BoxLayout:
+                    padding: "10dp"
+                    spacing: "10dp"
                     canvas.before:
                         Rectangle:
                             pos: self.pos
                             size: self.size
                             source: 'images/footer.jpg'
+
                         
 
                 
