@@ -1,3 +1,4 @@
+from multiprocessing.dummy import current_process
 import webbrowser
 
 from kivy.properties import ObjectProperty
@@ -83,6 +84,15 @@ def print_presentable_output(output):
         counter += 1
         print("-" * 80)
 
+def replace_hats_to_lines_SRO(string):
+    
+    string = string.replace("ê", "ē")
+    string = string.replace("î", "ī")
+    string = string.replace("ô", "ō")
+    string = string.replace("â", "ā")
+    
+    return string
+
 class DrawerList(MDList):
     pass
 
@@ -92,7 +102,14 @@ class MainLayout(BoxLayout):
     def on_submit_word(self, widget= None):
         # To get access to the input, you could also go TextinputId.text directly.
         root = App.get_running_app().root
-        output_res = get_main_page_results_list(root.ids.input_word.text)
+        current_query = root.ids.input_word.text
+        
+        if not current_query:
+            # Empty query
+            print("Empty query")
+            return
+        
+        output_res = get_main_page_results_list(current_query)
         print_presentable_output(output_res)
         print("OUTPUT:::", output_res)
         
@@ -135,10 +152,17 @@ class MainLayout(BoxLayout):
             for definition in data['definitions']:
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
+            
+            if app.index_selected == 2:
+                # Syllabics selected
+                title = sro2syllabics(title)
+            elif app.index_selected == 1:
+                # ēīōā selected
+                title = replace_hats_to_lines_SRO(title)
 
             defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter, 
-                                        'title': title if app.index_selected != 2 else sro2syllabics(title), 
+                                        'title': title, 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
