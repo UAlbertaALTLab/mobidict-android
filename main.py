@@ -1,4 +1,4 @@
-from multiprocessing.dummy import current_process
+# Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
 
 from kivy.properties import ObjectProperty
