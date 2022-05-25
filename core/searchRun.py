@@ -1,4 +1,4 @@
-from .query import Query
+from core.query import Query
 
 from typing import Iterable, Callable, Any, Optional, Union, TypeVar
 

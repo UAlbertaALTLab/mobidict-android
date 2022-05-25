@@ -1,6 +1,5 @@
 import os
 import ast
-from tkinter import N
 from hfst_optimized_lookup import TransducerFile, Analysis
 from functools import cache
 

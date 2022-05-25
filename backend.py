@@ -5,23 +5,6 @@ from typing import Set
 from core.runner import search
 from core.preferences import DisplayMode, AnimateEmoji
 
-# def get_main_page_results_list(word):
-#     # Create DB or connect to one
-#     conn = sqlite3.connect("wordtest_db.db")
-
-#     # Create a cursor
-#     c = conn.cursor()
-
-#     c.execute(""" SELECT * FROM words""")
-#     res = c.fetchall()
-
-#     # Commit our changes
-#     conn.commit()
-
-#     # Close the connection
-#     conn.close()
-#     return res
-
 
 def get_main_page_results_list(query: str):
     # user_query is the input word from the user
