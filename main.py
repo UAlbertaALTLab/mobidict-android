@@ -20,7 +20,7 @@ from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.card import MDCard
+from kivymd.uix.card import MDCard, MDSeparator
 from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
@@ -97,10 +97,7 @@ class DrawerList(MDList):
     pass
 
 class MainLayout(BoxLayout):
-    # results_print_str = StringProperty("")
-
     def on_submit_word(self, widget= None):
-        # To get access to the input, you could also go TextinputId.text directly.
         root = App.get_running_app().root
         current_query = root.ids.input_word.text
         
@@ -111,10 +108,9 @@ class MainLayout(BoxLayout):
         
         output_res = get_main_page_results_list(current_query)
         print_presentable_output(output_res)
-        print("OUTPUT:::", output_res)
+        print("Output:", output_res)
         
         resultToPrint = output_res.copy()
-        # self.results_print_str = "Hello"
         self.display_result_list(resultToPrint)
         # self.root.ids.result_label.text = output_res does the same thing as the above line
     
@@ -247,6 +243,11 @@ class ResultWidget(BoxLayout):
             
             self.add_widget(title_icon_box_layout)
             
+            # Add the line here.
+            line_break = MDSeparator()
+            
+            self.add_widget(line_break)
+            
             description_box_layout = BoxLayout()
             
             additional_emoji_margin = 0 if not self.emojis else 10
@@ -322,6 +323,11 @@ class ResultWidget(BoxLayout):
                                                                user_font_size="20dp"))
         
         self.add_widget(title_icon_box_layout)
+        
+        # Add the line here.
+        line_break = MDSeparator()
+        
+        self.add_widget(line_break)
         
         description_box_layout = BoxLayout()
         
