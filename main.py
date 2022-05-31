@@ -1,4 +1,5 @@
 # Release testing to see how much memory we currently occupy/for future purposes.
+from asyncio import format_helpers
 import webbrowser
 
 from kivy.properties import ObjectProperty
@@ -52,6 +53,12 @@ class WindowManager(ScreenManager):
     def switch_to_result_screen(self, index):
         root = App.get_running_app().root
         root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
+        self.transition.direction = "left"
+        self.current = "Result"
+    
+    def switch_to_result_screen_lemma_click(self, lemma):
+        root = App.get_running_app().root
+        root.ids.option_clicked.text = lemma
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -152,9 +159,15 @@ class MainLayout(BoxLayout):
             if app.index_selected == 2:
                 # Syllabics selected
                 title = sro2syllabics(title)
+                if not data['is_lemma'] and data['show_form_of']:
+                    data['lemma_wordform']['text'] = sro2syllabics(data['lemma_wordform']['text'])
             elif app.index_selected == 1:
                 # ēīōā selected
                 title = replace_hats_to_lines_SRO(title)
+                if not data['is_lemma'] and data['show_form_of']:
+                    data['lemma_wordform']['text'] = replace_hats_to_lines_SRO(data['lemma_wordform']['text'])
+            
+                
 
             defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter, 
@@ -164,6 +177,9 @@ class MainLayout(BoxLayout):
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
                                         'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
                                         'relabelled_fst_analysis': data['relabelled_fst_analysis'],
+                                        'is_lemma': data['is_lemma'] if 'is_lemma' in data else True,
+                                        'show_form_of': data['show_form_of'] if 'show_form_of' in data else False,
+                                        'lemma_wordform': data['lemma_wordform'] if 'lemma_wordform' in data else None,
                                         'definitions': defsToPass
                                         })
             
@@ -203,7 +219,11 @@ class ResultWidget(BoxLayout):
     friendly_linguistic_breakdown_head = ObjectProperty()
     friendly_linguistic_breakdown_tail = ObjectProperty()
     relabelled_fst_analysis = ObjectProperty()
+    is_lemma = ObjectProperty()
+    show_form_of = ObjectProperty()
+    lemma_wordform = ObjectProperty()
     
+    # ---------------------------------------------------
     # Any new properties should be added above definitions for proper rendering
     definitions = ObjectProperty()
     
@@ -213,6 +233,8 @@ class ResultWidget(BoxLayout):
     
     def row_initialization(self, dp):
         if self.index != -1:
+            app = App.get_running_app()
+            
             title_icon_box_layout = BoxLayout()
             
             title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
@@ -244,9 +266,33 @@ class ResultWidget(BoxLayout):
             self.add_widget(title_icon_box_layout)
             
             # Add the line here.
-            line_break = MDSeparator()
             
-            self.add_widget(line_break)
+            if not self.is_lemma and self.show_form_of:
+                # Add the "form of" first
+                form_of_box_layout = BoxLayout()
+                
+                form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+                form_of._label.refresh()
+                form_of = MDLabel(text="[size=13][i]form of[/i][/size]", 
+                                       markup = True,
+                                       size_hint=(None, 1),
+                                       width = form_of._label.texture.size[0] + 10)
+                
+                
+                form_of_box_layout.add_widget(form_of)
+                
+                lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+                
+                form_of_lemma = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                form_of_box_layout.add_widget(form_of_lemma)
+                
+                self.add_widget(form_of_box_layout)
+                
+                line_break = MDSeparator()
+                self.add_widget(line_break)
             
             description_box_layout = BoxLayout()
             
@@ -277,7 +323,7 @@ class ResultWidget(BoxLayout):
                                     markup=True,
                                     halign= 'center'))
         
-        self.bind(definitions = self.update_row)
+        self.bind(definitions = self.update_row, lemma_wordform = self.update_row)
     
     def update_row(self, *args):
         print("-"*100)
@@ -324,10 +370,34 @@ class ResultWidget(BoxLayout):
         
         self.add_widget(title_icon_box_layout)
         
-        # Add the line here.
-        line_break = MDSeparator()
-        
-        self.add_widget(line_break)
+        if not self.is_lemma and self.show_form_of:
+            # Add the "form of" first
+            form_of_box_layout = BoxLayout()
+            
+            form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+            form_of._label.refresh()
+            form_of = MDLabel(text="[size=13][i]form of[/i][/size]",
+                                    markup = True,
+                                    size_hint=(None, 1),
+                                    width = form_of._label.texture.size[0] + 10)
+            
+            form_of_box_layout.add_widget(form_of)
+            
+            lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+            
+            app = App.get_running_app()
+            
+            form_of_lemma = ClickableLabel(text=lemma_wordform_text,
+                                            markup=True, 
+                                            on_release=self.on_click_form_of_lemma
+                                            )
+            
+            form_of_box_layout.add_widget(form_of_lemma)
+            
+            self.add_widget(form_of_box_layout)
+            
+            line_break = MDSeparator()
+            self.add_widget(line_break)
         
         description_box_layout = BoxLayout()
         
@@ -367,6 +437,14 @@ class ResultWidget(BoxLayout):
     def on_click_label(self, touch):
         root = App.get_running_app().root
         root.ids.screen_manager.switch_to_result_screen(self.index)
+    
+    def on_click_form_of_lemma(self, touch):
+        app = App.get_running_app()
+        root = App.get_running_app().root
+        
+        lemma = self.lemma_wordform['text']
+        
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
     
 
 class MorphodictApp(MDApp):
