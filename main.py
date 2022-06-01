@@ -1,5 +1,4 @@
 # Release testing to see how much memory we currently occupy/for future purposes.
-from asyncio import format_helpers
 import webbrowser
 
 from kivy.properties import ObjectProperty
@@ -16,6 +15,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
@@ -31,6 +31,9 @@ from kivymd.uix.menu import MDDropdownMenu
 from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
+from api.api import get_sound
+
+SOUND_FILE_NAME = "sound.m4a"
 
 initial_data_list = []
 initial_result_list = []
@@ -262,7 +265,11 @@ class ResultWidget(BoxLayout):
                 title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
                                                                    user_font_size="20dp"))
-            
+                
+                title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                                   user_font_size="20dp",
+                                                                   on_release=self.play_sound))
+
             self.add_widget(title_icon_box_layout)
             
             # Add the line here.
@@ -367,6 +374,10 @@ class ResultWidget(BoxLayout):
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
                                                                user_font_size="20dp"))
+            
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                                user_font_size="20dp",
+                                                                on_release=self.play_sound))
         
         self.add_widget(title_icon_box_layout)
         
@@ -446,6 +457,14 @@ class ResultWidget(BoxLayout):
         
         root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
     
+    def play_sound(self, touch):
+        audio_file_loaded = get_sound("amisk")
+        
+        # Instead of audio URL, play the file just loaded
+        sound = SoundLoader.load(SOUND_FILE_NAME)
+        if sound:
+            print("Playing sound...")
+            sound.play()
 
 class MorphodictApp(MDApp):
     
