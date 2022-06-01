@@ -15,12 +15,13 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.card import MDCard
+from kivymd.uix.card import MDCard, MDSeparator
 from kivymd.uix.tooltip import MDTooltip
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
@@ -30,6 +31,9 @@ from kivymd.uix.menu import MDDropdownMenu
 from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
+from api.api import get_sound
+
+SOUND_FILE_NAME = "sound.m4a"
 
 initial_data_list = []
 initial_result_list = []
@@ -52,6 +56,12 @@ class WindowManager(ScreenManager):
     def switch_to_result_screen(self, index):
         root = App.get_running_app().root
         root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
+        self.transition.direction = "left"
+        self.current = "Result"
+    
+    def switch_to_result_screen_lemma_click(self, lemma):
+        root = App.get_running_app().root
+        root.ids.option_clicked.text = lemma
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -97,10 +107,7 @@ class DrawerList(MDList):
     pass
 
 class MainLayout(BoxLayout):
-    # results_print_str = StringProperty("")
-
     def on_submit_word(self, widget= None):
-        # To get access to the input, you could also go TextinputId.text directly.
         root = App.get_running_app().root
         current_query = root.ids.input_word.text
         
@@ -111,10 +118,9 @@ class MainLayout(BoxLayout):
         
         output_res = get_main_page_results_list(current_query)
         print_presentable_output(output_res)
-        print("OUTPUT:::", output_res)
+        print("Output:", output_res)
         
         resultToPrint = output_res.copy()
-        # self.results_print_str = "Hello"
         self.display_result_list(resultToPrint)
         # self.root.ids.result_label.text = output_res does the same thing as the above line
     
@@ -156,9 +162,15 @@ class MainLayout(BoxLayout):
             if app.index_selected == 2:
                 # Syllabics selected
                 title = sro2syllabics(title)
+                if not data['is_lemma'] and data['show_form_of']:
+                    data['lemma_wordform']['text'] = sro2syllabics(data['lemma_wordform']['text'])
             elif app.index_selected == 1:
                 # ēīōā selected
                 title = replace_hats_to_lines_SRO(title)
+                if not data['is_lemma'] and data['show_form_of']:
+                    data['lemma_wordform']['text'] = replace_hats_to_lines_SRO(data['lemma_wordform']['text'])
+            
+                
 
             defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter, 
@@ -168,6 +180,9 @@ class MainLayout(BoxLayout):
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
                                         'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
                                         'relabelled_fst_analysis': data['relabelled_fst_analysis'],
+                                        'is_lemma': data['is_lemma'] if 'is_lemma' in data else True,
+                                        'show_form_of': data['show_form_of'] if 'show_form_of' in data else False,
+                                        'lemma_wordform': data['lemma_wordform'] if 'lemma_wordform' in data else None,
                                         'definitions': defsToPass
                                         })
             
@@ -207,7 +222,11 @@ class ResultWidget(BoxLayout):
     friendly_linguistic_breakdown_head = ObjectProperty()
     friendly_linguistic_breakdown_tail = ObjectProperty()
     relabelled_fst_analysis = ObjectProperty()
+    is_lemma = ObjectProperty()
+    show_form_of = ObjectProperty()
+    lemma_wordform = ObjectProperty()
     
+    # ---------------------------------------------------
     # Any new properties should be added above definitions for proper rendering
     definitions = ObjectProperty()
     
@@ -217,6 +236,8 @@ class ResultWidget(BoxLayout):
     
     def row_initialization(self, dp):
         if self.index != -1:
+            app = App.get_running_app()
+            
             title_icon_box_layout = BoxLayout()
             
             title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
@@ -244,8 +265,41 @@ class ResultWidget(BoxLayout):
                 title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
                                                                    user_font_size="20dp"))
-            
+                
+                title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                                   user_font_size="20dp",
+                                                                   on_release=self.play_sound))
+
             self.add_widget(title_icon_box_layout)
+            
+            # Add the line here.
+            
+            if not self.is_lemma and self.show_form_of:
+                # Add the "form of" first
+                form_of_box_layout = BoxLayout()
+                
+                form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+                form_of._label.refresh()
+                form_of = MDLabel(text="[size=13][i]form of[/i][/size]", 
+                                       markup = True,
+                                       size_hint=(None, 1),
+                                       width = form_of._label.texture.size[0] + 10)
+                
+                
+                form_of_box_layout.add_widget(form_of)
+                
+                lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+                
+                form_of_lemma = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                form_of_box_layout.add_widget(form_of_lemma)
+                
+                self.add_widget(form_of_box_layout)
+                
+                line_break = MDSeparator()
+                self.add_widget(line_break)
             
             description_box_layout = BoxLayout()
             
@@ -276,7 +330,7 @@ class ResultWidget(BoxLayout):
                                     markup=True,
                                     halign= 'center'))
         
-        self.bind(definitions = self.update_row)
+        self.bind(definitions = self.update_row, lemma_wordform = self.update_row)
     
     def update_row(self, *args):
         print("-"*100)
@@ -320,8 +374,41 @@ class ResultWidget(BoxLayout):
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
                                                                user_font_size="20dp"))
+            
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                                user_font_size="20dp",
+                                                                on_release=self.play_sound))
         
         self.add_widget(title_icon_box_layout)
+        
+        if not self.is_lemma and self.show_form_of:
+            # Add the "form of" first
+            form_of_box_layout = BoxLayout()
+            
+            form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+            form_of._label.refresh()
+            form_of = MDLabel(text="[size=13][i]form of[/i][/size]",
+                                    markup = True,
+                                    size_hint=(None, 1),
+                                    width = form_of._label.texture.size[0] + 10)
+            
+            form_of_box_layout.add_widget(form_of)
+            
+            lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+            
+            app = App.get_running_app()
+            
+            form_of_lemma = ClickableLabel(text=lemma_wordform_text,
+                                            markup=True, 
+                                            on_release=self.on_click_form_of_lemma
+                                            )
+            
+            form_of_box_layout.add_widget(form_of_lemma)
+            
+            self.add_widget(form_of_box_layout)
+            
+            line_break = MDSeparator()
+            self.add_widget(line_break)
         
         description_box_layout = BoxLayout()
         
@@ -362,6 +449,22 @@ class ResultWidget(BoxLayout):
         root = App.get_running_app().root
         root.ids.screen_manager.switch_to_result_screen(self.index)
     
+    def on_click_form_of_lemma(self, touch):
+        app = App.get_running_app()
+        root = App.get_running_app().root
+        
+        lemma = self.lemma_wordform['text']
+        
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
+    
+    def play_sound(self, touch):
+        audio_file_loaded = get_sound("amisk")
+        
+        # Instead of audio URL, play the file just loaded
+        sound = SoundLoader.load(SOUND_FILE_NAME)
+        if sound:
+            print("Playing sound...")
+            sound.play()
 
 class MorphodictApp(MDApp):
     

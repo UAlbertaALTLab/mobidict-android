@@ -7,3 +7,4 @@ cree_sro_syllabics
 hfst_optimized_lookup
 typing_extensions
 emoji
+requests
