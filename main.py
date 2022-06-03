@@ -266,9 +266,9 @@ class ResultWidget(BoxLayout):
                                                                    tooltip_text= tooltip_content,
                                                                    user_font_size="20dp"))
                 
-                title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                                   user_font_size="20dp",
-                                                                   on_release=self.play_sound))
+            title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                                user_font_size="20dp",
+                                                                on_release=self.play_sound))
 
             self.add_widget(title_icon_box_layout)
             
@@ -375,9 +375,9 @@ class ResultWidget(BoxLayout):
                                                                tooltip_text= tooltip_content,
                                                                user_font_size="20dp"))
             
-            title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                                user_font_size="20dp",
-                                                                on_release=self.play_sound))
+        title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                            user_font_size="20dp",
+                                                            on_release=self.play_sound))
         
         self.add_widget(title_icon_box_layout)
         
