@@ -27,13 +27,13 @@ from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.toast import toast
 
 from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-
-SOUND_FILE_NAME = "sound.m4a"
+from general import SOUND_FILE_NAME
 
 initial_data_list = []
 initial_result_list = []
@@ -458,7 +458,16 @@ class ResultWidget(BoxLayout):
         root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
     
     def play_sound(self, touch):
-        audio_file_loaded = get_sound("amisk")
+        audio_fetch_status = get_sound(self.title)
+        
+        if audio_fetch_status == 2:
+            # Connection error
+            toast("This feature needs a reliable internet connection.")
+            return
+        elif audio_fetch_status == 3:
+            # No audio found
+            toast("No recording available for this word.")
+            return
         
         # Instead of audio URL, play the file just loaded
         sound = SoundLoader.load(SOUND_FILE_NAME)

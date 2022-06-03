@@ -8,3 +8,4 @@ hfst_optimized_lookup
 typing_extensions
 emoji
 requests
+pydub

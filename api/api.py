@@ -1,12 +1,21 @@
 import requests
 import urllib
+from general import SOUND_FILE_NAME
+from pydub import AudioSegment
 
 SPEECH_DB_BASE_URL = "https://speech-db.altlab.app"
 
 def get_sound(query):
     '''
+    Fetches the sound from the speech-db api
+    
+    Returns status. 1 = Successful. 2 = Connection Error, 3 = No audio available
     '''
-    response = requests.get(SPEECH_DB_BASE_URL + "/maskwacis/api/bulk_search" + "?" + "q=" + query)
+    try:
+        response = requests.get(SPEECH_DB_BASE_URL + "/maskwacis/api/bulk_search" + "?" + "q=" + query)
+    except:
+        print("Connection error!")
+        return 2 # Connection error
     
     jsonized_response = response.json()
     
@@ -22,9 +31,19 @@ def get_sound(query):
             sound_bytes = f.read()
             sound_file.write(sound_bytes)
         
+        # Convert to .wav
+        wav_sound = AudioSegment.from_file("sound.m4a", format="m4a")
+        
+        wav_sound.export("sound.wav", format="wav")
+        
         sound_file.close()
+    else:
+        # Before this, make a call to the maskwacis alternative to get the recording.
+        
+        # No connection problem, but no recordings found
+        return 3
     
-    return True
+    return 1
         
          
     
