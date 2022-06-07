@@ -579,6 +579,8 @@ class MorphodictApp(MDApp):
             self.root.ids.navigation_drawer_list.add_widget(row_item)
         return super().on_start()
 
+    def on_legend_ref_press(self, instance, ref):
+        print("Ref pressed", ref)
 
 if __name__ == '__main__':
     MorphodictApp().run()

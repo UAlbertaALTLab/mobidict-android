@@ -160,6 +160,7 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
+                    
                     MDBoxLayout:
                         padding: "20dp"
                         orientation: 'vertical'
@@ -172,12 +173,17 @@ MainScreen:
                             size_hint: 1, None
                             height: self.texture_size[1] + 10
                             font_size: 20
-                        MDLabel:
-                            text: app.legend_of_abbr_text
-                            markup: True
-                            font_size: 13
-                            valign: 'top'
-                            text_size: self.size
+                        ScrollView:
+                            MDList:
+                                MDLabel:
+                                    text: app.legend_of_abbr_text
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_legend_ref_press(*args)
 
         MDNavigationDrawer:
             id: nav_drawer

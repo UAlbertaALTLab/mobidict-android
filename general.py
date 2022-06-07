@@ -8,7 +8,7 @@ SOUND_FILE_NAME = "sound.wav"
 
 LEGEND_OF_ABBREVIATIONS_TEXT = '''
 s/he, she, he
-[b]s[/b]he, [b]h[/b]e, or (singular) th[b]e[/b]y. Used in definitions to stand for the [b]animate actor[/b], which is mostly human but can sometimes refer to other animate entities as well. The approximate equivalent to the Cree propnoun wiya. (e.g. [i]"[b]s/he[/b] sees; [b]s/he[/b] sees something; [b]s/he[/b] sees someone"[/i])
+[b]s[/b]he, [b]h[/b]e, or (singular) th[b]e[/b]y. Used in definitions to stand for the [b]animate actor[/b], which is mostly human but can sometimes refer to other animate entities as well. The approximate equivalent to the Cree propnoun [ref=wiya][u]wiya[/u][/ref]. (e.g. [i]"[b]s/he[/b] sees; [b]s/he[/b] sees something; [b]s/he[/b] sees someone"[/i])
 
 s.t., it
 [b]s[/b]ome[b]t[/b]hing. Used in definitions to stand for the [b]inanimate goal[/b]. (e.g. "[i]s/he sees [b]s.t.[/b], i.e. something; s/he sees [b]it[/b][/i]")
