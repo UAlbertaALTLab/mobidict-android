@@ -150,18 +150,18 @@ MainScreen:
                         font_name: 'bjcrus.ttf'
             LegendOfAbbrPage:
                 name: "Legend"
-                MDToolbar:
-                    title: "Legend of Abbreviations"
-                    elevation: 5
-                    pos_hint: {"top": 1}
-                    md_bg_color: get_color_from_hex("#8B0000")
-                    specific_text_color: get_color_from_hex("#F5F2D0")
-                    left_action_items:
-                        [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                 LegendPageMainLayout:
-                    padding: "20dp"
                     orientation: 'vertical'
+                    MDToolbar:
+                        title: "Legend of Abbreviations"
+                        elevation: 5
+                        pos_hint: {"top": 1}
+                        md_bg_color: get_color_from_hex("#8B0000")
+                        specific_text_color: get_color_from_hex("#F5F2D0")
+                        left_action_items:
+                            [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     MDBoxLayout:
+                        padding: "20dp"
                         orientation: 'vertical'
                         MDLabel:
                             text: "" 
@@ -169,7 +169,8 @@ MainScreen:
                         MDLabel:
                             text: "Legend of abbreviations and terms"
                             bold: True 
-                            size_hint: 1, 0.3
+                            size_hint: 1, None
+                            height: self.texture_size[1] + 10
                             font_size: 20
                         MDLabel:
                             text: app.legend_of_abbr_text
