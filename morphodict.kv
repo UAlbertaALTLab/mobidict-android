@@ -1,5 +1,5 @@
 #: import MDLabel kivymd.uix.label.MDLabel
-#:import get_color_from_hex kivy.utils.get_color_from_hex
+#: import get_color_from_hex kivy.utils.get_color_from_hex
 MainScreen:
 
 <ResultWidget>:
@@ -148,6 +148,25 @@ MainScreen:
                     MDLabel:
                         id: option_clicked
                         font_name: 'bjcrus.ttf'
+            LegendOfAbbrPage:
+                name: "Legend"
+                MDToolbar:
+                    title: "Legend of Abbreviations"
+                    elevation: 5
+                    pos_hint: {"top": 1}
+                    md_bg_color: get_color_from_hex("#8B0000")
+                    specific_text_color: get_color_from_hex("#F5F2D0")
+                    left_action_items:
+                        [['menu', lambda x: nav_drawer.set_state("open")]]
+                LegendPageMainLayout:
+                    padding: "20dp"
+                    orientation: 'vertical'
+                    MDBoxLayout:
+                        MDLabel:
+                            text: app.legend_of_abbr_text
+                            markup: True
+                            font_size: 13
+
         MDNavigationDrawer:
             id: nav_drawer
             md_bg_color: get_color_from_hex("#f7f4e7")
