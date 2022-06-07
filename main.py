@@ -33,7 +33,7 @@ from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT
+from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK
 
 initial_data_list = []
 initial_result_list = []
@@ -73,6 +73,11 @@ class WindowManager(ScreenManager):
         root = App.get_running_app().root
         root.ids.nav_drawer.set_state("close")
         self.current = "Legend"
+    
+    def switch_to_contact_screen(self):
+        root = App.get_running_app().root
+        root.ids.nav_drawer.set_state("close")
+        self.current = "Contact"
         
 
 
@@ -85,11 +90,16 @@ class ResultScreen(MDScreen):
 class LegendOfAbbrPage(MDScreen):
     pass
 
+class ContactUsScreen(MDScreen):
+    pass
 
 class ResultPageMainLayout(MDBoxLayout):
     pass
 
 class LegendPageMainLayout(MDBoxLayout):
+    pass
+
+class ContactPageMainLayout(MDBoxLayout):
     pass
 
 class ContentNavigationDrawer(MDBoxLayout):
@@ -489,6 +499,7 @@ class ResultWidget(BoxLayout):
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
+    contact_us_text = CONTACT_US_TEXT
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -556,7 +567,6 @@ class MorphodictApp(MDApp):
     
     def on_start(self):
         # Preload these things
-        
         def on_release_help(arg):
             webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
             
@@ -567,10 +577,15 @@ class MorphodictApp(MDApp):
             root = App.get_running_app().root
             root.ids.screen_manager.switch_to_legend_screen()
         
+        def on_release_contact_us(arg):
+            root = App.get_running_app().root
+            root.ids.screen_manager.switch_to_contact_screen()
+            
+        
         drawer_items_list = [{'text': 'Help', 'icon': "help-circle", 'callback': on_release_help},
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_help},
-                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_help},
+                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
                              {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
         
         for drawer_item in drawer_items_list:
@@ -584,6 +599,9 @@ class MorphodictApp(MDApp):
         root.ids.input_word.text = ref
         root.ids.main_box_layout.on_submit_word()
         root.ids.screen_manager.switch_back_home_screen()
+    
+    def on_contact_ref_press(self, instance, ref):
+        webbrowser.open(HELP_CONTACT_FORM_LINK)
 
 if __name__ == '__main__':
     MorphodictApp().run()

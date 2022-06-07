@@ -18,3 +18,11 @@ s.o., her, him
 it
 Used in definitions to stand for the [b]inanimate actor[/b] (e.g. "[i][b]it[/b] is blue[/i]") or [b]existential subject[/b] for impersonal verbs (the “it” in "[i]it is raining[/i]").
 '''
+
+CONTACT_US_TEXT = '''
+Email us at altlab@ualberta.ca. Alternatively, you can also use this structures [ref=feedback_form][color=0000ff][u]feedback form[/u][/color][/ref].
+Let us know about any bugs, glitches, issues with the dictionary, or incorrect information you find.
+You can also suggest features and improvements.
+'''
+
+HELP_CONTACT_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdsBPVPoadoRQEV9ZRKAHbHgolFtmvjWnfpZZYCvX-n2EFwZg/viewform"
