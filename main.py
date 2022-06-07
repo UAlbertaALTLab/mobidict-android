@@ -580,7 +580,10 @@ class MorphodictApp(MDApp):
         return super().on_start()
 
     def on_legend_ref_press(self, instance, ref):
-        print("Ref pressed", ref)
+        root = App.get_running_app().root
+        root.ids.input_word.text = ref
+        root.ids.main_box_layout.on_submit_word()
+        root.ids.screen_manager.switch_back_home_screen()
 
 if __name__ == '__main__':
     MorphodictApp().run()
