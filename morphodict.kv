@@ -219,6 +219,59 @@ MainScreen:
                                     size_hint: 1, None
                                     height: self.texture_size[1]
                                     on_ref_press: app.on_contact_ref_press(*args)
+            AboutScreen:
+                name: "About"
+                AboutPageMainLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        title: "About"
+                        elevation: 5
+                        pos_hint: {"top": 1}
+                        md_bg_color: get_color_from_hex("#8B0000")
+                        specific_text_color: get_color_from_hex("#F5F2D0")
+                        left_action_items:
+                            [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
+                    MDBoxLayout:
+                        padding: "20dp"
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "" 
+                            size_hint: 1, 0.01
+                        ScrollView:
+                            MDList:
+                                MDLabel:
+                                    text: "Source Materials"
+                                    bold: True 
+                                    size_hint: 1, None
+                                    height: self.texture_size[1] + 10
+                                    font_size: 20
+                                MDLabel:
+                                    text: app.about_text_source_material
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_about_ref_press(*args)
+                                MDLabel:
+                                    text: "Credits"
+                                    bold: True 
+                                    size_hint: 1, None
+                                    height: self.texture_size[1] + 10
+                                    font_size: 20
+                                MDLabel:
+                                    text: app.about_text_credit
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_about_ref_press(*args)
+                        
+
+
 
 
         MDNavigationDrawer:
