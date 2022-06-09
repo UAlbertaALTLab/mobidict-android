@@ -32,7 +32,7 @@ ABOUT_TEXT_SOURCE_MATERIALS = '''
 
 The computational model for analyzing Plains Cree / [i]nêhiyawêwin[/i] words and generating the various inflectional paradigms is based on the lexical materials and scientific research in [ref=about-1][u][i][color=#0000ff]nêhiyawêwin : itwêwina / Cree: Words[/color][/i][/u][/ref] (Compiled by Arok Wolvengrey. Regina: Canadian Plains Research Center, 2001), and described in [ref=about-2][u][i][color=#0000ff]Modeling the Noun Morphology of Plains Cree[/u][/i][/color][/ref] (Conor Snoek, Dorothy Thunder, Kaidi Lõo, Antti Arppe, Jordan Lachler, Sjur Moshagen & Trond Trosterud, 2014) and [ref=about-3][u][i][color=#0000ff]Learning from the Computational Modeling of Plains Cree Verbs[/u][/i][/color][/ref] (Atticus G. Harrigan, Katherine Schmirler, Antti Arppe, Lene Antonsen, Trond Trosterud & Arok Wolvengrey. Morphology, 2018).
 
-[size=18][color=#8B0000]Plains Cree / nêhiyawêwin ↔ English / âkayâsîmowin[/color][/size]
+[size=18][color=#8B0000]Plains Cree / nêhiyawêwin <-> English / âkayâsîmowin[/color][/size]
 
 The bilingual Dictionary for Plains Cree / nêhiyawêwin and English / âkayâsîmowin is based on the lexical materials in [ref=about-4][u][i][color=#0000ff]nêhiyawêwin : itwêwina / Cree: Words[/u][/i][/color][/ref]. (Compiled by Arok Wolvengrey. Regina: Canadian Plains Research Center, 2001), and in the [ref=about-5][u][i][color=#0000ff]Maskwacîs Dictionary of Cree Words / Nêhiyaw Pîkiskwêwinisa[/u][/i][/color][/ref] (Maskwachees Cultural College, Maskwacîs, 2009).
 

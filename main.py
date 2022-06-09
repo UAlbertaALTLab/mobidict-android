@@ -120,6 +120,9 @@ class AboutPageMainLayout(MDBoxLayout):
 class ContentNavigationDrawer(MDBoxLayout):
     pass
 
+class AboutMDList(MDList):
+    pass
+
 class LabelSettingsItem(OneLineListItem):
     text = StringProperty()
 

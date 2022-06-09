@@ -238,8 +238,8 @@ MainScreen:
                             text: "" 
                             size_hint: 1, 0.01
                         ScrollView:
-                            MDList:
-                                id: about_main_list
+                            id: about_page_scroll_view
+                            AboutMDList:
                                 MDLabel:
                                     text: "Source Materials"
                                     bold: True 
@@ -272,31 +272,41 @@ MainScreen:
                                     on_ref_press: app.on_about_ref_press(*args)
                                 ClickableImage:
                                     source: 'images/sshrc-crsh-logo.png'
+                                    size: root.size
                                     size_hint: 1, None
-                                    height: "200dp"
-                                    on_release: print("Image 1 clicked!")
-                                    size: self.texture_size
+                                    on_release: 
+                                        import webbrowser
+                                        webbrowser.open("https://www.sshrc-crsh.gc.ca/home-accueil-eng.aspx")
                                 MDBoxLayout:
                                     ClickableImage:
                                         source: 'images/mesc-logo.png'
                                         size_hint: 0.33, None
                                         height: "200dp"
-                                        on_release: print("Image 2 clicked!")
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://www.maskwacised.ca")
                                     ClickableImage:
                                         source: 'images/fnu-logo.png'
                                         size_hint: 0.33, None
                                         height: "200dp"
-                                        on_release: print("Image 3 clicked!")
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://www.fnuniv.ca")
                                     ClickableImage:
                                         source: 'images/uofa-logo.png'
                                         size_hint: 0.33, None
                                         height: "200dp"
-                                        on_release: print("Image 4 clicked!")
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://altlab.ualberta.ca")
                                 ClickableImage:
                                     source: 'images/nrc-cnrc-logo.png'
                                     size_hint: 1, None
                                     height: "200dp"
-                                    on_release: print("Image 5 clicked!")
+                                    on_release:
+                                        import webbrowser
+                                        webbrowser.open("https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project")
+                                        
 
         MDNavigationDrawer:
             id: nav_drawer
