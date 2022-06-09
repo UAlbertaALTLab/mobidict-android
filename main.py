@@ -57,15 +57,17 @@ class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
-    def switch_to_result_screen(self, index):
+    def switch_to_result_screen(self, index, title, emojis, subtitle, default_title, definitions):
         root = App.get_running_app().root
-        root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
+        # root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
+        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
-    def switch_to_result_screen_lemma_click(self, lemma):
+    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, definitions):
         root = App.get_running_app().root
-        root.ids.option_clicked.text = lemma
+        # root.ids.option_clicked.text = lemma
+        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -518,15 +520,14 @@ class ResultWidget(BoxLayout):
         
     def on_click_label(self, touch):
         root = App.get_running_app().root
-        root.ids.screen_manager.switch_to_result_screen(self.index)
+        root.ids.screen_manager.switch_to_result_screen(self.index, self.title, self.emojis, self.subtitle, self.default_title, self.definitions)
     
     def on_click_form_of_lemma(self, touch):
-        app = App.get_running_app()
         root = App.get_running_app().root
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
@@ -545,6 +546,10 @@ class ResultWidget(BoxLayout):
         if sound:
             print("Playing sound...")
             sound.play()
+            
+class SpecificResultMainList(MDList):
+    def populate_page(self, title, emojis, subtitle, default_title, definitions):
+        print("Inside populate page", title)
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
