@@ -7,6 +7,7 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
 from kivy.properties import StringProperty
+from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
@@ -33,7 +34,7 @@ from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT
+from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
 
 initial_data_list = []
 initial_result_list = []
@@ -41,6 +42,9 @@ initial_result_list = []
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
 class ClickableLabel(ButtonBehavior, MDLabel):
+    pass
+
+class ClickableImage(ButtonBehavior, Image):
     pass
 
 class InfoTooltipButton(MDIconButton, MDTooltip):
@@ -73,6 +77,16 @@ class WindowManager(ScreenManager):
         root = App.get_running_app().root
         root.ids.nav_drawer.set_state("close")
         self.current = "Legend"
+    
+    def switch_to_contact_screen(self):
+        root = App.get_running_app().root
+        root.ids.nav_drawer.set_state("close")
+        self.current = "Contact"
+    
+    def switch_to_about_screen(self):
+        root = App.get_running_app().root
+        root.ids.nav_drawer.set_state("close")
+        self.current = "About"
         
 
 
@@ -85,6 +99,11 @@ class ResultScreen(MDScreen):
 class LegendOfAbbrPage(MDScreen):
     pass
 
+class ContactUsScreen(MDScreen):
+    pass
+
+class AboutScreen(MDScreen):
+    pass
 
 class ResultPageMainLayout(MDBoxLayout):
     pass
@@ -92,7 +111,16 @@ class ResultPageMainLayout(MDBoxLayout):
 class LegendPageMainLayout(MDBoxLayout):
     pass
 
+class ContactPageMainLayout(MDBoxLayout):
+    pass
+
+class AboutPageMainLayout(MDBoxLayout):
+    pass
+
 class ContentNavigationDrawer(MDBoxLayout):
+    pass
+
+class AboutMDList(MDList):
     pass
 
 class LabelSettingsItem(OneLineListItem):
@@ -489,6 +517,9 @@ class ResultWidget(BoxLayout):
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
+    contact_us_text = CONTACT_US_TEXT
+    about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
+    about_text_credit = ABOUT_TEXT_CREDITS
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -556,7 +587,6 @@ class MorphodictApp(MDApp):
     
     def on_start(self):
         # Preload these things
-        
         def on_release_help(arg):
             webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
             
@@ -567,10 +597,19 @@ class MorphodictApp(MDApp):
             root = App.get_running_app().root
             root.ids.screen_manager.switch_to_legend_screen()
         
+        def on_release_contact_us(arg):
+            root = App.get_running_app().root
+            root.ids.screen_manager.switch_to_contact_screen()
+        
+        def on_release_about(arg):
+            root = App.get_running_app().root
+            root.ids.screen_manager.switch_to_about_screen()
+            
+        
         drawer_items_list = [{'text': 'Help', 'icon': "help-circle", 'callback': on_release_help},
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
-                             {'text': 'About', 'icon': "account-group", 'callback': on_release_help},
-                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_help},
+                             {'text': 'About', 'icon': "account-group", 'callback': on_release_about},
+                             {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
                              {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
         
         for drawer_item in drawer_items_list:
@@ -584,6 +623,28 @@ class MorphodictApp(MDApp):
         root.ids.input_word.text = ref
         root.ids.main_box_layout.on_submit_word()
         root.ids.screen_manager.switch_back_home_screen()
+    
+    def on_contact_ref_press(self, instance, ref):
+        webbrowser.open(HELP_CONTACT_FORM_LINK)
+        
+    def on_about_ref_press(self, instance, ref):
+        about_url_links = {
+            "about-1": "https://uofrpress.ca/Books/C/Cree-Words",
+            "about-2": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Snoek_et_al_CEL1_2014.pdf",
+            "about-3": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Harrigan_Schmirler_Arppe_Antonsen_Trosterud_Wolvengrey_2017fc.pdf",
+            "about-4": "https://uofrpress.ca/Books/C/Cree-Words",
+            "about-5": "https://www.altlab.dev/maskwacis/dictionary.html",
+            "about-6": "https://www.altlab.dev/maskwacis/",
+            "about-7": "https://www.maskwacised.ca",
+            "about-8": "https://altlab.ualberta.ca",
+            "about-9": "https://www.altlab.dev/maskwacis/Speakers/speakers.html",
+            "about-10": "https://github.com/UAlbertaALTLab/morphodict",
+            "about-11": "https://github.com/UAlbertaALTLab/morphodict/blob/main/AUTHORS.md",
+            "about-12": "https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project",
+            "about-13": "https://nrc.canada.ca/en"
+        }
+        
+        webbrowser.open(about_url_links[ref])
 
 if __name__ == '__main__':
     MorphodictApp().run()

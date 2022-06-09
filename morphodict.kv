@@ -184,6 +184,130 @@ MainScreen:
                                     size_hint: 1, None
                                     height: self.texture_size[1]
                                     on_ref_press: app.on_legend_ref_press(*args)
+            ContactUsScreen:
+                name: "Contact"
+                ContactPageMainLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        title: "Contact us"
+                        elevation: 5
+                        pos_hint: {"top": 1}
+                        md_bg_color: get_color_from_hex("#8B0000")
+                        specific_text_color: get_color_from_hex("#F5F2D0")
+                        left_action_items:
+                            [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
+                    MDBoxLayout:
+                        padding: "20dp"
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "" 
+                            size_hint: 1, 0.01
+                        MDLabel:
+                            text: "Contact us"
+                            bold: True 
+                            size_hint: 1, None
+                            height: self.texture_size[1] + 10
+                            font_size: 20
+                        ScrollView:
+                            MDList:
+                                MDLabel:
+                                    text: app.contact_us_text
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_contact_ref_press(*args)
+            AboutScreen:
+                name: "About"
+                AboutPageMainLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        title: "About"
+                        elevation: 5
+                        pos_hint: {"top": 1}
+                        md_bg_color: get_color_from_hex("#8B0000")
+                        specific_text_color: get_color_from_hex("#F5F2D0")
+                        left_action_items:
+                            [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
+                    MDBoxLayout:
+                        padding: "20dp"
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "" 
+                            size_hint: 1, 0.01
+                        ScrollView:
+                            id: about_page_scroll_view
+                            AboutMDList:
+                                MDLabel:
+                                    text: "Source Materials"
+                                    bold: True 
+                                    size_hint: 1, None
+                                    height: self.texture_size[1] + 10
+                                    font_size: 20
+                                MDLabel:
+                                    text: app.about_text_source_material
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_about_ref_press(*args)
+                                MDLabel:
+                                    text: "Credits"
+                                    bold: True 
+                                    size_hint: 1, None
+                                    height: self.texture_size[1] + 10
+                                    font_size: 20
+                                MDLabel:
+                                    text: app.about_text_credit
+                                    markup: True
+                                    font_size: 13
+                                    valign: 'top'
+                                    text_size: self.size
+                                    size_hint: 1, None
+                                    height: self.texture_size[1]
+                                    on_ref_press: app.on_about_ref_press(*args)
+                                ClickableImage:
+                                    source: 'images/sshrc-crsh-logo.png'
+                                    size: root.size
+                                    size_hint: 1, None
+                                    # height: "100dp"
+                                    on_release: 
+                                        import webbrowser
+                                        webbrowser.open("https://www.sshrc-crsh.gc.ca/home-accueil-eng.aspx")
+                                MDBoxLayout:
+                                    ClickableImage:
+                                        source: 'images/mesc-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://www.maskwacised.ca")
+                                    ClickableImage:
+                                        source: 'images/fnu-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://www.fnuniv.ca")
+                                    ClickableImage:
+                                        source: 'images/uofa-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: 
+                                            import webbrowser
+                                            webbrowser.open("https://altlab.ualberta.ca")
+                                ClickableImage:
+                                    source: 'images/nrc-cnrc-logo.png'
+                                    size_hint: 1, None
+                                    height: "200dp"
+                                    on_release:
+                                        import webbrowser
+                                        webbrowser.open("https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project")
+                                        
 
         MDNavigationDrawer:
             id: nav_drawer
