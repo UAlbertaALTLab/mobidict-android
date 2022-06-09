@@ -175,6 +175,7 @@ class MainLayout(BoxLayout):
         for data in data_list:
             
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
+            default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
             ic, emoji = data['lemma_wordform']['inflectional_category_plain_english'], data['lemma_wordform']['wordclass_emoji']
             
@@ -192,6 +193,15 @@ class MainLayout(BoxLayout):
             
             if ic:
                 subtitle += ic
+            
+            lemma_definitions = []
+            if not data['is_lemma'] and data['show_form_of']:
+                result_defs = data['lemma_wordform']['definitions']
+                
+                flag = 1
+                for lemma_def in result_defs:
+                    lemma_definitions.append(str(flag) + ". " + lemma_def['text'])
+                    flag += 1
             
             flag = 1
                 
@@ -213,10 +223,12 @@ class MainLayout(BoxLayout):
                 
 
             defsToPass = defs.copy()       
-            initial_result_list.append({'index': result_id_counter, 
+            initial_result_list.append({'index': result_id_counter,
+                                        'default_title': default_title,
                                         'title': title, 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
+                                        'lemma_definitions': lemma_definitions,
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
                                         'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
                                         'relabelled_fst_analysis': data['relabelled_fst_analysis'],
@@ -256,9 +268,11 @@ class ResultView(RecycleView):
 
 class ResultWidget(BoxLayout):
     index = ObjectProperty()
+    default_title = ObjectProperty()
     title = ObjectProperty()
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
+    lemma_definitions = ObjectProperty()
     friendly_linguistic_breakdown_head = ObjectProperty()
     friendly_linguistic_breakdown_tail = ObjectProperty()
     relabelled_fst_analysis = ObjectProperty()
@@ -315,6 +329,11 @@ class ResultWidget(BoxLayout):
             # Add the line here.
             
             if not self.is_lemma and self.show_form_of:
+                
+                for definition in self.definitions:
+                    definition_label = MDLabel(text=definition)
+                    self.add_widget(definition_label)
+                
                 # Add the "form of" first
                 form_of_box_layout = BoxLayout()
                 
@@ -360,7 +379,11 @@ class ResultWidget(BoxLayout):
             
             self.add_widget(description_box_layout)
             
-            for definition in self.definitions:
+            definitions_to_display = self.definitions
+            if not self.is_lemma and self.show_form_of:
+                definitions_to_display = self.lemma_definitions
+            
+            for definition in definitions_to_display:
                 definition_label = MDLabel(text=definition)
                 self.add_widget(definition_label)
         
@@ -422,6 +445,10 @@ class ResultWidget(BoxLayout):
         self.add_widget(title_icon_box_layout)
         
         if not self.is_lemma and self.show_form_of:
+            for definition in self.definitions:
+                definition_label = MDLabel(text=definition)
+                self.add_widget(definition_label)
+            
             # Add the "form of" first
             form_of_box_layout = BoxLayout()
             
@@ -470,7 +497,11 @@ class ResultWidget(BoxLayout):
         
         # definitions_box_layout = BoxLayout(orientation="vertical")
         
-        for definition in self.definitions:
+        definitions_to_display = self.definitions
+        if not self.is_lemma and self.show_form_of:
+            definitions_to_display = self.lemma_definitions
+        
+        for definition in definitions_to_display:
             definition_label = MDLabel(text=definition)
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
@@ -498,7 +529,7 @@ class ResultWidget(BoxLayout):
         root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma)
     
     def play_sound(self, touch):
-        audio_fetch_status = get_sound(self.title)
+        audio_fetch_status = get_sound(self.default_title)
         
         if audio_fetch_status == 2:
             # Connection error
