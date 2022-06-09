@@ -145,9 +145,44 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
+                    BoxLayout:
+                        size_hint: 1, 0.3
+                        Label:
+                            text: ""
+                            size_hint: 0.1, 0.1
+                        Image:
+                            source: 'images/itwewina.png'
+                            size_hint: None, None
+                            height: "35dp"
+                            width: "40dp"
+                            pos_hint: {"y": 0.25}
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint: 1, 0.8
+                            Label:
+                                text: "itwêwina"
+                                font_size: 20
+                                text_size: self.size
+                                color: (0.635, 0.105, 0.105, 1)
+                                halign: 'left'
+                                valign: 'bottom'
+                                pos_hint: {"x": 0.01}
+                            Label:
+                                text: "Plains Cree Dictionary"
+                                color: (0, 0, 0, 1)
+                                font_size: 11
+                                text_size: self.size
+                                halign: 'left'
+                                valign: 'top'
+                                pos_hint: {"x": 0.01}
+                        ScrollView:
+                            id: specific_result_page_scrollview
+                            SpecificResultMainList:
+                                id: specific_result_main_list
                     MDLabel:
                         id: option_clicked
                         font_name: 'bjcrus.ttf'
+                        text: ""
             LegendOfAbbrPage:
                 name: "Legend"
                 LegendPageMainLayout:
