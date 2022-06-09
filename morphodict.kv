@@ -239,6 +239,7 @@ MainScreen:
                             size_hint: 1, 0.01
                         ScrollView:
                             MDList:
+                                id: about_main_list
                                 MDLabel:
                                     text: "Source Materials"
                                     bold: True 
@@ -269,10 +270,33 @@ MainScreen:
                                     size_hint: 1, None
                                     height: self.texture_size[1]
                                     on_ref_press: app.on_about_ref_press(*args)
-                        
-
-
-
+                                ClickableImage:
+                                    source: 'images/sshrc-crsh-logo.png'
+                                    size_hint: 1, None
+                                    height: "200dp"
+                                    on_release: print("Image 1 clicked!")
+                                    size: self.texture_size
+                                MDBoxLayout:
+                                    ClickableImage:
+                                        source: 'images/mesc-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: print("Image 2 clicked!")
+                                    ClickableImage:
+                                        source: 'images/fnu-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: print("Image 3 clicked!")
+                                    ClickableImage:
+                                        source: 'images/uofa-logo.png'
+                                        size_hint: 0.33, None
+                                        height: "200dp"
+                                        on_release: print("Image 4 clicked!")
+                                ClickableImage:
+                                    source: 'images/nrc-cnrc-logo.png'
+                                    size_hint: 1, None
+                                    height: "200dp"
+                                    on_release: print("Image 5 clicked!")
 
         MDNavigationDrawer:
             id: nav_drawer
