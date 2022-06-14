@@ -11,6 +11,7 @@ from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.button import ButtonBehavior
@@ -549,7 +550,51 @@ class ResultWidget(BoxLayout):
             
 class SpecificResultMainList(MDList):
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
-        print("Inside populate page", title)
+        root = App.get_running_app().root
+        self.clear_widgets()
+        
+        top_details_box_layout = MDBoxLayout(orientation = "vertical", 
+                                             padding = "20dp", 
+                                             spacing = "30dp", 
+                                             size_hint = (1, None),
+                                             height= "170dp")
+        
+        title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
+        
+        title_label = Label(text="[font=bjcrus.ttf][size=22]" + title + "[/font][/size]", markup=True)
+        title_label._label.refresh()
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + title + "[/size][/font]", 
+                              markup=True,
+                              valign = "bottom",
+                              size_hint=(None, 1),
+                              text_size=title_label._label.size,
+                              width = title_label._label.texture.size[0] + 10,
+                              height = title_label._label.texture.size[1] + 10)
+        
+        title_and_sound_boxlayout.add_widget(title_label)
+        
+        
+        # Get sound playing to work
+        title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                               user_font_size="20dp",
+                                                               on_release=self.play_sound,
+                                                               pos_hint={'center_y': 1}))
+        
+        
+        top_details_box_layout.add_widget(title_and_sound_boxlayout)
+        
+        
+        
+        for definition in definitions:
+            top_details_box_layout.add_widget(MDLabel(text = definition))
+        
+        self.add_widget(top_details_box_layout)
+        
+    def play_sound(self, args):
+        print("Playing sound...")
+        
+        
+        
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT

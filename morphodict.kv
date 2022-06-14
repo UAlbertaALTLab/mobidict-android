@@ -146,10 +146,10 @@ MainScreen:
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     BoxLayout:
-                        size_hint: 1, 0.3
+                        size_hint: 1, 0.15
                         Label:
                             text: ""
-                            size_hint: 0.1, 0.1
+                            size_hint: 0.1, 0.02
                         Image:
                             source: 'images/itwewina.png'
                             size_hint: None, None
@@ -175,14 +175,10 @@ MainScreen:
                                 halign: 'left'
                                 valign: 'top'
                                 pos_hint: {"x": 0.01}
-                        ScrollView:
-                            id: specific_result_page_scrollview
-                            SpecificResultMainList:
-                                id: specific_result_main_list
-                    MDLabel:
-                        id: option_clicked
-                        font_name: 'bjcrus.ttf'
-                        text: ""
+                    ScrollView:
+                        id: specific_result_page_scrollview
+                        SpecificResultMainList:
+                            id: specific_result_main_list
             LegendOfAbbrPage:
                 name: "Legend"
                 LegendPageMainLayout:
