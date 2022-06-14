@@ -557,7 +557,7 @@ class SpecificResultMainList(MDList):
                                              padding = "20dp", 
                                              spacing = "30dp", 
                                              size_hint = (1, None),
-                                             height= "170dp")
+                                             height= "200dp")
         
         title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
         
@@ -583,6 +583,26 @@ class SpecificResultMainList(MDList):
         
         top_details_box_layout.add_widget(title_and_sound_boxlayout)
         
+        
+        # Add description
+        description_box_layout = MDBoxLayout(size_hint = (1, 0.5))
+            
+        additional_emoji_margin = 0 if not emojis else 10
+        
+        # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label._label.refresh()
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+                            markup=True,
+                            size_hint=(None, 1),
+                            width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+    
+        desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        top_details_box_layout.add_widget(description_box_layout)
         
         
         for definition in definitions:
