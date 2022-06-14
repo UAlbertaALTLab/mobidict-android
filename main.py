@@ -553,11 +553,13 @@ class SpecificResultMainList(MDList):
         root = App.get_running_app().root
         self.clear_widgets()
         
+        details_box_layout_height = max(len(definitions) * 60, 100)
+        
         top_details_box_layout = MDBoxLayout(orientation = "vertical", 
                                              padding = "20dp", 
                                              spacing = "30dp", 
                                              size_hint = (1, None),
-                                             height= "200dp")
+                                             height= str(details_box_layout_height) + "dp")
         
         title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
         
