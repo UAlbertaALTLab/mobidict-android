@@ -31,6 +31,8 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
 from kivymd.toast import toast
+from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelThreeLine
+from kivy.graphics import Rectangle, Color
 
 from cree_sro_syllabics import sro2syllabics
 
@@ -54,6 +56,24 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     Class for the tooltip icon next to title
     '''
     pass
+
+class ParadigmLabelContent(MDBoxLayout):
+    '''Custom content for Expandible panels.'''
+    
+    def __init__(self, data, **kwargs ):
+        super().__init__(**kwargs)
+        self.data = data
+        self.orientation = 'vertical'
+        self.padding = "20dp"
+        self.spacing = "20dp"
+        Clock.schedule_once(self.populate_content, 0)
+        
+    def populate_content(self, args):
+        '''
+        Population of each expansion panel
+        '''
+        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
+        self.add_widget(MDLabel(text = self.data['text']))
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -552,6 +572,9 @@ class ResultWidget(BoxLayout):
 class SpecificResultMainList(MDList):
     active = True
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
+        '''
+        Populates the second result-specific page
+        '''
         root = App.get_running_app().root
         self.clear_widgets()
         
@@ -614,11 +637,26 @@ class SpecificResultMainList(MDList):
         
         top_details_box_layout.add_widget(description_box_layout)
         
-        
+        # Add definitions
         for definition in definitions:
             top_details_box_layout.add_widget(MDLabel(text = definition))
         
         self.add_widget(top_details_box_layout)
+        
+        # Add paradigm panes
+        
+        pane_1 = MDExpansionPanel(
+                    icon="images/itwewina.png",
+                    content=ParadigmLabelContent({"text": "Hello World 2!"}),
+                    panel_cls=MDExpansionPanelThreeLine(
+                        text="Text",
+                        secondary_text="Secondary text",
+                        tertiary_text="Tertiary text",
+                    ),
+                )
+        
+        self.add_widget(pane_1)
+        
         
     def play_sound(self, default_title):
         print("Yoooo", default_title)

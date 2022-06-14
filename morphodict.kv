@@ -2,6 +2,23 @@
 #: import get_color_from_hex kivy.utils.get_color_from_hex
 MainScreen:
 
+<ParadigmLabelContent>:
+    id: paradigm_label_content
+    size_hint_y: None
+    height: self.minimum_height
+
+    canvas.before:
+        Color:
+            rgba: 0.8671875, 0.8671875, 0.8671875, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            width: 1.5
+            rectangle: self.x, self.y, self.width, self.height
+
 <ResultWidget>:
     id: res
     orientation: 'vertical'
@@ -175,10 +192,12 @@ MainScreen:
                                 halign: 'left'
                                 valign: 'top'
                                 pos_hint: {"x": 0.01}
-                    ScrollView:
-                        id: specific_result_page_scrollview
-                        SpecificResultMainList:
-                            id: specific_result_main_list
+                    MDBoxLayout:
+                        padding: "10dp"
+                        ScrollView:
+                            id: specific_result_page_scrollview
+                            SpecificResultMainList:
+                                id: specific_result_main_list
             LegendOfAbbrPage:
                 name: "Legend"
                 LegendPageMainLayout:
