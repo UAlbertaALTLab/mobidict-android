@@ -29,6 +29,7 @@ from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.spinner import MDSpinner
 from kivymd.toast import toast
 
 from cree_sro_syllabics import sro2syllabics
@@ -549,6 +550,7 @@ class ResultWidget(BoxLayout):
             sound.play()
             
 class SpecificResultMainList(MDList):
+    active = True
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
         root = App.get_running_app().root
         self.clear_widgets()
@@ -579,8 +581,14 @@ class SpecificResultMainList(MDList):
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                user_font_size="20dp",
-                                                               on_release=self.play_sound,
+                                                               on_release=lambda x: self.play_sound(default_title),
                                                                pos_hint={'center_y': 1}))
+        
+        # Add loading spinner
+        title_and_sound_boxlayout.add_widget(MDSpinner(size_hint = (None, None),
+                                                       size = ("15dp", "15dp"),
+                                                       palette = [[255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]],
+                                                       active = self.active))
         
         
         top_details_box_layout.add_widget(title_and_sound_boxlayout)
@@ -612,8 +620,24 @@ class SpecificResultMainList(MDList):
         
         self.add_widget(top_details_box_layout)
         
-    def play_sound(self, args):
-        print("Playing sound...")
+    def play_sound(self, default_title):
+        print("Yoooo", default_title)
+        audio_fetch_status = get_sound(default_title)
+        
+        if audio_fetch_status == 2:
+            # Connection error
+            toast("This feature needs a reliable internet connection.")
+            return
+        elif audio_fetch_status == 3:
+            # No audio found
+            toast("No recording available for this word.")
+            return
+        
+        # Instead of audio URL, play the file just loaded
+        sound = SoundLoader.load(SOUND_FILE_NAME)
+        if sound:
+            print("Playing sound...")
+            sound.play()
         
         
         
