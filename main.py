@@ -73,7 +73,19 @@ class ParadigmLabelContent(MDBoxLayout):
         Population of each expansion panel
         '''
         self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
-        self.add_widget(MDLabel(text = self.data['text']))
+        
+        row_box_layout = MDBoxLayout()
+        
+        row_box_layout.add_widget(Label(text = self.data['text'], 
+                                          size_hint = (1, 0.9),
+                                          pos_hint = {'center_x': 0.5},
+                                          color= (0, 0, 0, 1)))
+        row_box_layout.add_widget(Label(text = "Hello World 3!",
+                                          size_hint = (1, 0.9), 
+                                          pos_hint = {'center_x': 0.5},
+                                          color= (0, 0, 0, 1)))
+        
+        self.add_widget(row_box_layout)
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
