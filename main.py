@@ -1,5 +1,6 @@
 # Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
+import threading
 
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
@@ -11,6 +12,7 @@ from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.button import ButtonBehavior
@@ -28,7 +30,10 @@ from kivymd.uix.button import MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.spinner import MDSpinner
 from kivymd.toast import toast
+from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
+from kivy.graphics import Rectangle, Color
 
 from cree_sro_syllabics import sro2syllabics
 
@@ -52,6 +57,46 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     Class for the tooltip icon next to title
     '''
     pass
+
+class ParadigmLabelContent(MDBoxLayout):
+    '''Custom content for Expandible panels.'''
+    
+    def __init__(self, data, **kwargs ):
+        super().__init__(**kwargs)
+        self.data = data
+        self.orientation = 'vertical'
+        self.padding = "20dp"
+        self.spacing = "20dp"
+        Clock.schedule_once(self.populate_content, 0)
+        
+    def populate_content(self, args):
+        '''
+        Population of each expansion panel
+        '''
+        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
+        
+        layout_row_list = MDList()
+        
+        root = App.get_running_app().root
+        
+        for paradigm_form in self.data:
+            row_box_layout = MDBoxLayout(height="40dp",
+                                        size_hint = (1, None))
+            
+            row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
+                                            markup = True,
+                                            size_hint = (1, 0.9),
+                                            pos_hint = {'center_x': 0.5},
+                                            color= (0, 0, 0, 1)))
+            row_box_layout.add_widget(Label(text = paradigm_form['word'],
+                                            size_hint = (1, 0.9), 
+                                            pos_hint = {'center_x': 0.5},
+                                            color= (0, 0, 0, 1)))
+        
+            layout_row_list.add_widget(row_box_layout)
+        
+        self.add_widget(layout_row_list)
+        
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -120,6 +165,9 @@ class AboutPageMainLayout(MDBoxLayout):
     pass
 
 class ContentNavigationDrawer(MDBoxLayout):
+    pass
+
+class SoundLoadSpinner2(MDSpinner):
     pass
 
 class AboutMDList(MDList):
@@ -549,7 +597,114 @@ class ResultWidget(BoxLayout):
             
 class SpecificResultMainList(MDList):
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
-        print("Inside populate page", title)
+        '''
+        Populates the second result-specific page
+        '''
+        root = App.get_running_app().root
+        self.clear_widgets()
+        
+        details_box_layout_height = max(len(definitions) * 60, 100)
+        
+        top_details_box_layout = MDBoxLayout(orientation = "vertical", 
+                                             padding = "20dp", 
+                                             spacing = "30dp", 
+                                             size_hint = (1, None),
+                                             height= str(details_box_layout_height) + "dp")
+        
+        title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
+        
+        title_label = Label(text="[font=bjcrus.ttf][size=22]" + title + "[/font][/size]", markup=True)
+        title_label._label.refresh()
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + title + "[/size][/font]", 
+                              markup=True,
+                              valign = "bottom",
+                              size_hint=(None, 1),
+                              text_size=title_label._label.size,
+                              width = title_label._label.texture.size[0] + 10,
+                              height = title_label._label.texture.size[1] + 10)
+        
+        title_and_sound_boxlayout.add_widget(title_label)
+        
+        
+        # Get sound playing to work
+        title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
+                                                               user_font_size="20dp",
+                                                               on_release=lambda x: self.play_sound(default_title),
+                                                               pos_hint={'center_y': 1}))
+        
+        # Add loading spinner
+        title_and_sound_boxlayout.add_widget(SoundLoadSpinner2())
+        
+        
+        top_details_box_layout.add_widget(title_and_sound_boxlayout)
+        
+        
+        # Add description
+        description_box_layout = MDBoxLayout(size_hint = (1, 0.5))
+            
+        additional_emoji_margin = 0 if not emojis else 10
+        
+        # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
+        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label._label.refresh()
+        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+                            markup=True,
+                            size_hint=(None, 1),
+                            width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+    
+        desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
+        
+        description_box_layout.add_widget(emoji_label)
+        description_box_layout.add_widget(desc_label)
+        
+        top_details_box_layout.add_widget(description_box_layout)
+        
+        # Add definitions
+        for definition in definitions:
+            top_details_box_layout.add_widget(MDLabel(text = definition))
+        
+        self.add_widget(top_details_box_layout)
+        
+        # Add paradigm panes
+        
+        paradigm_data = [{'label-1': 'I', 'word': 'nimîcin'},
+                              {'label-1': 'you (one)', 'word': 'kimîcin'}]
+        
+        pane_1 = MDExpansionPanel(
+                    icon="bookshelf",
+                    content=ParadigmLabelContent(paradigm_data),
+                    panel_cls=MDExpansionPanelTwoLine(
+                        text= 'Paradigms',
+                        secondary_text= 'Click to expand'
+                    ),
+                )
+        
+        self.add_widget(pane_1)
+        
+        
+    def play_sound(self, default_title):
+        print("Yoooo", default_title)
+        app = App.get_running_app()
+
+        audio_fetch_status = get_sound(default_title)
+        
+        if audio_fetch_status == 2:
+            # Connection error
+            toast("This feature needs a reliable internet connection.")
+            app.spinner2_active = False
+            return
+        elif audio_fetch_status == 3:
+            # No audio found
+            toast("No recording available for this word.")
+            return
+        
+        # Instead of audio URL, play the file just loaded
+        sound = SoundLoader.load(SOUND_FILE_NAME)
+        if sound:
+            print("Playing sound...")
+            sound.play()
+        
+        
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
@@ -561,6 +716,7 @@ class MorphodictApp(MDApp):
         super().__init__(**kwargs)
         self.menu = None
         self.index_selected = 0
+        self.spinner2_active = False
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.

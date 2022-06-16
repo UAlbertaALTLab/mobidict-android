@@ -2,6 +2,30 @@
 #: import get_color_from_hex kivy.utils.get_color_from_hex
 MainScreen:
 
+<ParadigmLabelContent>:
+    id: paradigm_label_content
+    size_hint_y: None
+    height: self.minimum_height
+
+    canvas.before:
+        Color:
+            rgba: 0.8671875, 0.8671875, 0.8671875, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            width: 1.5
+            rectangle: self.x, self.y, self.width, self.height
+
+<SoundLoadSpinner2>:
+    size_hint: None, None
+    size: "15dp", "15dp"
+    palette: [255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]
+    active: True if app.spinner2_active else False
+
+
 <ResultWidget>:
     id: res
     orientation: 'vertical'
@@ -146,10 +170,10 @@ MainScreen:
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     BoxLayout:
-                        size_hint: 1, 0.3
+                        size_hint: 1, 0.15
                         Label:
                             text: ""
-                            size_hint: 0.1, 0.1
+                            size_hint: 0.1, 0.02
                         Image:
                             source: 'images/itwewina.png'
                             size_hint: None, None
@@ -175,14 +199,12 @@ MainScreen:
                                 halign: 'left'
                                 valign: 'top'
                                 pos_hint: {"x": 0.01}
+                    MDBoxLayout:
+                        padding: "10dp"
                         ScrollView:
                             id: specific_result_page_scrollview
                             SpecificResultMainList:
                                 id: specific_result_main_list
-                    MDLabel:
-                        id: option_clicked
-                        font_name: 'bjcrus.ttf'
-                        text: ""
             LegendOfAbbrPage:
                 name: "Legend"
                 LegendPageMainLayout:
