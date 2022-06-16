@@ -1,5 +1,6 @@
 # Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
+import threading
 
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
@@ -31,7 +32,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
 from kivymd.toast import toast
-from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelThreeLine
+from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
 from kivy.graphics import Rectangle, Color
 
 from cree_sro_syllabics import sro2syllabics
@@ -74,18 +75,28 @@ class ParadigmLabelContent(MDBoxLayout):
         '''
         self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
         
-        row_box_layout = MDBoxLayout()
+        layout_row_list = MDList()
         
-        row_box_layout.add_widget(Label(text = self.data['text'], 
-                                          size_hint = (1, 0.9),
-                                          pos_hint = {'center_x': 0.5},
-                                          color= (0, 0, 0, 1)))
-        row_box_layout.add_widget(Label(text = "Hello World 3!",
-                                          size_hint = (1, 0.9), 
-                                          pos_hint = {'center_x': 0.5},
-                                          color= (0, 0, 0, 1)))
+        root = App.get_running_app().root
         
-        self.add_widget(row_box_layout)
+        for paradigm_form in self.data:
+            row_box_layout = MDBoxLayout(height="40dp",
+                                        size_hint = (1, None))
+            
+            row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
+                                            markup = True,
+                                            size_hint = (1, 0.9),
+                                            pos_hint = {'center_x': 0.5},
+                                            color= (0, 0, 0, 1)))
+            row_box_layout.add_widget(Label(text = paradigm_form['word'],
+                                            size_hint = (1, 0.9), 
+                                            pos_hint = {'center_x': 0.5},
+                                            color= (0, 0, 0, 1)))
+        
+            layout_row_list.add_widget(row_box_layout)
+        
+        self.add_widget(layout_row_list)
+        
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -154,6 +165,9 @@ class AboutPageMainLayout(MDBoxLayout):
     pass
 
 class ContentNavigationDrawer(MDBoxLayout):
+    pass
+
+class SoundLoadSpinner2(MDSpinner):
     pass
 
 class AboutMDList(MDList):
@@ -582,7 +596,6 @@ class ResultWidget(BoxLayout):
             sound.play()
             
 class SpecificResultMainList(MDList):
-    active = True
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
         '''
         Populates the second result-specific page
@@ -620,10 +633,7 @@ class SpecificResultMainList(MDList):
                                                                pos_hint={'center_y': 1}))
         
         # Add loading spinner
-        title_and_sound_boxlayout.add_widget(MDSpinner(size_hint = (None, None),
-                                                       size = ("15dp", "15dp"),
-                                                       palette = [[255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]],
-                                                       active = self.active))
+        title_and_sound_boxlayout.add_widget(SoundLoadSpinner2())
         
         
         top_details_box_layout.add_widget(title_and_sound_boxlayout)
@@ -657,13 +667,15 @@ class SpecificResultMainList(MDList):
         
         # Add paradigm panes
         
+        paradigm_data = [{'label-1': 'I', 'word': 'nimîcin'},
+                              {'label-1': 'you (one)', 'word': 'kimîcin'}]
+        
         pane_1 = MDExpansionPanel(
-                    icon="images/itwewina.png",
-                    content=ParadigmLabelContent({"text": "Hello World 2!"}),
-                    panel_cls=MDExpansionPanelThreeLine(
-                        text="Text",
-                        secondary_text="Secondary text",
-                        tertiary_text="Tertiary text",
+                    icon="bookshelf",
+                    content=ParadigmLabelContent(paradigm_data),
+                    panel_cls=MDExpansionPanelTwoLine(
+                        text= 'Paradigms',
+                        secondary_text= 'Click to expand'
                     ),
                 )
         
@@ -672,11 +684,14 @@ class SpecificResultMainList(MDList):
         
     def play_sound(self, default_title):
         print("Yoooo", default_title)
+        app = App.get_running_app()
+
         audio_fetch_status = get_sound(default_title)
         
         if audio_fetch_status == 2:
             # Connection error
             toast("This feature needs a reliable internet connection.")
+            app.spinner2_active = False
             return
         elif audio_fetch_status == 3:
             # No audio found
@@ -690,7 +705,6 @@ class SpecificResultMainList(MDList):
             sound.play()
         
         
-        
 
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
@@ -702,6 +716,7 @@ class MorphodictApp(MDApp):
         super().__init__(**kwargs)
         self.menu = None
         self.index_selected = 0
+        self.spinner2_active = False
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.

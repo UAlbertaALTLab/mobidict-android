@@ -19,6 +19,13 @@ MainScreen:
             width: 1.5
             rectangle: self.x, self.y, self.width, self.height
 
+<SoundLoadSpinner2>:
+    size_hint: None, None
+    size: "15dp", "15dp"
+    palette: [255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]
+    active: True if app.spinner2_active else False
+
+
 <ResultWidget>:
     id: res
     orientation: 'vertical'
