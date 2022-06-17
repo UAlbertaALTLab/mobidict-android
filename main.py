@@ -1,6 +1,8 @@
 # Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
 import threading
+import paradigm_panes
+import os
 
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
@@ -44,6 +46,8 @@ from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TE
 initial_data_list = []
 initial_result_list = []
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
 class ClickableLabel(ButtonBehavior, MDLabel):
@@ -64,9 +68,11 @@ class ParadigmLabelContent(MDBoxLayout):
     def __init__(self, data, **kwargs ):
         super().__init__(**kwargs)
         self.data = data
+        
         self.orientation = 'vertical'
         self.padding = "20dp"
         self.spacing = "20dp"
+        
         Clock.schedule_once(self.populate_content, 0)
         
     def populate_content(self, args):
@@ -79,23 +85,63 @@ class ParadigmLabelContent(MDBoxLayout):
         
         root = App.get_running_app().root
         
-        for paradigm_form in self.data:
-            row_box_layout = MDBoxLayout(height="40dp",
-                                        size_hint = (1, None))
+        # for paradigm_form in self.data:
+        #     row_box_layout = MDBoxLayout(height="40dp",
+        #                                 size_hint = (1, None))
             
-            row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
-                                            markup = True,
-                                            size_hint = (1, 0.9),
-                                            pos_hint = {'center_x': 0.5},
-                                            color= (0, 0, 0, 1)))
-            row_box_layout.add_widget(Label(text = paradigm_form['word'],
-                                            size_hint = (1, 0.9), 
-                                            pos_hint = {'center_x': 0.5},
-                                            color= (0, 0, 0, 1)))
+        #     row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
+        #                                     markup = True,
+        #                                     size_hint = (1, 0.9),
+        #                                     pos_hint = {'center_x': 0.5},
+        #                                     color= (0, 0, 0, 1)))
+        #     row_box_layout.add_widget(Label(text = paradigm_form['word'],
+        #                                     size_hint = (1, 0.9), 
+        #                                     pos_hint = {'center_x': 0.5},
+        #                                     color= (0, 0, 0, 1)))
         
-            layout_row_list.add_widget(row_box_layout)
+        #     layout_row_list.add_widget(row_box_layout)
         
+        # self.add_widget(layout_row_list)
+        
+        # Prepare the paradigm data and add it to the screen
+        for pane in self.data['panes']:
+            for row in pane['tr_rows']:
+                row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
+                if row['is_header']:
+                    print("Header!!")
+                    row_box_layout.add_widget(Label(text = row['label'][0], 
+                                                    size_hint = (1, 0.9), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1)))
+                else:
+                    print("Row!!!")
+                    for cell in row['cells']:
+                        if cell['should_suppress_output']:
+                            continue
+                        elif cell['is_label']:
+                            row_box_layout.add_widget(Label(text = cell['label'][0], 
+                                                        size_hint = (1, 0.9), 
+                                                        pos_hint = {'center_x': 0.5}, 
+                                                        color= (0, 0, 0, 1)))
+                        elif cell['is_missing'] or cell['is_empty']:
+                            row_box_layout.add_widget(Label(text = "--", 
+                                                        size_hint = (1, 0.9), 
+                                                        pos_hint = {'center_x': 0.5}, 
+                                                        color= (0, 0, 0, 1)))
+                        else:
+                            row_box_layout.add_widget(Label(text = cell['inflection'],
+                                                        size_hint = (1, 0.9), 
+                                                        pos_hint = {'center_x': 0.5}, 
+                                                        color= (0, 0, 0, 1)))
+                    
+                layout_row_list.add_widget(row_box_layout)
+                
+                print("-"* 60)
         self.add_widget(layout_row_list)
+        
+        
+        
+        
         
 
 class WindowManager(ScreenManager):
@@ -674,9 +720,14 @@ class SpecificResultMainList(MDList):
         self.add_widget(top_details_box_layout)
         
         # Add paradigm panes
+        pane_generator = paradigm_panes.PaneGenerator()
         
-        paradigm_data = [{'label-1': 'I', 'word': 'nimîcin'},
-                              {'label-1': 'you (one)', 'word': 'kimîcin'}]
+        pane_generator.set_layouts_dir(BASE_DIR + "/layouts")
+        pane_generator.set_fst_filepath(BASE_DIR + "/core/resourcesFST/crk-strict-generator.hfstol")
+        
+        paradigm = pane_generator.generate_pane("amisk", "NA")
+        
+        paradigm_data = paradigm.copy()
         
         pane_1 = MDExpansionPanel(
                     icon="bookshelf",
