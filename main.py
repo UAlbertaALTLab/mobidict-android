@@ -7,7 +7,7 @@ from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, BooleanProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -168,7 +168,9 @@ class ContentNavigationDrawer(MDBoxLayout):
     pass
 
 class SoundLoadSpinner2(MDSpinner):
-    pass
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        app = App.get_running_app()
 
 class AboutMDList(MDList):
     pass
@@ -596,10 +598,16 @@ class ResultWidget(BoxLayout):
             sound.play()
             
 class SpecificResultMainList(MDList):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.default_title = None
+    
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
         '''
         Populates the second result-specific page
         '''
+        self.default_title = default_title
+        
         root = App.get_running_app().root
         self.clear_widgets()
         
@@ -629,7 +637,7 @@ class SpecificResultMainList(MDList):
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                user_font_size="20dp",
-                                                               on_release=lambda x: self.play_sound(default_title),
+                                                               on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
         # Add loading spinner
@@ -681,20 +689,20 @@ class SpecificResultMainList(MDList):
         
         self.add_widget(pane_1)
         
-        
-    def play_sound(self, default_title):
-        print("Yoooo", default_title)
+    def play_sound(self, *args):
+        print("Default title: ", self.default_title)
         app = App.get_running_app()
-
-        audio_fetch_status = get_sound(default_title)
+        app.spinner2_active = True
+        audio_fetch_status = get_sound(self.default_title)
         
         if audio_fetch_status == 2:
             # Connection error
-            toast("This feature needs a reliable internet connection.")
             app.spinner2_active = False
+            toast("This feature needs a reliable internet connection.")
             return
         elif audio_fetch_status == 3:
             # No audio found
+            app.spinner2_active = False
             toast("No recording available for this word.")
             return
         
@@ -702,8 +710,13 @@ class SpecificResultMainList(MDList):
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
             print("Playing sound...")
+            sound.on_stop = self.stop_loader
             sound.play()
         
+    def stop_loader(self):
+        print("Sound stopped")
+        app = App.get_running_app()
+        app.spinner2_active = False
         
 
 class MorphodictApp(MDApp):
@@ -711,12 +724,12 @@ class MorphodictApp(MDApp):
     contact_us_text = CONTACT_US_TEXT
     about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
     about_text_credit = ABOUT_TEXT_CREDITS
+    spinner2_active = BooleanProperty(defaultvalue = False)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.menu = None
         self.index_selected = 0
-        self.spinner2_active = False
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
