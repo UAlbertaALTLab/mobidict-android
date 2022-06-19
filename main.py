@@ -1,4 +1,3 @@
-# Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
 import threading
 import paradigm_panes
@@ -63,6 +62,9 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     '''
     pass
 
+class ModeSwitch(MDSwitch):
+    def change_mode(self):
+        print("Mode changed!")
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     

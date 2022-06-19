@@ -419,8 +419,9 @@ MainScreen:
                     MDLabel:
                         text: "Linguistic Mode"
                         size_hint: (0.5, 1)
-                    MDSwitch:
+                    ModeSwitch:
                         id: linguistic_community_mode
+                        on_active: self.change_mode()
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"
