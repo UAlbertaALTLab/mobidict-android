@@ -108,12 +108,14 @@ class ParadigmLabelContent(MDBoxLayout):
         
         # self.add_widget(layout_row_list)
         
+        paradigm_parameter = ["english", "linguistic", "source_language"]
+        
         # Prepare the paradigm data and add it to the screen
         for pane in self.data['panes']:
             for row in pane['tr_rows']:
                 row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
                 if row['is_header']:
-                    txt_label = relabel(row['label'])
+                    txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
                     
                     row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
                                                     markup = True,
@@ -125,7 +127,7 @@ class ParadigmLabelContent(MDBoxLayout):
                         if cell['should_suppress_output']:
                             continue
                         elif cell['is_label']:
-                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label']) + "[/i]",
+                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms]) + "[/i]",
                                                             markup = True,
                                                             size_hint = (1, 0.9), 
                                                             pos_hint = {'center_x': 0.5}, 
@@ -924,6 +926,13 @@ class MorphodictApp(MDApp):
         self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
         
         # Make additional callbacks here
+        second_page_population_list = self.root.ids.specific_result_main_list
+        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              second_page_population_list.subtitle,
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
+        
         
         self.paradigm_labels_menu.dismiss()
     
