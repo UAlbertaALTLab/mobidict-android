@@ -42,6 +42,7 @@ from cree_sro_syllabics import sro2syllabics
 from backend import get_main_page_results_list
 from api.api import get_sound
 from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
+from core.frontend.relabelling import relabel
 
 initial_data_list = []
 initial_result_list = []
@@ -112,7 +113,7 @@ class ParadigmLabelContent(MDBoxLayout):
                 row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
                 if row['is_header']:
                     print("Header!!")
-                    row_box_layout.add_widget(Label(text = row['label'][0], 
+                    row_box_layout.add_widget(Label(text = relabel(row['label']), 
                                                     size_hint = (1, 0.9), 
                                                     pos_hint = {'center_x': 0.5}, 
                                                     color= (0, 0, 0, 1)))
@@ -122,7 +123,7 @@ class ParadigmLabelContent(MDBoxLayout):
                         if cell['should_suppress_output']:
                             continue
                         elif cell['is_label']:
-                            row_box_layout.add_widget(Label(text = cell['label'][0], 
+                            row_box_layout.add_widget(Label(text = relabel(cell['label']), 
                                                         size_hint = (1, 0.9), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
