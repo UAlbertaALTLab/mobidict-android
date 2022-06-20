@@ -1,13 +1,14 @@
-# Release testing to see how much memory we currently occupy/for future purposes.
 import webbrowser
 import threading
+import paradigm_panes
+import os
 
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, BooleanProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -31,6 +32,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
+from kivymd.uix.selectioncontrol import MDSwitch
 from kivymd.toast import toast
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
 from kivy.graphics import Rectangle, Color
@@ -40,9 +42,12 @@ from cree_sro_syllabics import sro2syllabics
 from backend import get_main_page_results_list
 from api.api import get_sound
 from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
+from core.frontend.relabelling import relabel
 
 initial_data_list = []
 initial_result_list = []
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # To update a variable in .kv, you could go self.root.ids.{id}.text = ""
 
@@ -58,15 +63,20 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     '''
     pass
 
+class ModeSwitch(MDSwitch):
+    def change_mode(self):
+        print("Mode changed!")
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     
     def __init__(self, data, **kwargs ):
         super().__init__(**kwargs)
         self.data = data
+        
         self.orientation = 'vertical'
         self.padding = "20dp"
         self.spacing = "20dp"
+        
         Clock.schedule_once(self.populate_content, 0)
         
     def populate_content(self, args):
@@ -78,25 +88,67 @@ class ParadigmLabelContent(MDBoxLayout):
         layout_row_list = MDList()
         
         root = App.get_running_app().root
+        app = App.get_running_app()
         
-        for paradigm_form in self.data:
-            row_box_layout = MDBoxLayout(height="40dp",
-                                        size_hint = (1, None))
+        # for paradigm_form in self.data:
+        #     row_box_layout = MDBoxLayout(height="40dp",
+        #                                 size_hint = (1, None))
             
-            row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
-                                            markup = True,
-                                            size_hint = (1, 0.9),
-                                            pos_hint = {'center_x': 0.5},
-                                            color= (0, 0, 0, 1)))
-            row_box_layout.add_widget(Label(text = paradigm_form['word'],
-                                            size_hint = (1, 0.9), 
-                                            pos_hint = {'center_x': 0.5},
-                                            color= (0, 0, 0, 1)))
+        #     row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
+        #                                     markup = True,
+        #                                     size_hint = (1, 0.9),
+        #                                     pos_hint = {'center_x': 0.5},
+        #                                     color= (0, 0, 0, 1)))
+        #     row_box_layout.add_widget(Label(text = paradigm_form['word'],
+        #                                     size_hint = (1, 0.9), 
+        #                                     pos_hint = {'center_x': 0.5},
+        #                                     color= (0, 0, 0, 1)))
         
-            layout_row_list.add_widget(row_box_layout)
+        #     layout_row_list.add_widget(row_box_layout)
         
+        # self.add_widget(layout_row_list)
+        
+        paradigm_parameter = ["english", "linguistic", "source_language"]
+        
+        # Prepare the paradigm data and add it to the screen
+        for pane in self.data['panes']:
+            for row in pane['tr_rows']:
+                row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
+                if row['is_header']:
+                    txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
+                    
+                    row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
+                                                    markup = True,
+                                                    size_hint = (1, 0.9), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1)))
+                else:
+                    for cell in row['cells']:
+                        if cell['should_suppress_output']:
+                            continue
+                        elif cell['is_label']:
+                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms]) + "[/i]",
+                                                            markup = True,
+                                                            size_hint = (1, 0.9), 
+                                                            pos_hint = {'center_x': 0.5}, 
+                                                            color= (0, 0, 0, 1)))
+                        elif cell['is_missing'] or cell['is_empty']:
+                            row_box_layout.add_widget(Label(text = "--", 
+                                                        size_hint = (1, 0.9), 
+                                                        pos_hint = {'center_x': 0.5}, 
+                                                        color= (0, 0, 0, 1)))
+                        else:
+                            txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
+                            row_box_layout.add_widget(Label(text = txt_label,
+                                                        size_hint = (1, 0.9), 
+                                                        pos_hint = {'center_x': 0.5}, 
+                                                        color= (0, 0, 0, 1),
+                                                        font_name = 'bjcrus.ttf'))
+                    
+                layout_row_list.add_widget(row_box_layout)
+                
+                print("-"* 60)
         self.add_widget(layout_row_list)
-        
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -168,7 +220,9 @@ class ContentNavigationDrawer(MDBoxLayout):
     pass
 
 class SoundLoadSpinner2(MDSpinner):
-    pass
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        app = App.get_running_app()
 
 class AboutMDList(MDList):
     pass
@@ -596,12 +650,31 @@ class ResultWidget(BoxLayout):
             sound.play()
             
 class SpecificResultMainList(MDList):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.title = None
+        self.emojis = None
+        self.subtitle = None
+        self.default_title = None
+        self.definitions = None
+    
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
         '''
         Populates the second result-specific page
         '''
+        self.title = title
+        self.emojis = emojis
+        self.subtitle = subtitle
+        self.default_title = default_title
+        self.definitions = definitions
+        
+        app = App.get_running_app()
         root = App.get_running_app().root
         self.clear_widgets()
+        
+        if title == None and default_title == None and definitions == None:
+            # This page is still empty, don't do anything!
+            return
         
         details_box_layout_height = max(len(definitions) * 60, 100)
         
@@ -613,9 +686,11 @@ class SpecificResultMainList(MDList):
         
         title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
         
-        title_label = Label(text="[font=bjcrus.ttf][size=22]" + title + "[/font][/size]", markup=True)
+        txt_main_title = app.get_syllabics_sro_correct_label(title)
+        
+        title_label = Label(text="[font=bjcrus.ttf][size=22]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -629,7 +704,7 @@ class SpecificResultMainList(MDList):
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                user_font_size="20dp",
-                                                               on_release=lambda x: self.play_sound(default_title),
+                                                               on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
         # Add loading spinner
@@ -666,9 +741,14 @@ class SpecificResultMainList(MDList):
         self.add_widget(top_details_box_layout)
         
         # Add paradigm panes
+        pane_generator = paradigm_panes.PaneGenerator()
         
-        paradigm_data = [{'label-1': 'I', 'word': 'nimîcin'},
-                              {'label-1': 'you (one)', 'word': 'kimîcin'}]
+        pane_generator.set_layouts_dir(BASE_DIR + "/layouts")
+        pane_generator.set_fst_filepath(BASE_DIR + "/core/resourcesFST/crk-strict-generator.hfstol")
+        
+        paradigm = pane_generator.generate_pane("amisk", "NA")
+        
+        paradigm_data = paradigm.copy()
         
         pane_1 = MDExpansionPanel(
                     icon="bookshelf",
@@ -681,20 +761,20 @@ class SpecificResultMainList(MDList):
         
         self.add_widget(pane_1)
         
-        
-    def play_sound(self, default_title):
-        print("Yoooo", default_title)
+    def play_sound(self, *args):
+        print("Default title: ", self.default_title)
         app = App.get_running_app()
-
-        audio_fetch_status = get_sound(default_title)
+        app.spinner2_active = True
+        audio_fetch_status = get_sound(self.default_title)
         
         if audio_fetch_status == 2:
             # Connection error
-            toast("This feature needs a reliable internet connection.")
             app.spinner2_active = False
+            toast("This feature needs a reliable internet connection.")
             return
         elif audio_fetch_status == 3:
             # No audio found
+            app.spinner2_active = False
             toast("No recording available for this word.")
             return
         
@@ -702,8 +782,13 @@ class SpecificResultMainList(MDList):
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
             print("Playing sound...")
+            sound.on_stop = self.stop_loader
             sound.play()
         
+    def stop_loader(self):
+        print("Sound stopped")
+        app = App.get_running_app()
+        app.spinner2_active = False
         
 
 class MorphodictApp(MDApp):
@@ -711,12 +796,14 @@ class MorphodictApp(MDApp):
     contact_us_text = CONTACT_US_TEXT
     about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
     about_text_credit = ABOUT_TEXT_CREDITS
+    spinner2_active = BooleanProperty(defaultvalue = False)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.menu = None
         self.index_selected = 0
-        self.spinner2_active = False
+        self.index_selected_paradigms = 0
+        self.paradigm_labels_menu = None
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -727,7 +814,7 @@ class MorphodictApp(MDApp):
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
-                                 "text_color": (0, 0, 1, 1)},
+                                 "text_color": (0.543, 0, 0, 1)},
                                 {'index': 1, 'text': "SRO(ēīōā)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
@@ -743,6 +830,28 @@ class MorphodictApp(MDApp):
             items=label_settings_items,
             width_mult=4,
         )
+        
+        paradigm_settings_items = [{'index': 0, 
+                                 'text': "Plain English Labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
+                                 "text_color": (0.543, 0, 0, 1)},
+                                {'index': 1, 'text': "Linguistic labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "nêhiyawêwin labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        
+        self.paradigm_labels_menu = MDDropdownMenu(
+            caller=self.root.ids.paradigm_label_settings_dropdown,
+            items=paradigm_settings_items,
+            width_mult=4,
+        )
+        
     
     def set_item(self, text_item):
         if self.root.ids.label_settings_dropdown.current_item == text_item:
@@ -763,19 +872,70 @@ class MorphodictApp(MDApp):
                                  "on_release": lambda x=f"Syllabics": self.set_item(x),
                                  "text_color": (0, 0, 0, 1)}]
         if text_item == "Syllabics":
-            label_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 2
         elif text_item == "SRO(ēīōā)":
-            label_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 1
         else:
-            label_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 0
         
         self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
         self.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = self.root.ids.specific_result_main_list
+        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              second_page_population_list.subtitle,
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
         self.menu.dismiss()
+    
+    def set_item_paradigm(self, text_item):
+        if self.root.ids.paradigm_label_settings_dropdown.current_item == text_item:
+            # Same option chosen, don't do anything
+            return
+        
+        paradigm_settings_items = [{'index': 0, 
+                                 'text': "Plain English Labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 1, 'text': "Linguistic labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "nêhiyawêwin labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        
+        if text_item == "nêhiyawêwin labels":
+            paradigm_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
+            self.index_selected_paradigms = 2
+        elif text_item == "Linguistic labels":
+            paradigm_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
+            self.index_selected_paradigms = 1
+        else:
+            paradigm_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
+            self.index_selected_paradigms = 0
+        
+        self.paradigm_labels_menu.items = paradigm_settings_items
+        self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
+        
+        # Make additional callbacks here
+        second_page_population_list = self.root.ids.specific_result_main_list
+        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              second_page_population_list.subtitle,
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
+        
+        
+        self.paradigm_labels_menu.dismiss()
+    
     
     def on_start(self):
         # Preload these things
@@ -837,6 +997,16 @@ class MorphodictApp(MDApp):
         }
         
         webbrowser.open(about_url_links[ref])
+    
+    def get_syllabics_sro_correct_label(self, string: str) -> str:
+        if self.index_selected == 2:
+            # Syllabics
+            string = sro2syllabics(string)
+        elif self.index_selected == 1:
+            # ēīōā selected
+            string = replace_hats_to_lines_SRO(string)
+        
+        return string
 
 if __name__ == '__main__':
     MorphodictApp().run()

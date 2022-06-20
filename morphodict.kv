@@ -23,7 +23,7 @@ MainScreen:
     size_hint: None, None
     size: "15dp", "15dp"
     palette: [255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]
-    active: True if app.spinner2_active else False
+    active: app.spinner2_active
 
 
 <ResultWidget>:
@@ -373,7 +373,7 @@ MainScreen:
             ContentNavigationDrawer:
                 orientation: 'vertical'
                 spacing: "10dp"
-                padding: "10dp"
+                padding: "5dp"
 
                 # MDLabel:
                 #     text: ""
@@ -413,6 +413,20 @@ MainScreen:
                     id: label_settings_dropdown
                     text: "SRO(êîôâ)"
                     on_release: app.menu.open()
+                
+                MDDropDownItem:
+                    id: paradigm_label_settings_dropdown
+                    text: "Plain English Labels"
+                    on_release: app.paradigm_labels_menu.open()
+
+                MDBoxLayout:
+                    size_hint: (1, 0.35)
+                    MDLabel:
+                        text: "Linguistic Mode"
+                        size_hint: (0.5, 1)
+                    ModeSwitch:
+                        id: linguistic_community_mode
+                        on_active: self.change_mode()
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"
@@ -420,8 +434,6 @@ MainScreen:
                     font_name: 'bjcrus.ttf'
                     size_hint: 1, 0.01
                 BoxLayout:
-                    padding: "10dp"
-                    spacing: "10dp"
                     canvas.before:
                         Rectangle:
                             pos: self.pos
