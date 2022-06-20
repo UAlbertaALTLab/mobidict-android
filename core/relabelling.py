@@ -219,9 +219,8 @@ def read_labels() -> Relabelling:
         mtime = ALTERNATE_LABELS_FILE.stat().st_mtime
         previous_mtime = _label_cache["mtime"]
 
-        # if previous_mtime is not None and mtime == previous_mtime:
-        #     print("Dangggggg", mtime, previous_mtime)
-        #     return cast_away_optional(_label_cache["labels"])
+        if previous_mtime is not None and mtime == previous_mtime:
+            return cast_away_optional(_label_cache["labels"])
 
         with ALTERNATE_LABELS_FILE.open(encoding="UTF-8") as tsv_file:
             _label_cache["mtime"] = mtime
