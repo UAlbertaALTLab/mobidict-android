@@ -113,24 +113,23 @@ class ParadigmLabelContent(MDBoxLayout):
             for row in pane['tr_rows']:
                 row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
                 if row['is_header']:
-                    print("Header!!")
-                    
                     txt_label = relabel(row['label'])
                     
-                    row_box_layout.add_widget(Label(text = txt_label, 
+                    row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
+                                                    markup = True,
                                                     size_hint = (1, 0.9), 
                                                     pos_hint = {'center_x': 0.5}, 
                                                     color= (0, 0, 0, 1)))
                 else:
-                    print("Row!!!")
                     for cell in row['cells']:
                         if cell['should_suppress_output']:
                             continue
                         elif cell['is_label']:
-                            row_box_layout.add_widget(Label(text = relabel(cell['label']), 
-                                                        size_hint = (1, 0.9), 
-                                                        pos_hint = {'center_x': 0.5}, 
-                                                        color= (0, 0, 0, 1)))
+                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label']) + "[/i]",
+                                                            markup = True,
+                                                            size_hint = (1, 0.9), 
+                                                            pos_hint = {'center_x': 0.5}, 
+                                                            color= (0, 0, 0, 1)))
                         elif cell['is_missing'] or cell['is_empty']:
                             row_box_layout.add_widget(Label(text = "--", 
                                                         size_hint = (1, 0.9), 
@@ -801,6 +800,8 @@ class MorphodictApp(MDApp):
         super().__init__(**kwargs)
         self.menu = None
         self.index_selected = 0
+        self.index_selected_paradigms = 0
+        self.paradigm_labels_menu = None
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -827,6 +828,28 @@ class MorphodictApp(MDApp):
             items=label_settings_items,
             width_mult=4,
         )
+        
+        paradigm_settings_items = [{'index': 0, 
+                                 'text': "Plain English Labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 1, 1)},
+                                {'index': 1, 'text': "Linguistic labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "nêhiyawêwin labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        
+        self.paradigm_labels_menu = MDDropdownMenu(
+            caller=self.root.ids.paradigm_label_settings_dropdown,
+            items=paradigm_settings_items,
+            width_mult=4,
+        )
+        
     
     def set_item(self, text_item):
         if self.root.ids.label_settings_dropdown.current_item == text_item:
@@ -866,6 +889,44 @@ class MorphodictApp(MDApp):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.definitions)
         self.menu.dismiss()
+    
+    def set_item_paradigm(self, text_item):
+        if self.root.ids.paradigm_label_settings_dropdown.current_item == text_item:
+            # Same option chosen, don't do anything
+            return
+        
+        paradigm_settings_items = [{'index': 0, 
+                                 'text': "Plain English Labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 1, 'text': "Linguistic labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)},
+                                {'index': 2, 
+                                 'text': "nêhiyawêwin labels", 
+                                 "viewclass": "LabelSettingsItem", 
+                                 "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
+                                 "text_color": (0, 0, 0, 1)}]
+        
+        if text_item == "nêhiyawêwin labels":
+            paradigm_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            self.index_selected_paradigms = 2
+        elif text_item == "Linguistic labels":
+            paradigm_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            self.index_selected_paradigms = 1
+        else:
+            paradigm_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            self.index_selected_paradigms = 0
+        
+        self.paradigm_labels_menu.items = paradigm_settings_items
+        self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
+        
+        # Make additional callbacks here
+        
+        self.paradigm_labels_menu.dismiss()
+    
     
     def on_start(self):
         # Preload these things

@@ -373,7 +373,7 @@ MainScreen:
             ContentNavigationDrawer:
                 orientation: 'vertical'
                 spacing: "10dp"
-                padding: "10dp"
+                padding: "5dp"
 
                 # MDLabel:
                 #     text: ""
@@ -413,6 +413,11 @@ MainScreen:
                     id: label_settings_dropdown
                     text: "SRO(êîôâ)"
                     on_release: app.menu.open()
+                
+                MDDropDownItem:
+                    id: paradigm_label_settings_dropdown
+                    text: "Plain English Labels"
+                    on_release: app.paradigm_labels_menu.open()
 
                 MDBoxLayout:
                     size_hint: (1, 0.35)
@@ -429,8 +434,6 @@ MainScreen:
                     font_name: 'bjcrus.ttf'
                     size_hint: 1, 0.01
                 BoxLayout:
-                    padding: "10dp"
-                    spacing: "10dp"
                     canvas.before:
                         Rectangle:
                             pos: self.pos
