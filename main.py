@@ -812,7 +812,7 @@ class MorphodictApp(MDApp):
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
-                                 "text_color": (0, 0, 1, 1)},
+                                 "text_color": (0.543, 0, 0, 1)},
                                 {'index': 1, 'text': "SRO(ēīōā)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
@@ -833,7 +833,7 @@ class MorphodictApp(MDApp):
                                  'text': "Plain English Labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
-                                 "text_color": (0, 0, 1, 1)},
+                                 "text_color": (0.543, 0, 0, 1)},
                                 {'index': 1, 'text': "Linguistic labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
@@ -870,13 +870,13 @@ class MorphodictApp(MDApp):
                                  "on_release": lambda x=f"Syllabics": self.set_item(x),
                                  "text_color": (0, 0, 0, 1)}]
         if text_item == "Syllabics":
-            label_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 2
         elif text_item == "SRO(ēīōā)":
-            label_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 1
         else:
-            label_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            label_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 0
         
         self.menu.items = label_settings_items
@@ -911,13 +911,13 @@ class MorphodictApp(MDApp):
                                  "text_color": (0, 0, 0, 1)}]
         
         if text_item == "nêhiyawêwin labels":
-            paradigm_settings_items[2]["text_color"] = (0, 0, 1, 1)
+            paradigm_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 2
         elif text_item == "Linguistic labels":
-            paradigm_settings_items[1]["text_color"] = (0, 0, 1, 1)
+            paradigm_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 1
         else:
-            paradigm_settings_items[0]["text_color"] = (0, 0, 1, 1)
+            paradigm_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 0
         
         self.paradigm_labels_menu.items = paradigm_settings_items
