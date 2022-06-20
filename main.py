@@ -88,6 +88,7 @@ class ParadigmLabelContent(MDBoxLayout):
         layout_row_list = MDList()
         
         root = App.get_running_app().root
+        app = App.get_running_app()
         
         # for paradigm_form in self.data:
         #     row_box_layout = MDBoxLayout(height="40dp",
@@ -113,7 +114,10 @@ class ParadigmLabelContent(MDBoxLayout):
                 row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
                 if row['is_header']:
                     print("Header!!")
-                    row_box_layout.add_widget(Label(text = relabel(row['label']), 
+                    
+                    txt_label = relabel(row['label'])
+                    
+                    row_box_layout.add_widget(Label(text = txt_label, 
                                                     size_hint = (1, 0.9), 
                                                     pos_hint = {'center_x': 0.5}, 
                                                     color= (0, 0, 0, 1)))
@@ -133,20 +137,17 @@ class ParadigmLabelContent(MDBoxLayout):
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
                         else:
-                            row_box_layout.add_widget(Label(text = cell['inflection'],
+                            txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
+                            row_box_layout.add_widget(Label(text = txt_label,
                                                         size_hint = (1, 0.9), 
                                                         pos_hint = {'center_x': 0.5}, 
-                                                        color= (0, 0, 0, 1)))
+                                                        color= (0, 0, 0, 1),
+                                                        font_name = 'bjcrus.ttf'))
                     
                 layout_row_list.add_widget(row_box_layout)
                 
                 print("-"* 60)
         self.add_widget(layout_row_list)
-        
-        
-        
-        
-        
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -650,16 +651,29 @@ class ResultWidget(BoxLayout):
 class SpecificResultMainList(MDList):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        self.title = None
+        self.emojis = None
+        self.subtitle = None
         self.default_title = None
+        self.definitions = None
     
     def populate_page(self, title, emojis, subtitle, default_title, definitions):
         '''
         Populates the second result-specific page
         '''
+        self.title = title
+        self.emojis = emojis
+        self.subtitle = subtitle
         self.default_title = default_title
+        self.definitions = definitions
         
+        app = App.get_running_app()
         root = App.get_running_app().root
         self.clear_widgets()
+        
+        if title == None and default_title == None and definitions == None:
+            # This page is still empty, don't do anything!
+            return
         
         details_box_layout_height = max(len(definitions) * 60, 100)
         
@@ -671,9 +685,11 @@ class SpecificResultMainList(MDList):
         
         title_and_sound_boxlayout = BoxLayout(size_hint = (1, 0.000001))
         
-        title_label = Label(text="[font=bjcrus.ttf][size=22]" + title + "[/font][/size]", markup=True)
+        txt_main_title = app.get_syllabics_sro_correct_label(title)
+        
+        title_label = Label(text="[font=bjcrus.ttf][size=22]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -843,6 +859,12 @@ class MorphodictApp(MDApp):
         self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
         self.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = self.root.ids.specific_result_main_list
+        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              second_page_population_list.subtitle,
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
         self.menu.dismiss()
     
     def on_start(self):
@@ -905,6 +927,16 @@ class MorphodictApp(MDApp):
         }
         
         webbrowser.open(about_url_links[ref])
+    
+    def get_syllabics_sro_correct_label(self, string: str) -> str:
+        if self.index_selected == 2:
+            # Syllabics
+            string = sro2syllabics(string)
+        elif self.index_selected == 1:
+            # ēīōā selected
+            string = replace_hats_to_lines_SRO(string)
+        
+        return string
 
 if __name__ == '__main__':
     MorphodictApp().run()

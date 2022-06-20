@@ -21,8 +21,6 @@ def relabel(tags, labels="english"):
 def label_setting_to_relabeller(label_setting: str):
     labels = read_labels()
     
-    print("HAHHAHA", labels.english)
-    
     # TODO: Solve the source_language
 
     return {
