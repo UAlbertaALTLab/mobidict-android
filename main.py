@@ -74,7 +74,7 @@ class ModeSwitch(MDSwitch):
         second_page_population_list = app.root.ids.specific_result_main_list
         app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
                                                               second_page_population_list.emojis, 
-                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'],
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.definitions)
 
