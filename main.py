@@ -257,6 +257,7 @@ class DrawerList(MDList):
 class MainLayout(BoxLayout):
     def on_submit_word(self, widget= None):
         root = App.get_running_app().root
+        app = App.get_running_app()
         current_query = root.ids.input_word.text
         
         if not current_query:
@@ -264,7 +265,12 @@ class MainLayout(BoxLayout):
             print("Empty query")
             return
         
-        output_res = get_main_page_results_list(current_query)
+        ling_mode = "community"
+        
+        if app.linguistic_mode:
+            ling_mode = "linguistic"
+        
+        output_res = get_main_page_results_list(current_query, ling_mode)
         print_presentable_output(output_res)
         print("Output:", output_res)
         
