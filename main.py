@@ -70,6 +70,13 @@ class ModeSwitch(MDSwitch):
             app.linguistic_mode = True
         else:
             app.linguistic_mode = False
+        app.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = app.root.ids.specific_result_main_list
+        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'],
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
@@ -383,9 +390,9 @@ class ResultView(RecycleView):
         self.data = initial_data_list
     
     def update_data(self, data):
+        app = App.get_running_app()
         self.data = data.copy()
-        # root = App.get_running_app().root
-        # root.ids.result_list_main.refresh_from_data()
+        app.newest_result_list = data.copy()
         self.refresh_from_data()
 
 class ResultWidget(BoxLayout):
@@ -639,7 +646,9 @@ class ResultWidget(BoxLayout):
     #     return super(ResultWidget, self).on_touch_down(touch)
         
     def on_click_label(self, touch):
+        app = App.get_running_app()
         root = App.get_running_app().root
+        app.last_result_list_index_click = self.index
         root.ids.screen_manager.switch_to_result_screen(self.index, self.title, self.emojis, self.subtitle, self.default_title, self.definitions)
     
     def on_click_form_of_lemma(self, touch):
@@ -823,6 +832,8 @@ class MorphodictApp(MDApp):
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
         self.linguistic_mode = False
+        self.last_result_list_index_click = None
+        self.newest_result_list = []
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
