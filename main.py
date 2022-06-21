@@ -65,7 +65,12 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
 
 class ModeSwitch(MDSwitch):
     def change_mode(self):
-        print("Mode changed!")
+        app = App.get_running_app()
+        if self.active:
+            app.linguistic_mode = True
+        else:
+            app.linguistic_mode = False
+
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     
@@ -222,7 +227,6 @@ class ContentNavigationDrawer(MDBoxLayout):
 class SoundLoadSpinner2(MDSpinner):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        app = App.get_running_app()
 
 class AboutMDList(MDList):
     pass
@@ -281,7 +285,15 @@ class MainLayout(BoxLayout):
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
-            ic, emoji = data['lemma_wordform']['inflectional_category_plain_english'], data['lemma_wordform']['wordclass_emoji']
+            
+            ic = data['lemma_wordform']['inflectional_category_plain_english']
+            
+            if app.linguistic_mode:
+                ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
+                if 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
+                    ic += " (" +data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
+            
+            emoji = data['lemma_wordform']['wordclass_emoji']
             
             emojis = ""
             subtitle = ""
@@ -804,6 +816,7 @@ class MorphodictApp(MDApp):
         self.index_selected = 0
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
+        self.linguistic_mode = False
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
