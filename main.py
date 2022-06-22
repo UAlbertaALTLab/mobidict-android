@@ -49,8 +49,6 @@ initial_result_list = []
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# To update a variable in .kv, you could go self.root.ids.{id}.text = ""
-
 class ClickableLabel(ButtonBehavior, MDLabel):
     pass
 
@@ -102,24 +100,6 @@ class ParadigmLabelContent(MDBoxLayout):
         root = App.get_running_app().root
         app = App.get_running_app()
         
-        # for paradigm_form in self.data:
-        #     row_box_layout = MDBoxLayout(height="40dp",
-        #                                 size_hint = (1, None))
-            
-        #     row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
-        #                                     markup = True,
-        #                                     size_hint = (1, 0.9),
-        #                                     pos_hint = {'center_x': 0.5},
-        #                                     color= (0, 0, 0, 1)))
-        #     row_box_layout.add_widget(Label(text = paradigm_form['word'],
-        #                                     size_hint = (1, 0.9), 
-        #                                     pos_hint = {'center_x': 0.5},
-        #                                     color= (0, 0, 0, 1)))
-        
-        #     layout_row_list.add_widget(row_box_layout)
-        
-        # self.add_widget(layout_row_list)
-        
         paradigm_parameter = ["english", "linguistic", "source_language"]
         
         # Prepare the paradigm data and add it to the screen
@@ -131,7 +111,7 @@ class ParadigmLabelContent(MDBoxLayout):
                     
                     row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
                                                     markup = True,
-                                                    size_hint = (1, 0.9), 
+                                                    size_hint = (0.05, None), 
                                                     pos_hint = {'center_x': 0.5}, 
                                                     color= (0, 0, 0, 1)))
                 else:
@@ -141,18 +121,18 @@ class ParadigmLabelContent(MDBoxLayout):
                         elif cell['is_label']:
                             row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms]) + "[/i]",
                                                             markup = True,
-                                                            size_hint = (1, 0.9), 
+                                                            size_hint = (0.05, None), 
                                                             pos_hint = {'center_x': 0.5}, 
                                                             color= (0, 0, 0, 1)))
                         elif cell['is_missing'] or cell['is_empty']:
                             row_box_layout.add_widget(Label(text = "--", 
-                                                        size_hint = (1, 0.9), 
+                                                        size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
                         else:
                             txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
                             row_box_layout.add_widget(Label(text = txt_label,
-                                                        size_hint = (1, 0.9), 
+                                                        size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1),
                                                         font_name = 'bjcrus.ttf'))
@@ -525,12 +505,6 @@ class ResultWidget(BoxLayout):
         self.bind(definitions = self.update_row, lemma_wordform = self.update_row)
     
     def update_row(self, *args):
-        print("-"*100)
-        
-        print("=> title: ", self.title)
-        print("=> subtitle: ", self.subtitle)
-        print("=> emojis", self.emojis)
-        print("=> definitions", self.definitions)
         
         self.clear_widgets()
         
