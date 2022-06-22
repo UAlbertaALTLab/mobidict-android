@@ -373,11 +373,11 @@ MainScreen:
             ContentNavigationDrawer:
                 orientation: 'vertical'
                 spacing: "10dp"
-                padding: "5dp"
+                padding: "8dp"
 
-                # MDLabel:
-                #     text: ""
-                #     size_hint: 1, 0.05
+                MDLabel:
+                    text: ""
+                    size_hint: 1, 0.05
                 MDBoxLayout:
                     orientation: 'horizontal'
                     size_hint: 1, 0.25
@@ -406,6 +406,8 @@ MainScreen:
                             halign: 'left'
                             valign: 'top'
                             pos_hint: {"x": 0.01}
+
+
                 DrawerList:
                     id: navigation_drawer_list
                 

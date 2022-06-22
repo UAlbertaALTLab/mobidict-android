@@ -6,7 +6,7 @@ from core.runner import search
 from core.preferences import DisplayMode, AnimateEmoji
 
 
-def get_main_page_results_list(query: str):
+def get_main_page_results_list(query: str, linguistic_mode = "community"):
     # user_query is the input word from the user
     user_query = query[:]
 
@@ -24,7 +24,8 @@ def get_main_page_results_list(query: str):
         )
         
         search_results = search_run.serialized_presentation_results(
-            dict_source=dict_source
+            dict_source=dict_source,
+            display_mode=linguistic_mode
         )
         
         did_search = True

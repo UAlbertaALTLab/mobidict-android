@@ -49,8 +49,6 @@ initial_result_list = []
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# To update a variable in .kv, you could go self.root.ids.{id}.text = ""
-
 class ClickableLabel(ButtonBehavior, MDLabel):
     pass
 
@@ -65,7 +63,19 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
 
 class ModeSwitch(MDSwitch):
     def change_mode(self):
-        print("Mode changed!")
+        app = App.get_running_app()
+        if self.active:
+            app.linguistic_mode = True
+        else:
+            app.linguistic_mode = False
+        app.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = app.root.ids.specific_result_main_list
+        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
+
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     
@@ -90,25 +100,9 @@ class ParadigmLabelContent(MDBoxLayout):
         root = App.get_running_app().root
         app = App.get_running_app()
         
-        # for paradigm_form in self.data:
-        #     row_box_layout = MDBoxLayout(height="40dp",
-        #                                 size_hint = (1, None))
-            
-        #     row_box_layout.add_widget(Label(text = "[i]" + paradigm_form['label-1'] + "[/i]", 
-        #                                     markup = True,
-        #                                     size_hint = (1, 0.9),
-        #                                     pos_hint = {'center_x': 0.5},
-        #                                     color= (0, 0, 0, 1)))
-        #     row_box_layout.add_widget(Label(text = paradigm_form['word'],
-        #                                     size_hint = (1, 0.9), 
-        #                                     pos_hint = {'center_x': 0.5},
-        #                                     color= (0, 0, 0, 1)))
-        
-        #     layout_row_list.add_widget(row_box_layout)
-        
-        # self.add_widget(layout_row_list)
-        
         paradigm_parameter = ["english", "linguistic", "source_language"]
+        
+        # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
         for pane in self.data['panes']:
@@ -117,9 +111,16 @@ class ParadigmLabelContent(MDBoxLayout):
                 if row['is_header']:
                     txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
                     
-                    row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
+                    if app.index_selected_paradigms == 2:
+                        # source language labels
+                        txt_label = app.get_syllabics_sro_correct_label(txt_label)
+                        txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
+                    
+                    txt_label = "[i]" + txt_label + "[/i]"
+                    
+                    row_box_layout.add_widget(Label(text = txt_label, 
                                                     markup = True,
-                                                    size_hint = (1, 0.9), 
+                                                    size_hint = (0.05, None), 
                                                     pos_hint = {'center_x': 0.5}, 
                                                     color= (0, 0, 0, 1)))
                 else:
@@ -127,20 +128,28 @@ class ParadigmLabelContent(MDBoxLayout):
                         if cell['should_suppress_output']:
                             continue
                         elif cell['is_label']:
-                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms]) + "[/i]",
+                            paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
+
+                            if app.index_selected_paradigms == 2:
+                                paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
+                                paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                            
+                            paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                            
+                            row_box_layout.add_widget(Label(text = paradigm_label_text,
                                                             markup = True,
-                                                            size_hint = (1, 0.9), 
+                                                            size_hint = (0.05, None), 
                                                             pos_hint = {'center_x': 0.5}, 
                                                             color= (0, 0, 0, 1)))
                         elif cell['is_missing'] or cell['is_empty']:
                             row_box_layout.add_widget(Label(text = "--", 
-                                                        size_hint = (1, 0.9), 
+                                                        size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
                         else:
                             txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
                             row_box_layout.add_widget(Label(text = txt_label,
-                                                        size_hint = (1, 0.9), 
+                                                        size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1),
                                                         font_name = 'bjcrus.ttf'))
@@ -149,6 +158,7 @@ class ParadigmLabelContent(MDBoxLayout):
                 
                 print("-"* 60)
         self.add_widget(layout_row_list)
+        # self.add_widget(within_paradigm_scrollview)
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -222,7 +232,6 @@ class ContentNavigationDrawer(MDBoxLayout):
 class SoundLoadSpinner2(MDSpinner):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        app = App.get_running_app()
 
 class AboutMDList(MDList):
     pass
@@ -253,6 +262,7 @@ class DrawerList(MDList):
 class MainLayout(BoxLayout):
     def on_submit_word(self, widget= None):
         root = App.get_running_app().root
+        app = App.get_running_app()
         current_query = root.ids.input_word.text
         
         if not current_query:
@@ -260,7 +270,12 @@ class MainLayout(BoxLayout):
             print("Empty query")
             return
         
-        output_res = get_main_page_results_list(current_query)
+        ling_mode = "community"
+        
+        if app.linguistic_mode:
+            ling_mode = "linguistic"
+        
+        output_res = get_main_page_results_list(current_query, ling_mode)
         print_presentable_output(output_res)
         print("Output:", output_res)
         
@@ -281,7 +296,15 @@ class MainLayout(BoxLayout):
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
-            ic, emoji = data['lemma_wordform']['inflectional_category_plain_english'], data['lemma_wordform']['wordclass_emoji']
+            
+            ic = data['lemma_wordform']['inflectional_category_plain_english']
+            
+            if app.linguistic_mode:
+                ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
+                if 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
+                    ic += " (" +data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
+            
+            emoji = data['lemma_wordform']['wordclass_emoji']
             
             emojis = ""
             subtitle = ""
@@ -365,9 +388,9 @@ class ResultView(RecycleView):
         self.data = initial_data_list
     
     def update_data(self, data):
+        app = App.get_running_app()
         self.data = data.copy()
-        # root = App.get_running_app().root
-        # root.ids.result_list_main.refresh_from_data()
+        app.newest_result_list = data.copy()
         self.refresh_from_data()
 
 class ResultWidget(BoxLayout):
@@ -500,12 +523,6 @@ class ResultWidget(BoxLayout):
         self.bind(definitions = self.update_row, lemma_wordform = self.update_row)
     
     def update_row(self, *args):
-        print("-"*100)
-        
-        print("=> title: ", self.title)
-        print("=> subtitle: ", self.subtitle)
-        print("=> emojis", self.emojis)
-        print("=> definitions", self.definitions)
         
         self.clear_widgets()
         
@@ -621,7 +638,9 @@ class ResultWidget(BoxLayout):
     #     return super(ResultWidget, self).on_touch_down(touch)
         
     def on_click_label(self, touch):
+        app = App.get_running_app()
         root = App.get_running_app().root
+        app.last_result_list_index_click = self.index
         root.ids.screen_manager.switch_to_result_screen(self.index, self.title, self.emojis, self.subtitle, self.default_title, self.definitions)
     
     def on_click_form_of_lemma(self, touch):
@@ -804,6 +823,9 @@ class MorphodictApp(MDApp):
         self.index_selected = 0
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
+        self.linguistic_mode = False
+        self.last_result_list_index_click = None
+        self.newest_result_list = []
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -962,7 +984,8 @@ class MorphodictApp(MDApp):
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_about},
                              {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
-                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
+                             # {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}
+                            ]
         
         for drawer_item in drawer_items_list:
             row_item = OneLineIconListItem(text=drawer_item['text'], on_release=drawer_item['callback'])
