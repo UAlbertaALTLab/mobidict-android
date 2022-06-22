@@ -111,7 +111,14 @@ class ParadigmLabelContent(MDBoxLayout):
                 if row['is_header']:
                     txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
                     
-                    row_box_layout.add_widget(Label(text = "[i]" + txt_label + "[/i]", 
+                    if app.index_selected_paradigms == 2:
+                        # source language labels
+                        txt_label = app.get_syllabics_sro_correct_label(txt_label)
+                        txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
+                    
+                    txt_label = "[i]" + txt_label + "[/i]"
+                    
+                    row_box_layout.add_widget(Label(text = txt_label, 
                                                     markup = True,
                                                     size_hint = (0.05, None), 
                                                     pos_hint = {'center_x': 0.5}, 
@@ -121,7 +128,15 @@ class ParadigmLabelContent(MDBoxLayout):
                         if cell['should_suppress_output']:
                             continue
                         elif cell['is_label']:
-                            row_box_layout.add_widget(Label(text = "[i]" + relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms]) + "[/i]",
+                            paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
+
+                            if app.index_selected_paradigms == 2:
+                                paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
+                                paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                            
+                            paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                            
+                            row_box_layout.add_widget(Label(text = paradigm_label_text,
                                                             markup = True,
                                                             size_hint = (0.05, None), 
                                                             pos_hint = {'center_x': 0.5}, 
