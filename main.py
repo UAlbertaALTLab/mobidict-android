@@ -984,7 +984,8 @@ class MorphodictApp(MDApp):
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_about},
                              {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
-                             {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}]
+                             # {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}
+                            ]
         
         for drawer_item in drawer_items_list:
             row_item = OneLineIconListItem(text=drawer_item['text'], on_release=drawer_item['callback'])
