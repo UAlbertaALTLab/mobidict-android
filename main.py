@@ -102,7 +102,7 @@ class ParadigmLabelContent(MDBoxLayout):
         
         paradigm_parameter = ["english", "linguistic", "source_language"]
         
-        within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
+        # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
         for pane in self.data['panes']:
@@ -142,8 +142,8 @@ class ParadigmLabelContent(MDBoxLayout):
                 layout_row_list.add_widget(row_box_layout)
                 
                 print("-"* 60)
-        within_paradigm_scrollview.add_widget(layout_row_list)
-        self.add_widget(within_paradigm_scrollview)
+        self.add_widget(layout_row_list)
+        # self.add_widget(within_paradigm_scrollview)
 
 class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
