@@ -80,36 +80,11 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['menu', lambda x: nav_drawer.set_state("open")]]
-                    BoxLayout:
-                        size_hint: 1, 0.3
-                        Label:
-                            text: ""
-                            size_hint: 0.1, 0.1
-                        Image:
-                            source: 'images/itwewina.png'
-                            size_hint: None, None
-                            height: "35dp"
-                            width: "40dp"
-                            pos_hint: {"y": 0.25}
-                        BoxLayout:
-                            orientation: 'vertical'
-                            size_hint: 1, 0.8
-                            Label:
-                                text: "itwêwina"
-                                font_size: 20
-                                text_size: self.size
-                                color: (0.635, 0.105, 0.105, 1)
-                                halign: 'left'
-                                valign: 'bottom'
-                                pos_hint: {"x": 0.01}
-                            Label:
-                                text: "Plains Cree Dictionary"
-                                color: (0, 0, 0, 1)
-                                font_size: 11
-                                text_size: self.size
-                                halign: 'left'
-                                valign: 'top'
-                                pos_hint: {"x": 0.01}
+                    Image:
+                        source: 'images/itwewina-with-text.png'
+                        size: "175dp", "250dp"
+                        size_hint: None, 0.2
+                        pos_hint: {'x': 0.08}
                         
                     MDTextField:
                         id: input_word
@@ -356,8 +331,9 @@ MainScreen:
                     size_hint: 1, 0.05
                 Image:
                     source: 'images/itwewina-with-text.png'
-                    size_hint: 1, 0.5
-                    pos_hint: {'center_x': 0.35}
+                    size: "175dp", "250dp"
+                    size_hint: None, 0.6
+                    pos_hint: {'x': 0.01}
 
                 DrawerList:
                     id: navigation_drawer_list
