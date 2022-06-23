@@ -301,8 +301,8 @@ class MainLayout(BoxLayout):
             
             if app.linguistic_mode:
                 ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
-                if 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
-                    ic += " (" +data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
+                if ic is not None and 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
+                    ic += " (" + data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
             
             emoji = data['lemma_wordform']['wordclass_emoji']
             
@@ -421,9 +421,14 @@ class ResultWidget(BoxLayout):
             
             title_icon_box_layout = BoxLayout()
             
+            main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+            
+            if not self.is_lemma and self.show_form_of:
+                main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
+                
             title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
             title_label._label.refresh()
-            title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
+            title_label = ClickableLabel(text=main_title_label_text_markup, 
                                             markup=True,
                                             on_release=self.on_click_label,
                                             size_hint=(None, 1),
@@ -486,6 +491,13 @@ class ResultWidget(BoxLayout):
                 
                 line_break = MDSeparator()
                 self.add_widget(line_break)
+                
+                form_of_lemma2 = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                
+                self.add_widget(form_of_lemma2)
             
             description_box_layout = BoxLayout()
             
@@ -534,10 +546,15 @@ class ResultWidget(BoxLayout):
             return
             
         title_icon_box_layout = BoxLayout()
+        
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+            
+        if not self.is_lemma and self.show_form_of:
+            main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
         title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
         title_label._label.refresh()
-        title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
+        title_label = ClickableLabel(text=main_title_label_text_markup, 
                                         markup=True,
                                         on_release=self.on_click_label,
                                         size_hint=(None, 1),
@@ -597,6 +614,15 @@ class ResultWidget(BoxLayout):
             
             line_break = MDSeparator()
             self.add_widget(line_break)
+            
+            form_of_lemma2 = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                
+            self.add_widget(form_of_lemma2)
+            
+            
         
         description_box_layout = BoxLayout()
         
@@ -638,6 +664,9 @@ class ResultWidget(BoxLayout):
     #     return super(ResultWidget, self).on_touch_down(touch)
         
     def on_click_label(self, touch):
+        if not self.is_lemma and self.show_form_of:
+            # Shouldn't be clicked/redirected.
+            return
         app = App.get_running_app()
         root = App.get_running_app().root
         app.last_result_list_index_click = self.index
