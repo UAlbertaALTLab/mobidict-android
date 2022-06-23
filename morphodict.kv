@@ -169,14 +169,11 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
-                    BoxLayout:
-                        size_hint: 1, 0.2
-                        Image:
-                            source: 'images/itwewina-with-text.png'
-                        
-                        MDLabel:
-                            text: ""
-                            size_hint: 1, 0.05
+                    Image:
+                        source: 'images/itwewina-with-text.png'
+                        size: "175dp", "250dp"
+                        size_hint: None, 0.2
+                        pos_hint: {'x': 0.01}
 
                     MDBoxLayout:
                         padding: "10dp"
@@ -360,7 +357,7 @@ MainScreen:
                 Image:
                     source: 'images/itwewina-with-text.png'
                     size_hint: 1, 0.5
-                    pos_hint: {'center_x': 0.3}
+                    pos_hint: {'center_x': 0.35}
 
                 DrawerList:
                     id: navigation_drawer_list
