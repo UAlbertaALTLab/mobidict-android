@@ -378,35 +378,12 @@ MainScreen:
                 MDLabel:
                     text: ""
                     size_hint: 1, 0.05
-                MDBoxLayout:
-                    orientation: 'horizontal'
-                    size_hint: 1, 0.25
-                    Image:
-                        source: 'images/itwewina.png'
-                        size_hint: None, None
-                        height: "35dp"
-                        width: "40dp"
-                        pos_hint: {"y": 0.01}
-                    BoxLayout:
-                        orientation: 'vertical'
-                        size_hint: 1, 0.8
-                        Label:
-                            text: "itwêwina"
-                            font_size: 15
-                            text_size: self.size
-                            color: (0.635, 0.105, 0.105, 1)
-                            halign: 'left'
-                            valign: 'bottom'
-                            pos_hint: {"x": 0.01}
-                        Label:
-                            text: "Plains Cree Dictionary"
-                            color: (0, 0, 0, 1)
-                            font_size: 11
-                            text_size: self.size
-                            halign: 'left'
-                            valign: 'top'
-                            pos_hint: {"x": 0.01}
-
+                Image:
+                    source: 'images/itwewina-with-text.png'
+                    size_hint: 1, 0.5
+                    pos_hint: {'center_x': 0.3}
+                    #keep_ratio: False
+                    #allow_stretch: True
 
                 DrawerList:
                     id: navigation_drawer_list
@@ -422,10 +399,14 @@ MainScreen:
                     on_release: app.paradigm_labels_menu.open()
 
                 MDBoxLayout:
-                    size_hint: (1, 0.35)
-                    MDLabel:
+                    size_hint: (1, 0.3)
+                    Label:
                         text: "Linguistic Mode"
                         size_hint: (0.5, 1)
+                        color: (0, 0, 0, 1)
+                        text_size: self.size
+                        padding_x: "5dp"
+                        halign: 'left'
                     ModeSwitch:
                         id: linguistic_community_mode
                         on_active: self.change_mode()
