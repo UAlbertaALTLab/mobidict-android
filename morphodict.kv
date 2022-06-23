@@ -170,35 +170,14 @@ MainScreen:
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
                     BoxLayout:
-                        size_hint: 1, 0.15
-                        Label:
-                            text: ""
-                            size_hint: 0.1, 0.02
+                        size_hint: 1, 0.2
                         Image:
-                            source: 'images/itwewina.png'
-                            size_hint: None, None
-                            height: "35dp"
-                            width: "40dp"
-                            pos_hint: {"y": 0.25}
-                        BoxLayout:
-                            orientation: 'vertical'
-                            size_hint: 1, 0.8
-                            Label:
-                                text: "itwêwina"
-                                font_size: 20
-                                text_size: self.size
-                                color: (0.635, 0.105, 0.105, 1)
-                                halign: 'left'
-                                valign: 'bottom'
-                                pos_hint: {"x": 0.01}
-                            Label:
-                                text: "Plains Cree Dictionary"
-                                color: (0, 0, 0, 1)
-                                font_size: 11
-                                text_size: self.size
-                                halign: 'left'
-                                valign: 'top'
-                                pos_hint: {"x": 0.01}
+                            source: 'images/itwewina-with-text.png'
+                        
+                        MDLabel:
+                            text: ""
+                            size_hint: 1, 0.05
+
                     MDBoxLayout:
                         padding: "10dp"
                         ScrollView:
@@ -382,8 +361,6 @@ MainScreen:
                     source: 'images/itwewina-with-text.png'
                     size_hint: 1, 0.5
                     pos_hint: {'center_x': 0.3}
-                    #keep_ratio: False
-                    #allow_stretch: True
 
                 DrawerList:
                     id: navigation_drawer_list
