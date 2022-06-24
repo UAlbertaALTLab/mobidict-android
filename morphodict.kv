@@ -29,12 +29,18 @@ MainScreen:
 <ResultWidget>:
     id: res
     orientation: 'vertical'
-    # canvas.before:
-    #     Color:
-    #         rgba: (1, 0, 0, 1)
-    #     Rectangle:
-    #         pos: self.pos
-    #         size: self.size
+    padding: "5dp"
+    canvas.before:
+        Color:
+            rgba: 0.8671875, 0.8671875, 0.8671875, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
 
 <ResultView>:
     viewclass: 'ResultWidget'
