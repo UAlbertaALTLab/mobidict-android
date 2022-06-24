@@ -1,3 +1,4 @@
+from email.policy import default
 import webbrowser
 import threading
 import paradigm_panes
@@ -8,7 +9,8 @@ from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.metrics import dp
+from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -415,7 +417,7 @@ class ResultWidget(MDBoxLayout):
         super().__init__(**kwargs)
         Clock.schedule_once(self.row_initialization, 0)
     
-    def row_initialization(self, dp):
+    def row_initialization(self, *args):
         if self.index != -1:
             app = App.get_running_app()
             
@@ -512,6 +514,9 @@ class ResultWidget(MDBoxLayout):
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+        
+            if self.subtitle == "":
+                self.subtitle = "None"
         
             desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
             
@@ -638,6 +643,9 @@ class ResultWidget(MDBoxLayout):
                               markup=True,
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
+        
+        if self.subtitle == "":
+            self.subtitle = "None"
         
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
         
@@ -850,6 +858,7 @@ class MorphodictApp(MDApp):
     about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
     about_text_credit = ABOUT_TEXT_CREDITS
     spinner2_active = BooleanProperty(defaultvalue = False)
+    # result_default_size = NumericProperty(defaultvalue = dp(200))
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
