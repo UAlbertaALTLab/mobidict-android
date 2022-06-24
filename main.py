@@ -450,11 +450,13 @@ class ResultWidget(BoxLayout):
                 
                 title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
-                                                                   user_font_size="20dp"))
+                                                                   user_font_size="20dp",
+                                                                   pos_hint = {'center_y': 0.5}))
                 
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                 user_font_size="20dp",
-                                                                on_release=self.play_sound))
+                                                                on_release=self.play_sound,
+                                                                pos_hint = {'center_y': 0.5}))
 
             self.add_widget(title_icon_box_layout)
             
@@ -574,11 +576,13 @@ class ResultWidget(BoxLayout):
                 tooltip_content = tooltip_content[:-1]
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
-                                                               user_font_size="20dp"))
+                                                               user_font_size="20dp",
+                                                               pos_hint = {'center_y': 0.5}))
             
         title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                             user_font_size="20dp",
-                                                            on_release=self.play_sound))
+                                                            on_release=self.play_sound,
+                                                            pos_hint = {'center_y': 0.5}))
         
         self.add_widget(title_icon_box_layout)
         
@@ -691,10 +695,11 @@ class ResultWidget(BoxLayout):
             toast("No recording available for this word.")
             return
         
+        toast("Playing sound...", duration = 1)
+        
         # Instead of audio URL, play the file just loaded
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
-            print("Playing sound...")
             sound.play()
             
 class SpecificResultMainList(MDList):
