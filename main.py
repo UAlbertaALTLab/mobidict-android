@@ -393,7 +393,7 @@ class ResultView(RecycleView):
         app.newest_result_list = data.copy()
         self.refresh_from_data()
 
-class ResultWidget(BoxLayout):
+class ResultWidget(MDBoxLayout):
     index = ObjectProperty()
     default_title = ObjectProperty()
     title = ObjectProperty()
