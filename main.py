@@ -861,10 +861,11 @@ class SpecificResultMainList(MDList):
                         else:
                             cells_dict = row.copy()
                             cells_dict['cells'] = []
+                            # The subheaders are not right in all paradigm panes subheaders
                             for idx, cell in enumerate(row['cells']):
                                 if idx in current_columns:
                                     cells_dict['cells'].append(cell)
-                                    if i1 == current_columns[1] and cell["is_label"]:
+                                    if i1 == 1 and idx == current_columns[1] and cell["is_label"]:
                                         paradigm_subheader = relabel(cell["label"], "english")
                             altered_pane['tr_rows'].append(cells_dict)
                     all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
