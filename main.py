@@ -95,70 +95,70 @@ class ParadigmLabelContent(MDBoxLayout):
         '''
         Population of each expansion panel
         '''
-        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
-        
-        layout_row_list = MDList()
         
         root = App.get_running_app().root
         app = App.get_running_app()
         
+        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
+        
+        layout_row_list = MDList()
+        
         paradigm_parameter = ["english", "linguistic", "source_language"]
+        
+        print("Current PARADIGM pane: ", self.data)
         
         # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
-        for pane in self.data['panes']:
-            for row in pane['tr_rows']:
-                row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
-                if row['is_header']:
-                    txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
-                    
-                    if app.index_selected_paradigms == 2:
-                        # source language labels
-                        txt_label = app.get_syllabics_sro_correct_label(txt_label)
-                        txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
-                    
-                    txt_label = "[i]" + txt_label + "[/i]"
-                    
-                    row_box_layout.add_widget(Label(text = txt_label, 
-                                                    markup = True,
-                                                    size_hint = (0.05, None), 
-                                                    pos_hint = {'center_x': 0.5}, 
-                                                    color= (0, 0, 0, 1)))
-                else:
-                    for cell in row['cells']:
-                        if cell['should_suppress_output']:
-                            continue
-                        elif cell['is_label']:
-                            paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
+        for row in self.data['tr_rows']:
+            row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
+            if row['is_header']:
+                txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
+                
+                if app.index_selected_paradigms == 2:
+                    # source language labels
+                    txt_label = app.get_syllabics_sro_correct_label(txt_label)
+                    txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
+                
+                txt_label = "[i]" + txt_label + "[/i]"
+                
+                row_box_layout.add_widget(Label(text = txt_label, 
+                                                markup = True,
+                                                size_hint = (0.05, None), 
+                                                pos_hint = {'center_x': 0.5}, 
+                                                color= (0, 0, 0, 1)))
+            else:
+                for cell in row['cells']:
+                    if cell['should_suppress_output']:
+                        continue
+                    elif cell['is_label']:
+                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
 
-                            if app.index_selected_paradigms == 2:
-                                paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
-                                paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
-                            
-                            paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
-                            
-                            row_box_layout.add_widget(Label(text = paradigm_label_text,
-                                                            markup = True,
-                                                            size_hint = (0.05, None), 
-                                                            pos_hint = {'center_x': 0.5}, 
-                                                            color= (0, 0, 0, 1)))
-                        elif cell['is_missing'] or cell['is_empty']:
-                            row_box_layout.add_widget(Label(text = "--", 
+                        if app.index_selected_paradigms == 2:
+                            paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
+                            paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                        
+                        paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                        
+                        row_box_layout.add_widget(Label(text = paradigm_label_text,
+                                                        markup = True,
                                                         size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
-                        else:
-                            txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
-                            row_box_layout.add_widget(Label(text = txt_label,
-                                                        size_hint = (0.05, None), 
-                                                        pos_hint = {'center_x': 0.5}, 
-                                                        color= (0, 0, 0, 1),
-                                                        font_name = 'bjcrus.ttf'))
-                    
-                layout_row_list.add_widget(row_box_layout)
+                    elif cell['is_missing'] or cell['is_empty']:
+                        row_box_layout.add_widget(Label(text = "--", 
+                                                    size_hint = (0.05, None), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1)))
+                    else:
+                        txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
+                        row_box_layout.add_widget(Label(text = txt_label,
+                                                    size_hint = (0.05, None), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1),
+                                                    font_name = 'bjcrus.ttf'))
                 
-                print("-"* 60)
+            layout_row_list.add_widget(row_box_layout)
         self.add_widget(layout_row_list)
         # self.add_widget(within_paradigm_scrollview)
 
@@ -811,16 +811,72 @@ class SpecificResultMainList(MDList):
         
         paradigm_data = paradigm.copy()
         
-        pane_1 = MDExpansionPanel(
-                    icon="bookshelf",
-                    content=ParadigmLabelContent(paradigm_data),
-                    panel_cls=MDExpansionPanelTwoLine(
-                        text= 'Paradigms',
-                        secondary_text= 'Click to expand'
-                    ),
-                )
+        # Decide how many panels to add
+        all_panes = []
         
-        self.add_widget(pane_1)
+        for pane in paradigm_data['panes']:
+            pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
+            pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
+            only_labels_in_first_row = True
+            nlabels = 0
+            
+            for cell in pane_first_row['cells']:
+                if cell['should_suppress_output']:
+                    continue
+                elif cell['is_label']:
+                    nlabels += 1
+                elif cell['is_missing'] or cell['is_empty']:
+                    pass
+                else:
+                    only_labels_in_first_row = False
+                    break
+            
+            if len(pane_first_row['cells']) == 0:
+                only_labels_in_first_row = False
+            
+            if not only_labels_in_first_row:
+                print("Adding pane directly!")
+                all_panes.append(pane)
+            else:
+                # We need to separately add the pane.
+                print("Need to divide pane - nlabels columns: ", nlabels)
+                for i in range(1, nlabels + 1):
+                    current_columns = [0, i]
+                    altered_pane = {'tr_rows': []}
+                    for row in pane['tr_rows']:
+                        if row['is_header']:
+                            altered_pane['tr_rows'].append(row)
+                        else:
+                            cells_dict = row.copy()
+                            cells_dict['cells'] = []
+                            for idx, cell in enumerate(row['cells']):
+                                if idx in current_columns:
+                                    cells_dict['cells'].append(cell)
+                            altered_pane['tr_rows'].append(cells_dict)
+                    all_panes.append(altered_pane)
+            
+            print("=" * 80)
+            
+        for each_pane in all_panes:
+            self.add_widget(MDExpansionPanel(
+                            icon="bookshelf",
+                            content=ParadigmLabelContent(each_pane),
+                            panel_cls=MDExpansionPanelTwoLine(
+                                text= 'Paradigms',
+                                secondary_text= 'Click to expand'
+                            ),
+                            ))
+        
+        # pane_1 = MDExpansionPanel(
+        #             icon="bookshelf",
+        #             content=ParadigmLabelContent(paradigm_data),
+        #             panel_cls=MDExpansionPanelTwoLine(
+        #                 text= 'Paradigms',
+        #                 secondary_text= 'Click to expand'
+        #             ),
+        #         )
+        
+        # self.add_widget(pane_1)
         
     def play_sound(self, *args):
         print("Default title: ", self.default_title)
