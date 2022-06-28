@@ -814,11 +814,22 @@ class SpecificResultMainList(MDList):
         # Decide how many panels to add
         all_panes = []
         
-        for pane in paradigm_data['panes']:
+        for index, pane in enumerate(paradigm_data['panes']):
             pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
             pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
             only_labels_in_first_row = True
             nlabels = 0
+            
+            paradigm_header = ""
+            paradigm_subheader = ""
+            
+            if index == 0:
+                paradigm_header = "Paradigms"
+                paradigm_subheader = "core"
+            else:
+                paradigm_header = "Paradigms"
+                paradigm_subheader = relabel(pane_header['label'], "english")
+                
             
             for cell in pane_first_row['cells']:
                 if cell['should_suppress_output']:
@@ -836,15 +847,16 @@ class SpecificResultMainList(MDList):
             
             if not only_labels_in_first_row:
                 print("Adding pane directly!")
-                all_panes.append(pane)
+                all_panes.append({'pane': pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
             else:
                 # We need to separately add the pane.
                 print("Need to divide pane - nlabels columns: ", nlabels)
                 for i in range(1, nlabels + 1):
                     current_columns = [0, i]
                     altered_pane = {'tr_rows': []}
-                    for row in pane['tr_rows']:
+                    for i1, row in enumerate(pane['tr_rows']):
                         if row['is_header']:
+                            paradigm_header = relabel(row['label'], "english")
                             altered_pane['tr_rows'].append(row)
                         else:
                             cells_dict = row.copy()
@@ -852,18 +864,20 @@ class SpecificResultMainList(MDList):
                             for idx, cell in enumerate(row['cells']):
                                 if idx in current_columns:
                                     cells_dict['cells'].append(cell)
+                                    if i1 == current_columns[1] and cell["is_label"]:
+                                        paradigm_subheader = relabel(cell["label"], "english")
                             altered_pane['tr_rows'].append(cells_dict)
-                    all_panes.append(altered_pane)
+                    all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
             
             print("=" * 80)
             
         for each_pane in all_panes:
             self.add_widget(MDExpansionPanel(
                             icon="bookshelf",
-                            content=ParadigmLabelContent(each_pane),
+                            content=ParadigmLabelContent(each_pane['pane']),
                             panel_cls=MDExpansionPanelTwoLine(
-                                text= 'Paradigms',
-                                secondary_text= 'Click to expand'
+                                text= each_pane['header'],
+                                secondary_text= each_pane['subheader']
                             ),
                             ))
         
