@@ -29,18 +29,24 @@ MainScreen:
 <ResultWidget>:
     id: res
     orientation: 'vertical'
-    # canvas.before:
-    #     Color:
-    #         rgba: (1, 0, 0, 1)
-    #     Rectangle:
-    #         pos: self.pos
-    #         size: self.size
+    padding: "5dp"
+    canvas.before:
+        Color:
+            rgba: 0.8671875, 0.8671875, 0.8671875, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
 
 <ResultView>:
     viewclass: 'ResultWidget'
     RecycleBoxLayout:
-        spacing: "15dp"
-        default_size: None, dp(150)
+        spacing: "22dp"
+        default_size: None, dp(190)
         default_size_hint: 1, None
         default_pos_hint: {'x': 0.1}
         size_hint_y: None
@@ -80,36 +86,11 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['menu', lambda x: nav_drawer.set_state("open")]]
-                    BoxLayout:
-                        size_hint: 1, 0.3
-                        Label:
-                            text: ""
-                            size_hint: 0.1, 0.1
-                        Image:
-                            source: 'images/itwewina.png'
-                            size_hint: None, None
-                            height: "35dp"
-                            width: "40dp"
-                            pos_hint: {"y": 0.25}
-                        BoxLayout:
-                            orientation: 'vertical'
-                            size_hint: 1, 0.8
-                            Label:
-                                text: "itwêwina"
-                                font_size: 20
-                                text_size: self.size
-                                color: (0.635, 0.105, 0.105, 1)
-                                halign: 'left'
-                                valign: 'bottom'
-                                pos_hint: {"x": 0.01}
-                            Label:
-                                text: "Plains Cree Dictionary"
-                                color: (0, 0, 0, 1)
-                                font_size: 11
-                                text_size: self.size
-                                halign: 'left'
-                                valign: 'top'
-                                pos_hint: {"x": 0.01}
+                    Image:
+                        source: 'images/itwewina-with-text.png'
+                        size: "175dp", "250dp"
+                        size_hint: None, 0.2
+                        pos_hint: {'x': 0.08}
                         
                     MDTextField:
                         id: input_word
@@ -169,36 +150,12 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
-                    BoxLayout:
-                        size_hint: 1, 0.15
-                        Label:
-                            text: ""
-                            size_hint: 0.1, 0.02
-                        Image:
-                            source: 'images/itwewina.png'
-                            size_hint: None, None
-                            height: "35dp"
-                            width: "40dp"
-                            pos_hint: {"y": 0.25}
-                        BoxLayout:
-                            orientation: 'vertical'
-                            size_hint: 1, 0.8
-                            Label:
-                                text: "itwêwina"
-                                font_size: 20
-                                text_size: self.size
-                                color: (0.635, 0.105, 0.105, 1)
-                                halign: 'left'
-                                valign: 'bottom'
-                                pos_hint: {"x": 0.01}
-                            Label:
-                                text: "Plains Cree Dictionary"
-                                color: (0, 0, 0, 1)
-                                font_size: 11
-                                text_size: self.size
-                                halign: 'left'
-                                valign: 'top'
-                                pos_hint: {"x": 0.01}
+                    Image:
+                        source: 'images/itwewina-with-text.png'
+                        size: "175dp", "250dp"
+                        size_hint: None, 0.2
+                        pos_hint: {'x': 0.01}
+
                     MDBoxLayout:
                         padding: "10dp"
                         ScrollView:
@@ -378,35 +335,11 @@ MainScreen:
                 MDLabel:
                     text: ""
                     size_hint: 1, 0.05
-                MDBoxLayout:
-                    orientation: 'horizontal'
-                    size_hint: 1, 0.25
-                    Image:
-                        source: 'images/itwewina.png'
-                        size_hint: None, None
-                        height: "35dp"
-                        width: "40dp"
-                        pos_hint: {"y": 0.01}
-                    BoxLayout:
-                        orientation: 'vertical'
-                        size_hint: 1, 0.8
-                        Label:
-                            text: "itwêwina"
-                            font_size: 15
-                            text_size: self.size
-                            color: (0.635, 0.105, 0.105, 1)
-                            halign: 'left'
-                            valign: 'bottom'
-                            pos_hint: {"x": 0.01}
-                        Label:
-                            text: "Plains Cree Dictionary"
-                            color: (0, 0, 0, 1)
-                            font_size: 11
-                            text_size: self.size
-                            halign: 'left'
-                            valign: 'top'
-                            pos_hint: {"x": 0.01}
-
+                Image:
+                    source: 'images/itwewina-with-text.png'
+                    size: "175dp", "250dp"
+                    size_hint: None, 0.6
+                    pos_hint: {'x': 0.01}
 
                 DrawerList:
                     id: navigation_drawer_list
@@ -422,13 +355,32 @@ MainScreen:
                     on_release: app.paradigm_labels_menu.open()
 
                 MDBoxLayout:
-                    size_hint: (1, 0.35)
-                    MDLabel:
+                    size_hint: (1, 0.3)
+                    Label:
                         text: "Linguistic Mode"
                         size_hint: (0.5, 1)
+                        color: (0, 0, 0, 1)
+                        text_size: self.size
+                        padding_x: "5dp"
+                        halign: 'left'
                     ModeSwitch:
                         id: linguistic_community_mode
                         on_active: self.change_mode()
+                        pos_hint: {'center_y': 0.3}
+                
+                MDBoxLayout:
+                    size_hint: (1, 0.3)
+                    Label:
+                        text: "Show Emojis"
+                        size_hint: (0.5, 1)
+                        color: (0, 0, 0, 1)
+                        text_size: self.size
+                        padding_x: "5dp"
+                        halign: 'left'
+                    EmojiSwitch:
+                        id: display_emoji_switch
+                        on_active: self.change_mode()
+                        pos_hint: {'center_y': 0.3}
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"

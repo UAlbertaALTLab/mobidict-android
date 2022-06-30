@@ -1,3 +1,4 @@
+from email.policy import default
 import webbrowser
 import threading
 import paradigm_panes
@@ -8,7 +9,8 @@ from kivy.clock import Clock
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.metrics import dp
+from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -76,6 +78,24 @@ class ModeSwitch(MDSwitch):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.definitions)
 
+
+class EmojiSwitch(MDSwitch):
+    def change_mode(self):
+        print("Emojis display changed")
+        app = App.get_running_app()
+        if self.active:
+            app.display_emoji_mode = True
+        else:
+            app.display_emoji_mode = False
+        
+        app.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = app.root.ids.specific_result_main_list
+        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
+
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     
@@ -93,70 +113,70 @@ class ParadigmLabelContent(MDBoxLayout):
         '''
         Population of each expansion panel
         '''
-        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
-        
-        layout_row_list = MDList()
         
         root = App.get_running_app().root
         app = App.get_running_app()
         
+        self.add_widget(MDLabel(text = "", size_hint = (1, 0.1)))
+        
+        layout_row_list = MDList()
+        
         paradigm_parameter = ["english", "linguistic", "source_language"]
+        
+        print("Current PARADIGM pane: ", self.data)
         
         # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
-        for pane in self.data['panes']:
-            for row in pane['tr_rows']:
-                row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
-                if row['is_header']:
-                    txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
-                    
-                    if app.index_selected_paradigms == 2:
-                        # source language labels
-                        txt_label = app.get_syllabics_sro_correct_label(txt_label)
-                        txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
-                    
-                    txt_label = "[i]" + txt_label + "[/i]"
-                    
-                    row_box_layout.add_widget(Label(text = txt_label, 
-                                                    markup = True,
-                                                    size_hint = (0.05, None), 
-                                                    pos_hint = {'center_x': 0.5}, 
-                                                    color= (0, 0, 0, 1)))
-                else:
-                    for cell in row['cells']:
-                        if cell['should_suppress_output']:
-                            continue
-                        elif cell['is_label']:
-                            paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
+        for row in self.data['tr_rows']:
+            row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
+            if row['is_header']:
+                txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
+                
+                if app.index_selected_paradigms == 2:
+                    # source language labels
+                    txt_label = app.get_syllabics_sro_correct_label(txt_label)
+                    txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
+                
+                txt_label = "[i]" + txt_label + "[/i]"
+                
+                row_box_layout.add_widget(Label(text = txt_label, 
+                                                markup = True,
+                                                size_hint = (0.05, None), 
+                                                pos_hint = {'center_x': 0.5}, 
+                                                color= (0, 0, 0, 1)))
+            else:
+                for cell in row['cells']:
+                    if cell['should_suppress_output']:
+                        continue
+                    elif cell['is_label']:
+                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
 
-                            if app.index_selected_paradigms == 2:
-                                paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
-                                paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
-                            
-                            paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
-                            
-                            row_box_layout.add_widget(Label(text = paradigm_label_text,
-                                                            markup = True,
-                                                            size_hint = (0.05, None), 
-                                                            pos_hint = {'center_x': 0.5}, 
-                                                            color= (0, 0, 0, 1)))
-                        elif cell['is_missing'] or cell['is_empty']:
-                            row_box_layout.add_widget(Label(text = "--", 
+                        if app.index_selected_paradigms == 2:
+                            paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
+                            paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                        
+                        paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                        
+                        row_box_layout.add_widget(Label(text = paradigm_label_text,
+                                                        markup = True,
                                                         size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
                                                         color= (0, 0, 0, 1)))
-                        else:
-                            txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
-                            row_box_layout.add_widget(Label(text = txt_label,
-                                                        size_hint = (0.05, None), 
-                                                        pos_hint = {'center_x': 0.5}, 
-                                                        color= (0, 0, 0, 1),
-                                                        font_name = 'bjcrus.ttf'))
-                    
-                layout_row_list.add_widget(row_box_layout)
+                    elif cell['is_missing'] or cell['is_empty']:
+                        row_box_layout.add_widget(Label(text = "--", 
+                                                    size_hint = (0.05, None), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1)))
+                    else:
+                        txt_label = app.get_syllabics_sro_correct_label(cell['inflection'])
+                        row_box_layout.add_widget(Label(text = txt_label,
+                                                    size_hint = (0.05, None), 
+                                                    pos_hint = {'center_x': 0.5}, 
+                                                    color= (0, 0, 0, 1),
+                                                    font_name = 'bjcrus.ttf'))
                 
-                print("-"* 60)
+            layout_row_list.add_widget(row_box_layout)
         self.add_widget(layout_row_list)
         # self.add_widget(within_paradigm_scrollview)
 
@@ -301,8 +321,8 @@ class MainLayout(BoxLayout):
             
             if app.linguistic_mode:
                 ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
-                if 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
-                    ic += " (" +data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
+                if ic is not None and 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
+                    ic += " (" + data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
             
             emoji = data['lemma_wordform']['wordclass_emoji']
             
@@ -393,7 +413,7 @@ class ResultView(RecycleView):
         app.newest_result_list = data.copy()
         self.refresh_from_data()
 
-class ResultWidget(BoxLayout):
+class ResultWidget(MDBoxLayout):
     index = ObjectProperty()
     default_title = ObjectProperty()
     title = ObjectProperty()
@@ -415,15 +435,20 @@ class ResultWidget(BoxLayout):
         super().__init__(**kwargs)
         Clock.schedule_once(self.row_initialization, 0)
     
-    def row_initialization(self, dp):
+    def row_initialization(self, *args):
         if self.index != -1:
             app = App.get_running_app()
             
             title_icon_box_layout = BoxLayout()
             
+            main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+            
+            if not self.is_lemma and self.show_form_of:
+                main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
+                
             title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
             title_label._label.refresh()
-            title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
+            title_label = ClickableLabel(text=main_title_label_text_markup, 
                                             markup=True,
                                             on_release=self.on_click_label,
                                             size_hint=(None, 1),
@@ -445,11 +470,13 @@ class ResultWidget(BoxLayout):
                 
                 title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
-                                                                   user_font_size="20dp"))
+                                                                   user_font_size="20dp",
+                                                                   pos_hint = {'center_y': 0.5}))
                 
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                 user_font_size="20dp",
-                                                                on_release=self.play_sound))
+                                                                on_release=self.play_sound,
+                                                                pos_hint = {'center_y': 0.5}))
 
             self.add_widget(title_icon_box_layout)
             
@@ -486,6 +513,13 @@ class ResultWidget(BoxLayout):
                 
                 line_break = MDSeparator()
                 self.add_widget(line_break)
+                
+                form_of_lemma2 = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                
+                self.add_widget(form_of_lemma2)
             
             description_box_layout = BoxLayout()
             
@@ -499,9 +533,14 @@ class ResultWidget(BoxLayout):
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
         
+            if self.subtitle == "":
+                self.subtitle = "None"
+        
             desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
             
-            description_box_layout.add_widget(emoji_label)
+            app = App.get_running_app()
+            if app.display_emoji_mode == True:
+                description_box_layout.add_widget(emoji_label)
             description_box_layout.add_widget(desc_label)
             
             self.add_widget(description_box_layout)
@@ -534,10 +573,15 @@ class ResultWidget(BoxLayout):
             return
             
         title_icon_box_layout = BoxLayout()
+        
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+            
+        if not self.is_lemma and self.show_form_of:
+            main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
         title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
         title_label._label.refresh()
-        title_label = ClickableLabel(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", 
+        title_label = ClickableLabel(text=main_title_label_text_markup, 
                                         markup=True,
                                         on_release=self.on_click_label,
                                         size_hint=(None, 1),
@@ -557,11 +601,13 @@ class ResultWidget(BoxLayout):
                 tooltip_content = tooltip_content[:-1]
             title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
-                                                               user_font_size="20dp"))
+                                                               user_font_size="20dp",
+                                                               pos_hint = {'center_y': 0.5}))
             
         title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                             user_font_size="20dp",
-                                                            on_release=self.play_sound))
+                                                            on_release=self.play_sound,
+                                                            pos_hint = {'center_y': 0.5}))
         
         self.add_widget(title_icon_box_layout)
         
@@ -597,6 +643,15 @@ class ResultWidget(BoxLayout):
             
             line_break = MDSeparator()
             self.add_widget(line_break)
+            
+            form_of_lemma2 = ClickableLabel(text=lemma_wordform_text,
+                                               markup=True, 
+                                               on_release=self.on_click_form_of_lemma
+                                               )
+                
+            self.add_widget(form_of_lemma2)
+            
+            
         
         description_box_layout = BoxLayout()
         
@@ -609,9 +664,15 @@ class ResultWidget(BoxLayout):
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
         
+        if self.subtitle == "":
+            self.subtitle = "None"
+        
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
         
-        description_box_layout.add_widget(emoji_label)
+        app = App.get_running_app()
+        
+        if app.display_emoji_mode == True:
+            description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
         self.add_widget(description_box_layout)
@@ -638,6 +699,9 @@ class ResultWidget(BoxLayout):
     #     return super(ResultWidget, self).on_touch_down(touch)
         
     def on_click_label(self, touch):
+        if not self.is_lemma and self.show_form_of:
+            # Shouldn't be clicked/redirected.
+            return
         app = App.get_running_app()
         root = App.get_running_app().root
         app.last_result_list_index_click = self.index
@@ -662,10 +726,11 @@ class ResultWidget(BoxLayout):
             toast("No recording available for this word.")
             return
         
+        toast("Playing sound...", duration = 1)
+        
         # Instead of audio URL, play the file just loaded
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
-            print("Playing sound...")
             sound.play()
             
 class SpecificResultMainList(MDList):
@@ -748,7 +813,8 @@ class SpecificResultMainList(MDList):
     
         desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
         
-        description_box_layout.add_widget(emoji_label)
+        if app.display_emoji_mode:
+            description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
         top_details_box_layout.add_widget(description_box_layout)
@@ -769,16 +835,87 @@ class SpecificResultMainList(MDList):
         
         paradigm_data = paradigm.copy()
         
-        pane_1 = MDExpansionPanel(
-                    icon="bookshelf",
-                    content=ParadigmLabelContent(paradigm_data),
-                    panel_cls=MDExpansionPanelTwoLine(
-                        text= 'Paradigms',
-                        secondary_text= 'Click to expand'
-                    ),
-                )
+        # Decide how many panels to add
+        all_panes = []
         
-        self.add_widget(pane_1)
+        for index, pane in enumerate(paradigm_data['panes']):
+            pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
+            pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
+            only_labels_in_first_row = True
+            nlabels = 0
+            
+            paradigm_header = ""
+            paradigm_subheader = ""
+            
+            if index == 0:
+                paradigm_header = "Paradigms"
+                paradigm_subheader = "core"
+            else:
+                paradigm_header = "Paradigms"
+                paradigm_subheader = relabel(pane_header['label'], "english")
+                
+            
+            for cell in pane_first_row['cells']:
+                if cell['should_suppress_output']:
+                    continue
+                elif cell['is_label']:
+                    nlabels += 1
+                elif cell['is_missing'] or cell['is_empty']:
+                    pass
+                else:
+                    only_labels_in_first_row = False
+                    break
+            
+            if len(pane_first_row['cells']) == 0:
+                only_labels_in_first_row = False
+            
+            if not only_labels_in_first_row:
+                print("Adding pane directly!")
+                all_panes.append({'pane': pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
+            else:
+                # We need to separately add the pane.
+                print("Need to divide pane - nlabels columns: ", nlabels)
+                for i in range(1, nlabels + 1):
+                    current_columns = [0, i]
+                    altered_pane = {'tr_rows': []}
+                    for i1, row in enumerate(pane['tr_rows']):
+                        if row['is_header']:
+                            paradigm_header = relabel(row['label'], "english")
+                            altered_pane['tr_rows'].append(row)
+                        else:
+                            cells_dict = row.copy()
+                            cells_dict['cells'] = []
+                            # The subheaders are not right in all paradigm panes subheaders
+                            for idx, cell in enumerate(row['cells']):
+                                if idx in current_columns:
+                                    cells_dict['cells'].append(cell)
+                                    if i1 == 1 and idx == current_columns[1] and cell["is_label"]:
+                                        paradigm_subheader = relabel(cell["label"], "english")
+                            altered_pane['tr_rows'].append(cells_dict)
+                    all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
+            
+            print("=" * 80)
+            
+        for each_pane in all_panes:
+            self.add_widget(MDExpansionPanel(
+                            icon="bookshelf",
+                            content=ParadigmLabelContent(each_pane['pane']),
+                            panel_cls=MDExpansionPanelTwoLine(
+                                text= each_pane['header'],
+                                secondary_text= each_pane['subheader']
+                            ),
+                            ))
+        
+        # pane_1 = MDExpansionPanel(
+        #             icon="bookshelf",
+        #             content=ParadigmLabelContent(paradigm_data),
+        #             panel_cls=MDExpansionPanelTwoLine(
+        #                 text= 'Paradigms',
+        #                 secondary_text= 'Click to expand'
+        #             ),
+        #         )
+        
+        # self.add_widget(pane_1)
         
     def play_sound(self, *args):
         print("Default title: ", self.default_title)
@@ -816,6 +953,7 @@ class MorphodictApp(MDApp):
     about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
     about_text_credit = ABOUT_TEXT_CREDITS
     spinner2_active = BooleanProperty(defaultvalue = False)
+    # result_default_size = NumericProperty(defaultvalue = dp(200))
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -824,6 +962,7 @@ class MorphodictApp(MDApp):
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
         self.linguistic_mode = False
+        self.display_emoji_mode = False
         self.last_result_list_index_click = None
         self.newest_result_list = []
     
