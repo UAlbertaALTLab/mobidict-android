@@ -82,6 +82,19 @@ class ModeSwitch(MDSwitch):
 class EmojiSwitch(MDSwitch):
     def change_mode(self):
         print("Emojis display changed")
+        app = App.get_running_app()
+        if self.active:
+            app.display_emoji_mode = True
+        else:
+            app.display_emoji_mode = False
+        
+        app.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = app.root.ids.specific_result_main_list
+        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
@@ -525,7 +538,9 @@ class ResultWidget(MDBoxLayout):
         
             desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
             
-            description_box_layout.add_widget(emoji_label)
+            app = App.get_running_app()
+            if app.display_emoji_mode == True:
+                description_box_layout.add_widget(emoji_label)
             description_box_layout.add_widget(desc_label)
             
             self.add_widget(description_box_layout)
@@ -654,7 +669,10 @@ class ResultWidget(MDBoxLayout):
         
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
         
-        description_box_layout.add_widget(emoji_label)
+        app = App.get_running_app()
+        
+        if app.display_emoji_mode == True:
+            description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
         self.add_widget(description_box_layout)
@@ -795,7 +813,8 @@ class SpecificResultMainList(MDList):
     
         desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
         
-        description_box_layout.add_widget(emoji_label)
+        if app.display_emoji_mode:
+            description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
         top_details_box_layout.add_widget(description_box_layout)
@@ -943,6 +962,7 @@ class MorphodictApp(MDApp):
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
         self.linguistic_mode = False
+        self.display_emoji_mode = False
         self.last_result_list_index_click = None
         self.newest_result_list = []
     
