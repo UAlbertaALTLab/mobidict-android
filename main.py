@@ -78,6 +78,11 @@ class ModeSwitch(MDSwitch):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.definitions)
 
+
+class EmojiSwitch(MDSwitch):
+    def change_mode(self):
+        print("Emojis display changed")
+
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
     

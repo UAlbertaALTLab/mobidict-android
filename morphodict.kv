@@ -367,6 +367,20 @@ MainScreen:
                         id: linguistic_community_mode
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
+                
+                MDBoxLayout:
+                    size_hint: (1, 0.3)
+                    Label:
+                        text: "Show Emojis"
+                        size_hint: (0.5, 1)
+                        color: (0, 0, 0, 1)
+                        text_size: self.size
+                        padding_x: "5dp"
+                        halign: 'left'
+                    EmojiSwitch:
+                        id: display_emoji_switch
+                        on_active: self.change_mode()
+                        pos_hint: {'center_y': 0.3}
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"
