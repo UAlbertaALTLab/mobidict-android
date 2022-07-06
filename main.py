@@ -17,6 +17,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.recycleview import RecycleView
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
@@ -372,6 +373,7 @@ class MainLayout(BoxLayout):
             defsToPass = defs.copy()       
             initial_result_list.append({'index': result_id_counter,
                                         'default_title': default_title,
+                                        'height': dp(200),
                                         'title': title, 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
@@ -413,7 +415,10 @@ class ResultView(RecycleView):
         app.newest_result_list = data.copy()
         self.refresh_from_data()
 
-class ResultWidget(MDBoxLayout):
+class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
+    _latest_data = None
+    _rv = None
+    
     index = ObjectProperty()
     default_title = ObjectProperty()
     title = ObjectProperty()
@@ -434,6 +439,19 @@ class ResultWidget(MDBoxLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         Clock.schedule_once(self.row_initialization, 0)
+ 
+    def refresh_view_attrs(self, rv, index, data):
+        self._rv = rv
+        if self._latest_data is not None:
+            self._latest_data["height"] = self.height
+        self._latest_data = data
+        super(ResultWidget, self).refresh_view_attrs(rv, index, data)
+ 
+    def on_height(self, instance, value):
+        data = self._latest_data
+        if data is not None and data["height"] != value:
+            data["height"] = value
+            self._rv.refresh_from_data()
     
     def row_initialization(self, *args):
         if self.index != -1:
