@@ -1,4 +1,5 @@
 from email.policy import default
+from math import ceil
 import webbrowser
 import threading
 import paradigm_panes
@@ -368,12 +369,16 @@ class MainLayout(BoxLayout):
                 if not data['is_lemma'] and data['show_form_of']:
                     data['lemma_wordform']['text'] = replace_hats_to_lines_SRO(data['lemma_wordform']['text'])
             
-                
-
-            defsToPass = defs.copy()       
+            defsToPass = defs.copy()    
+            
+            dynamic_tile_height = 0
+            for d in defsToPass:
+                dynamic_tile_height += 30
+                dynamic_tile_height += int(ceil(len(d) / 30)) * 35
+               
             initial_result_list.append({'index': result_id_counter,
                                         'default_title': default_title,
-                                        'height': dp(200),
+                                        'height': dp(max(100, dynamic_tile_height)),
                                         'title': title, 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
