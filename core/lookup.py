@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def fetch_results(search_run: SearchRun):
     
     # Connect to the DB
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
@@ -178,7 +178,7 @@ def fetch_results_from_target_language_keywords(search_run):
     stem_keys = stem_keywords(search_run.internal_query)
 
     # Connect to the DB
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
@@ -216,7 +216,7 @@ def make_wordform_dict(data):
     Given a dict, returns a WordForm object to be added.
     '''
     # Connect to the DB
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
@@ -266,7 +266,7 @@ def fetch_results_from_source_language_keywords(search_run):
 
     keyword = to_source_language_keyword(search_run.internal_query)
 
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 

@@ -162,7 +162,7 @@ class PresentationResult:
 
     def serialize(self) -> SerializedPresentationResult:
         
-        conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+        conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
         conn.row_factory = sqlite3.Row
 
@@ -311,7 +311,7 @@ def serialize_wordform(
     """
     result = vars(wordform)
     
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
@@ -461,7 +461,7 @@ def get_lexical_info(
                 # convert to "âpihci" by dropping prefix and last character
                 normative_preverb_text = ling_short[len("Preverb: ") :]
                 
-                conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+                conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
                 conn.row_factory = sqlite3.Row
 

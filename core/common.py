@@ -12,7 +12,7 @@ def make_wordform_dict(data):
     Given a dict, returns a WordForm object to be added.
     '''
     # Connect to the DB
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
