@@ -25,7 +25,7 @@ def make_wordform_dict(data):
     Given a dict, returns a WordForm object to be added.
     '''
     # Connect to the DB
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     conn.row_factory = sqlite3.Row
 
@@ -134,7 +134,7 @@ def do_affix_search(query: InternalForm, affixes: AffixSearcher) -> Iterable[Wor
     matched_ids = set(affixes.search_by_prefix(query))
     matched_ids |= set(affixes.search_by_suffix(query))
     
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
     
     conn.row_factory = sqlite3.Row
 
@@ -225,7 +225,7 @@ def fetch_source_language_lemmas_with_ids():
     """
     # Slurp up all the results to prevent walking the database multiple times
     
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     c = conn.cursor()
     
@@ -250,7 +250,7 @@ def fetch_target_language_keywords_with_ids():
     """
     # Slurp up all the results to prevent walking the database multiple times
     
-    conn = sqlite3.connect(BASE_DIR + '/../test_db.sqlite3')
+    conn = sqlite3.connect(BASE_DIR + '/../main_db.sqlite3')
 
     c = conn.cursor()
     

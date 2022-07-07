@@ -32,12 +32,14 @@ MainScreen:
     padding: "5dp"
     canvas.before:
         Color:
-            rgba: 0.8671875, 0.8671875, 0.8671875, 1
+            # rgba: 0.8671875, 0.8671875, 0.8671875, 1
+            rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
         Color:
-            rgba: 0, 0, 0, 1
+            # rgba: 0.8671875, 0.8671875, 0.8671875, 1
+            rgba: 0.5450, 0, 0, 1
         Line:
             width: 1
             rectangle: self.x, self.y, self.width, self.height
@@ -46,7 +48,7 @@ MainScreen:
     viewclass: 'ResultWidget'
     RecycleBoxLayout:
         spacing: "22dp"
-        default_size: None, dp(190)
+        default_size: None, None
         default_size_hint: 1, None
         default_pos_hint: {'x': 0.1}
         size_hint_y: None
@@ -367,6 +369,7 @@ MainScreen:
                         id: linguistic_community_mode
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
+                        active: app.linguistic_mode
                 
                 MDBoxLayout:
                     size_hint: (1, 0.3)
@@ -381,6 +384,7 @@ MainScreen:
                         id: display_emoji_switch
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
+                        active: app.display_emoji_mode
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"
