@@ -375,6 +375,12 @@ class MainLayout(BoxLayout):
             for d in defsToPass:
                 dynamic_tile_height += 30
                 dynamic_tile_height += int(ceil(len(d) / 30)) * 35
+            
+            if not data['is_lemma'] and data['show_form_of']:
+                dynamic_tile_height += 15
+                for d in lemma_definitions:
+                    dynamic_tile_height += 30
+                    dynamic_tile_height += int(ceil(len(d) / 30)) * 35
                
             initial_result_list.append({'index': result_id_counter,
                                         'default_title': default_title,
