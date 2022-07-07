@@ -369,6 +369,7 @@ MainScreen:
                         id: linguistic_community_mode
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
+                        active: app.linguistic_mode
                 
                 MDBoxLayout:
                     size_hint: (1, 0.3)
@@ -383,6 +384,7 @@ MainScreen:
                         id: display_emoji_switch
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
+                        active: app.display_emoji_mode
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"

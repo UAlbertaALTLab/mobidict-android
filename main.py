@@ -24,6 +24,8 @@ from kivy.uix.button import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
+from kivy.storage.jsonstore import JsonStore
+
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
@@ -68,10 +70,13 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
 class ModeSwitch(MDSwitch):
     def change_mode(self):
         app = App.get_running_app()
+        store = JsonStore('store.json')
         if self.active:
             app.linguistic_mode = True
+            store.put('linguistic_mode', linguistic_mode = True)
         else:
             app.linguistic_mode = False
+            store.put('linguistic_mode', linguistic_mode = False)
         app.root.ids.main_box_layout.on_submit_word()
         second_page_population_list = app.root.ids.specific_result_main_list
         app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
@@ -85,10 +90,13 @@ class EmojiSwitch(MDSwitch):
     def change_mode(self):
         print("Emojis display changed")
         app = App.get_running_app()
+        store = JsonStore('store.json')
         if self.active:
             app.display_emoji_mode = True
+            store.put('display_emoji_mode', display_emoji_mode = True)
         else:
             app.display_emoji_mode = False
+            store.put('display_emoji_mode', display_emoji_mode = False)
         
         app.root.ids.main_box_layout.on_submit_word()
         second_page_population_list = app.root.ids.specific_result_main_list
@@ -285,6 +293,9 @@ class MainLayout(BoxLayout):
     def on_submit_word(self, widget= None):
         root = App.get_running_app().root
         app = App.get_running_app()
+        
+        store = JsonStore('store.json')
+        
         current_query = root.ids.input_word.text
         
         if not current_query:
@@ -999,6 +1010,28 @@ class MorphodictApp(MDApp):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
         Window.clearcolor = (0.933, 1, 0.92, 1)
         
+        # Add properties to store if they don't exist
+        store = JsonStore('store.json')
+        if not store.exists("label_type"):
+            store.put('label_type', index_selected=0)
+        else:
+            self.index_selected = store.get('label_type')['index_selected']
+        if not store.exists("paradigm_labels_type"):
+            store.put('paradigm_labels_type', index_selected_paradigms=0)
+        else:
+            self.index_selected_paradigms = store.get('paradigm_labels_type')['index_selected_paradigms']
+        if not store.exists("linguistic_mode"):
+            store.put('linguistic_mode', linguistic_mode = False)
+        else:
+            self.linguistic_mode = store.get('linguistic_mode')['linguistic_mode']
+        self.root.ids.linguistic_community_mode.active = self.linguistic_mode
+        if not store.exists('display_emoji_mode'):
+            store.put('display_emoji_mode', display_emoji_mode = False)
+        else:
+            self.display_emoji_mode = store.get('display_emoji_mode')['display_emoji_mode']
+            print("Emoji current value:::", self.display_emoji_mode)
+        self.root.ids.display_emoji_switch.active = self.display_emoji_mode
+        
         # Label Settings Menu
         label_settings_items = [{'index': 0, 
                                  'text': "SRO(êîôâ)", 
@@ -1047,6 +1080,9 @@ class MorphodictApp(MDApp):
         if self.root.ids.label_settings_dropdown.current_item == text_item:
             # Same option chosen, don't do anything
             return
+        
+        store = JsonStore('store.json')
+        
         label_settings_items = [{'index': 0, 
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
@@ -1064,12 +1100,15 @@ class MorphodictApp(MDApp):
         if text_item == "Syllabics":
             label_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 2
+            store.put('label_type', index_selected=2)
         elif text_item == "SRO(ēīōā)":
             label_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 1
+            store.put('label_type', index_selected=1)
         else:
             label_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected = 0
+            store.put('label_type', index_selected=0)
         
         self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
@@ -1086,6 +1125,8 @@ class MorphodictApp(MDApp):
         if self.root.ids.paradigm_label_settings_dropdown.current_item == text_item:
             # Same option chosen, don't do anything
             return
+        
+        store = JsonStore('store.json')
         
         paradigm_settings_items = [{'index': 0, 
                                  'text': "Plain English Labels", 
@@ -1105,12 +1146,15 @@ class MorphodictApp(MDApp):
         if text_item == "nêhiyawêwin labels":
             paradigm_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 2
+            store.put('paradigm_labels_type', index_selected_paradigms=2)
         elif text_item == "Linguistic labels":
             paradigm_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 1
+            store.put('paradigm_labels_type', index_selected_paradigms=1)
         else:
             paradigm_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
             self.index_selected_paradigms = 0
+            store.put('paradigm_labels_type', index_selected_paradigms=0)
         
         self.paradigm_labels_menu.items = paradigm_settings_items
         self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
@@ -1200,4 +1244,5 @@ class MorphodictApp(MDApp):
         return string
 
 if __name__ == '__main__':
+    # Run the main app
     MorphodictApp().run()
