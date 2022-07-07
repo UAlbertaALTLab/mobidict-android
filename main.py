@@ -1,4 +1,3 @@
-from email.policy import default
 from math import ceil
 import webbrowser
 import threading
