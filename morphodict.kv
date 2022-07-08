@@ -385,6 +385,20 @@ MainScreen:
                         on_active: self.change_mode()
                         pos_hint: {'center_y': 0.3}
                         active: app.display_emoji_mode
+                MDBoxLayout:
+                    size_hint: (1, 0.3)
+                    Label:
+                        text: "Show Inflectional Category"
+                        size_hint: (0.5, 1)
+                        color: (0, 0, 0, 1)
+                        text_size: self.size
+                        padding_x: "5dp"
+                        halign: 'left'
+                    InflectionalSwitch:
+                        id: inflectional_switch
+                        on_active: self.change_mode()
+                        pos_hint: {'center_y': 0.3}
+                        active: app.display_inflectional_category
 
                 MDLabel:
                     # text: "ᐃᑘᐏᓇ"
