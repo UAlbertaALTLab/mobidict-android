@@ -107,7 +107,24 @@ class EmojiSwitch(MDSwitch):
                                                               second_page_population_list.definitions)
 
 class InflectionalSwitch(MDSwitch):
-    pass
+    def change_mode(self):
+        app = App.get_running_app()
+        store = JsonStore('store.json')
+        if self.active:
+            app.display_inflectional_category = True
+            store.put('display_inflectional_category', display_inflectional_category = True)
+        else:
+            app.display_inflectional_category = False
+            store.put('display_inflectional_category', display_inflectional_category = False)
+        
+        app.root.ids.main_box_layout.on_submit_word()
+        second_page_population_list = app.root.ids.specific_result_main_list
+        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
+                                                              second_page_population_list.emojis, 
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
+                                                              second_page_population_list.default_title,
+                                                              second_page_population_list.inflectional_category,
+                                                              second_page_population_list.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
@@ -569,15 +586,19 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             description_box_layout = BoxLayout()
             
-            # Add the inflectional category
-            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
-            inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
-                                markup=True,
-                                size_hint=(None, 1),
-                                width=inflection_label._label.texture.size[0] + 5)
+            app = App.get_running_app()
             
-            description_box_layout.add_widget(inflection_label)
+            # Add the inflectional category only if the option is on
+            
+            if app.display_inflectional_category:
+                inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label._label.refresh()
+                inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+                                    markup=True,
+                                    size_hint=(None, 1),
+                                    width=inflection_label._label.texture.size[0] + 5)
+                
+                description_box_layout.add_widget(inflection_label)
             
             
             additional_emoji_margin = 0 if not self.emojis else 10
@@ -595,7 +616,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
             desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
             
-            app = App.get_running_app()
+            
             if app.display_emoji_mode == True:
                 description_box_layout.add_widget(emoji_label)
             description_box_layout.add_widget(desc_label)
@@ -712,16 +733,19 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         description_box_layout = BoxLayout()
         
+        app = App.get_running_app()
+        
         # Add the inflectional category
-        inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
-        inflection_label._label.refresh()
-        inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
-                            markup=True,
-                            size_hint=(None, 1),
-                            width=inflection_label._label.texture.size[0] + 5)
-        
-        description_box_layout.add_widget(inflection_label)
-        
+        if app.display_inflectional_category:
+            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label._label.refresh()
+            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+                                markup=True,
+                                size_hint=(None, 1),
+                                width=inflection_label._label.texture.size[0] + 5)
+            
+            description_box_layout.add_widget(inflection_label)
+            
         additional_emoji_margin = 0 if not self.emojis else 10
         
         emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
@@ -735,8 +759,6 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             self.subtitle = "None"
         
         desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
-        
-        app = App.get_running_app()
         
         if app.display_emoji_mode == True:
             description_box_layout.add_widget(emoji_label)
@@ -871,14 +893,15 @@ class SpecificResultMainList(MDList):
         description_box_layout = MDBoxLayout(size_hint = (1, 0.5))
         
         # Add the inflectional category
-        inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
-        inflection_label._label.refresh()
-        inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
-                            markup=True,
-                            size_hint=(None, 1),
-                            width=inflection_label._label.texture.size[0] + 5)
-        
-        description_box_layout.add_widget(inflection_label)
+        if app.display_inflectional_category:
+            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label._label.refresh()
+            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+                                markup=True,
+                                size_hint=(None, 1),
+                                width=inflection_label._label.texture.size[0] + 5)
+            
+            description_box_layout.add_widget(inflection_label)
             
         additional_emoji_margin = 0 if not emojis else 10
         
@@ -1078,6 +1101,13 @@ class MorphodictApp(MDApp):
         else:
             self.display_emoji_mode = store.get('display_emoji_mode')['display_emoji_mode']
         self.root.ids.display_emoji_switch.active = self.display_emoji_mode
+        
+        if not store.exists('display_inflectional_category'):
+            store.put('display_inflectional_category', display_inflectional_category = True)
+        else:
+            self.display_inflectional_category = store.get('display_inflectional_category')['display_inflectional_category']
+        self.root.ids.inflectional_switch.active = self.display_inflectional_category
+        
         
         # Label Settings Menu
         label_settings_items = [{'index': 0, 
