@@ -87,7 +87,6 @@ class ModeSwitch(MDSwitch):
 
 class EmojiSwitch(MDSwitch):
     def change_mode(self):
-        print("Emojis display changed")
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
@@ -1004,6 +1003,8 @@ class MorphodictApp(MDApp):
         self.display_emoji_mode = False
         self.last_result_list_index_click = None
         self.newest_result_list = []
+        self.label_type_list = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
+        self.paradigm_label_type_list = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -1015,10 +1016,16 @@ class MorphodictApp(MDApp):
             store.put('label_type', index_selected=0)
         else:
             self.index_selected = store.get('label_type')['index_selected']
+        
+        self.root.ids.label_settings_dropdown.set_item(self.label_type_list[self.index_selected])
+        
         if not store.exists("paradigm_labels_type"):
             store.put('paradigm_labels_type', index_selected_paradigms=0)
         else:
             self.index_selected_paradigms = store.get('paradigm_labels_type')['index_selected_paradigms']
+        
+        self.root.ids.paradigm_label_settings_dropdown.set_item(self.paradigm_label_type_list[self.index_selected_paradigms])
+        
         if not store.exists("linguistic_mode"):
             store.put('linguistic_mode', linguistic_mode = False)
         else:
@@ -1028,24 +1035,25 @@ class MorphodictApp(MDApp):
             store.put('display_emoji_mode', display_emoji_mode = False)
         else:
             self.display_emoji_mode = store.get('display_emoji_mode')['display_emoji_mode']
-            print("Emoji current value:::", self.display_emoji_mode)
         self.root.ids.display_emoji_switch.active = self.display_emoji_mode
+        
+        # TODO: Add support for the dropdowns so the options can be remembered
         
         # Label Settings Menu
         label_settings_items = [{'index': 0, 
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
-                                 "text_color": (0.543, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 0 else (0, 0, 0, 1)},
                                 {'index': 1, 'text': "SRO(ēīōā)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
-                                 "text_color": (0, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 1 else (0, 0, 0, 1)},
                                 {'index': 2, 
                                  'text': "Syllabics", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Syllabics": self.set_item(x),
-                                 "text_color": (0, 0, 0, 1)}]
+                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 2 else (0, 0, 0, 1)}]
         
         self.menu = MDDropdownMenu(
             caller=self.root.ids.label_settings_dropdown,
