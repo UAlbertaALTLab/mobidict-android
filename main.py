@@ -16,6 +16,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager
@@ -518,6 +519,8 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
             title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
             title_label._label.refresh()
+
+            title_label_width = title_label._label.texture.size[0] + 10
             title_label = ClickableLabel(text=main_title_label_text_markup, 
                                             markup=True,
                                             on_release=self.on_click_label,
@@ -525,6 +528,8 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                             width = title_label._label.texture.size[0] + 10)
 
             title_icon_box_layout.add_widget(title_label)
+            
+            tooltip_and_sound_float_layout = FloatLayout(size=(150, 150))
             
             if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
                 tooltip_content = ""
@@ -538,16 +543,21 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 if len(tooltip_content) > 0:
                     tooltip_content = tooltip_content[:-1]
                 
-                title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
                                                                    user_font_size="20dp",
-                                                                   pos_hint = {'center_y': 0.5}))
+                                                                   size_hint_x = 0.5,
+                                                                   pos_hint = {'center_y': 0.5},
+                                                                   pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
                 
-            title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+            tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                                 user_font_size="20dp",
                                                                 on_release=self.play_sound,
-                                                                pos_hint = {'center_y': 0.5}))
+                                                                size_hint_x = 0.5,
+                                                                pos_hint = {'center_y': 0.5},
+                                                                pos=(app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width + 30)))
 
+            title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
             self.add_widget(title_icon_box_layout)
             
             # Add the line here.
@@ -666,6 +676,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
 
         title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
         title_label._label.refresh()
+        
+        title_label_width = title_label._label.texture.size[0] + 10
+        
         title_label = ClickableLabel(text=main_title_label_text_markup, 
                                         markup=True,
                                         on_release=self.on_click_label,
@@ -673,6 +686,10 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                         width = title_label._label.texture.size[0] + 10)
 
         title_icon_box_layout.add_widget(title_label)
+        
+        tooltip_and_sound_float_layout = FloatLayout(size=(150, 150))
+        
+        app = App.get_running_app()
         
         if self.friendly_linguistic_breakdown_head or self.friendly_linguistic_breakdown_tail:
             tooltip_content = ""
@@ -684,16 +701,22 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             if len(tooltip_content) > 0:
                 tooltip_content = tooltip_content[:-1]
-            title_icon_box_layout.add_widget(InfoTooltipButton(icon="information", 
+                
+            tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
                                                                user_font_size="20dp",
-                                                               pos_hint = {'center_y': 0.5}))
+                                                               size_hint_x = 0.5,
+                                                               pos_hint = {'center_y': 0.5},
+                                                               pos = (app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
             
-        title_icon_box_layout.add_widget(InfoTooltipButton(icon="volume-high", 
+        tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
                                                             user_font_size="20dp",
                                                             on_release=self.play_sound,
-                                                            pos_hint = {'center_y': 0.5}))
+                                                            size_hint_x = 0.5,
+                                                            pos_hint = {'center_y': 0.5},
+                                                            pos = (app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width)))
         
+        title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
         self.add_widget(title_icon_box_layout)
         
         if not self.is_lemma and self.show_form_of:
@@ -946,6 +969,8 @@ class SpecificResultMainList(MDList):
         
         if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
             paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+        else:
+            print("Paradigm Type (currently unavailable): ", paradigm_type)
         
         paradigm_data = paradigm.copy()
         
