@@ -998,9 +998,6 @@ class SpecificResultMainList(MDList):
             else:
                 paradigm_header = "Paradigms"
                 paradigm_subheader = relabel(pane_header['label'], "english")
-                
-            
-            print("You are looking above here...")
             
             for cell in pane_first_row['cells']:
                 if cell['should_suppress_output']:
@@ -1032,7 +1029,6 @@ class SpecificResultMainList(MDList):
                         else:
                             cells_dict = row.copy()
                             cells_dict['cells'] = []
-                            # The subheaders are not right in all paradigm panes subheaders
                             for idx, cell in enumerate(row['cells']):
                                 if idx in current_columns:
                                     cells_dict['cells'].append(cell)
