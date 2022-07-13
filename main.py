@@ -979,7 +979,13 @@ class SpecificResultMainList(MDList):
         
         for index, pane in enumerate(paradigm_data['panes']):
             pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
+            
             pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
+            if index == 0:
+                # We are looking at the core
+                pane_header = None
+                pane_first_row = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else {'cells': []}
+            
             only_labels_in_first_row = True
             nlabels = 0
             
@@ -993,6 +999,8 @@ class SpecificResultMainList(MDList):
                 paradigm_header = "Paradigms"
                 paradigm_subheader = relabel(pane_header['label'], "english")
                 
+            
+            print("You are looking above here...")
             
             for cell in pane_first_row['cells']:
                 if cell['should_suppress_output']:
