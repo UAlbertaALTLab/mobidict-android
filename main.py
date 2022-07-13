@@ -1111,7 +1111,7 @@ class MorphodictApp(MDApp):
         self.newest_result_list = []
         self.label_type_list = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
         self.paradigm_label_type_list = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
-        self.paradigm_pane_layouts_available = ["NA", "VII"]
+        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI"]
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
