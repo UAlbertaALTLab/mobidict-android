@@ -4,7 +4,7 @@ To start the code,
 
 1. Make the virtualenv using virtualenv venv
 2. Type 'source venv/bin/activate'
-3. Open the folder in VSCode
+3. Change directory into the project folder (mobidict-android) and run "pip3 install -r requirements.txt"
 4. Run with the ">" button OR python3 main.py in shell.
 
 To deactivate venv, type 'deactivate'. I am using virtualenv for virtual env.
