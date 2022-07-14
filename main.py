@@ -157,8 +157,6 @@ class ParadigmLabelContent(MDBoxLayout):
         
         paradigm_parameter = ["english", "linguistic", "source_language"]
         
-        print("Current PARADIGM pane: ", self.data)
-        
         # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
@@ -978,13 +976,21 @@ class SpecificResultMainList(MDList):
         all_panes = []
         
         for index, pane in enumerate(paradigm_data['panes']):
-            pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
+            pane_header = None
             
-            pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
-            if index == 0:
-                # We are looking at the core
-                pane_header = None
-                pane_first_row = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else {'cells': []}
+            subheader_flag_idx = 1
+            
+            if len(pane['tr_rows']) > 0 and pane['tr_rows'][0]['is_header']:
+                pane_header = pane['tr_rows'][0]
+            
+            
+            pane_first_row = {'cells': []}
+            
+            if pane_header is None and len(pane['tr_rows']) > 0:
+                pane_first_row = pane['tr_rows'][0]
+                subheader_flag_idx = 0
+            elif pane_header is not None and len(pane['tr_rows']) > 1:
+                pane_first_row = pane['tr_rows'][1]
             
             only_labels_in_first_row = True
             nlabels = 0
@@ -997,8 +1003,8 @@ class SpecificResultMainList(MDList):
                 paradigm_subheader = "core"
             else:
                 paradigm_header = "Paradigms"
-                paradigm_subheader = relabel(pane_header['label'], "english")
-            
+                paradigm_subheader = relabel(pane_header['label'], "english") if pane_header is not None else relabel(pane_first_row['cells'][1]['label'], "english")
+                print("Paradigm subheader: ", paradigm_subheader)
             for cell in pane_first_row['cells']:
                 if cell['should_suppress_output']:
                     continue
@@ -1032,7 +1038,7 @@ class SpecificResultMainList(MDList):
                             for idx, cell in enumerate(row['cells']):
                                 if idx in current_columns:
                                     cells_dict['cells'].append(cell)
-                                    if i1 == 1 and idx == current_columns[1] and cell["is_label"]:
+                                    if i1 == subheader_flag_idx and idx == current_columns[1] and cell["is_label"]:
                                         paradigm_subheader = relabel(cell["label"], "english")
                             altered_pane['tr_rows'].append(cells_dict)
                     all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
