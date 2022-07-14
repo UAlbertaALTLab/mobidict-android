@@ -394,6 +394,8 @@ class MainLayout(BoxLayout):
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
             
+            default_title_lemma = data['lemma_wordform']['text']
+            
             if app.index_selected == 2:
                 # Syllabics selected
                 title = sro2syllabics(title)
@@ -432,6 +434,7 @@ class MainLayout(BoxLayout):
                                         'relabelled_fst_analysis': data['relabelled_fst_analysis'],
                                         'is_lemma': data['is_lemma'] if 'is_lemma' in data else True,
                                         'show_form_of': data['show_form_of'] if 'show_form_of' in data else False,
+                                        'default_title_lemma': default_title_lemma,
                                         'lemma_wordform': data['lemma_wordform'] if 'lemma_wordform' in data else None,
                                         'definitions': defsToPass
                                         })
@@ -481,6 +484,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
     relabelled_fst_analysis = ObjectProperty()
     is_lemma = ObjectProperty()
     show_form_of = ObjectProperty()
+    default_title_lemma = ObjectProperty()
     lemma_wordform = ObjectProperty()
     
     # ---------------------------------------------------
@@ -829,7 +833,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title, self.inflectional_category, self.paradigm_type, self.definitions)
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
