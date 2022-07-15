@@ -157,8 +157,6 @@ class ParadigmLabelContent(MDBoxLayout):
         
         paradigm_parameter = ["english", "linguistic", "source_language"]
         
-        print("Current PARADIGM pane: ", self.data)
-        
         # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
         
         # Prepare the paradigm data and add it to the screen
@@ -396,6 +394,8 @@ class MainLayout(BoxLayout):
                 defs.append(str(flag) + ". " + definition['text'])
                 flag += 1
             
+            default_title_lemma = data['lemma_wordform']['text']
+            
             if app.index_selected == 2:
                 # Syllabics selected
                 title = sro2syllabics(title)
@@ -434,6 +434,7 @@ class MainLayout(BoxLayout):
                                         'relabelled_fst_analysis': data['relabelled_fst_analysis'],
                                         'is_lemma': data['is_lemma'] if 'is_lemma' in data else True,
                                         'show_form_of': data['show_form_of'] if 'show_form_of' in data else False,
+                                        'default_title_lemma': default_title_lemma,
                                         'lemma_wordform': data['lemma_wordform'] if 'lemma_wordform' in data else None,
                                         'definitions': defsToPass
                                         })
@@ -483,6 +484,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
     relabelled_fst_analysis = ObjectProperty()
     is_lemma = ObjectProperty()
     show_form_of = ObjectProperty()
+    default_title_lemma = ObjectProperty()
     lemma_wordform = ObjectProperty()
     
     # ---------------------------------------------------
@@ -831,7 +833,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title, self.inflectional_category, self.paradigm_type, self.definitions)
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
@@ -978,8 +980,22 @@ class SpecificResultMainList(MDList):
         all_panes = []
         
         for index, pane in enumerate(paradigm_data['panes']):
-            pane_header = pane['tr_rows'][0] if len(pane['tr_rows']) > 0 else None
-            pane_first_row = pane['tr_rows'][1] if len(pane['tr_rows']) > 1 else {'cells': []}
+            pane_header = None
+            
+            subheader_flag_idx = 1
+            
+            if len(pane['tr_rows']) > 0 and pane['tr_rows'][0]['is_header']:
+                pane_header = pane['tr_rows'][0]
+            
+            
+            pane_first_row = {'cells': []}
+            
+            if pane_header is None and len(pane['tr_rows']) > 0:
+                pane_first_row = pane['tr_rows'][0]
+                subheader_flag_idx = 0
+            elif pane_header is not None and len(pane['tr_rows']) > 1:
+                pane_first_row = pane['tr_rows'][1]
+            
             only_labels_in_first_row = True
             nlabels = 0
             
@@ -991,9 +1007,8 @@ class SpecificResultMainList(MDList):
                 paradigm_subheader = "core"
             else:
                 paradigm_header = "Paradigms"
-                paradigm_subheader = relabel(pane_header['label'], "english")
-                
-            
+                paradigm_subheader = relabel(pane_header['label'], "english") if pane_header is not None else relabel(pane_first_row['cells'][1]['label'], "english")
+                print("Paradigm subheader: ", paradigm_subheader)
             for cell in pane_first_row['cells']:
                 if cell['should_suppress_output']:
                     continue
@@ -1024,11 +1039,10 @@ class SpecificResultMainList(MDList):
                         else:
                             cells_dict = row.copy()
                             cells_dict['cells'] = []
-                            # The subheaders are not right in all paradigm panes subheaders
                             for idx, cell in enumerate(row['cells']):
                                 if idx in current_columns:
                                     cells_dict['cells'].append(cell)
-                                    if i1 == 1 and idx == current_columns[1] and cell["is_label"]:
+                                    if i1 == subheader_flag_idx and idx == current_columns[1] and cell["is_label"]:
                                         paradigm_subheader = relabel(cell["label"], "english")
                             altered_pane['tr_rows'].append(cells_dict)
                     all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
@@ -1107,7 +1121,7 @@ class MorphodictApp(MDApp):
         self.newest_result_list = []
         self.label_type_list = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
         self.paradigm_label_type_list = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
-        self.paradigm_pane_layouts_available = ["NA", "VII"]
+        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI"]
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.

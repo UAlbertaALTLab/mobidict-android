@@ -1,6 +1,8 @@
 from core.types import FSTTag
 from core.relabelling import read_labels
 
+
+# Check here - how are the tags that are passed None?
 def relabel(tags, labels="english"):
     # Default label = "english"
     label_setting = labels
