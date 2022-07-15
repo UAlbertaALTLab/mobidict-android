@@ -419,6 +419,11 @@ class MainLayout(BoxLayout):
                 for d in lemma_definitions:
                     dynamic_tile_height += 30
                     dynamic_tile_height += int(ceil(len(d) / 30)) * 35
+            
+            # If linguistic mode, increase dynamic height to give space for the larger subtitle
+            if app.linguistic_mode:
+                dynamic_tile_height += 20
+            
                
             initial_result_list.append({'index': result_id_counter,
                                         'default_title': default_title,
@@ -885,7 +890,12 @@ class SpecificResultMainList(MDList):
             # This page is still empty, don't do anything!
             return
         
-        details_box_layout_height = max(len(definitions) * 60, 100)
+        dynamic_details_height = 0
+        
+        for d in definitions:
+            dynamic_details_height += max(int(ceil(len(d) / 30)) * 35, 60)
+        
+        details_box_layout_height = max(dynamic_details_height, 100)
         
         top_details_box_layout = MDBoxLayout(orientation = "vertical", 
                                              padding = "20dp", 
