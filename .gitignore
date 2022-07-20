@@ -1,3 +1,5 @@
 __pycache__/
 core/__pycache__/
 /main_db.sqlite3
+/.buildozer
+/bin

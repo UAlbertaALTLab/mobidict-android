@@ -1,3 +1,4 @@
+__version__ = "1.0.0"
 from math import ceil
 import webbrowser
 import threading
