@@ -13,9 +13,38 @@ To deactivate venv, type 'deactivate'. I am using virtualenv for virtual env.
 Troubleshooting:
 - If you encounter the error "Could not find core.SearchRun", just rename the searchRun.py file in the core folder to "SearchRun.py". (This should be solved soon)
 
-
 Resources:
 1. https://www.youtube.com/watch?v=X2MkC1ru3cQ&list=PLCC34OHNcOtpz7PJQ7Tv7hqFBP_xDDjqg&index=56
 2. https://www.youtube.com/watch?v=l8Imtec4ReQ&t=585s
 3. https://kivycoder.com/using-sqlite3-database-with-kivy-python-kivy-gui-tutorial-55/
 4. https://kivymd.readthedocs.io/en/latest/getting-started/
+
+Steps to release from scratch:
+1. Make a new folder for the build.
+2. Clone the mobidict-android repository.
+3. Rename searchRun.py to SearchRun.py
+4. Create a virtualenv by "virtualenv [name of environment]". For eg. "virtualenv mobidict"
+5. Activate the environment by source "mobidict/bin/activate"
+6. Make the DB the usual way from morphodict and take the test_db.sqlite3 file and paste it in the root directory of the project. (mobidict-android/) where main.py is found.
+7. Rename the db to main_db.sqlite3
+8. Run the app using "python3 main.py" from the root directory. 
+
+Now the app should run successfully. Only proceed once it is running properly.
+
+9. To continue the build, deactivate the virtualenv by "deactivate"
+10. Follow the steps on https://buildozer.readthedocs.io/en/latest/ (installation) to install all dependencies required to run buildozer.
+11. Once it's installed using all the dependencies, go "buildozer init" in the root directory. This should create buildozer.spec.
+12. Remove all the contents of buildozer.spec and paste everything from the buildozer.spec on branch release-v5 on mobidict-android. (I have modified it to include all dependencies we are using in the app)
+13. Lastly, go "buildozer -v android debug" to make the .apk file.
+14. To test it, we would need a x86_64 environment. So make sure when you use a virtual emulator from Android Studio, it has the environment x86_64 set up. 
+15. Just drag the .apk file onto the emulator to test. 
+
+16. Alternatively, you can also use a physical device connected to your desktop/laptop - just follow the steps on https://buildozer.readthedocs.io/en/latest/quickstart.html
+
+Notes and Resources for Troubleshooting the build:
+- I came across weird errors while building the app with "buildozer -v android debug" - so this website helped me:
+https://vucavucalife.com/build-apk-with-buildozer-and-install-to-androidemu-on-macos-12-4-m1-macbook/
+Note that it's in Chinese and you can convert it to an English page to understand.
+
+- I was using the Python version 3.9.12 - note that this is extremely important to work with the current buildozer.spec - because if you have any later version, the build may/may not work - and you will need to change the buildozer.spec requirements (python3, hostpython3)
+- In case pip3 install buildozer gives problems on step 10, follow the buildozer steps on https://kivy.org/doc/stable/guide/packaging-android.html. This helped me make buildozer work on terminal.
