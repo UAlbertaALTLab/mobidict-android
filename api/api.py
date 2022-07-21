@@ -1,5 +1,4 @@
 import requests
-import urllib
 from general import SOUND_FILE_NAME
 from pydub import AudioSegment
 
@@ -27,7 +26,7 @@ def get_sound(query):
         # Write sound to a local file in the same directory
         sound_file = open("sound.m4a", "wb")
         
-        with urllib.request.urlopen(audio_url) as f:
+        with requests.get(audio_url) as f:
             sound_bytes = f.read()
             sound_file.write(sound_bytes)
         
@@ -54,7 +53,7 @@ def get_sound(query):
             # Write sound to a local file in the same directory
             sound_file = open("sound.m4a", "wb")
             
-            with urllib.request.urlopen(audio_url) as f:
+            with requests.get(audio_url) as f:
                 sound_bytes = f.read()
                 sound_file.write(sound_bytes)
             
