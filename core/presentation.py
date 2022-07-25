@@ -105,6 +105,7 @@ class PresentationResult:
         self._relabeller = {
             "community": read_labels().english,
             "linguistic": read_labels().linguistic_long,
+            "source_language": read_labels().cree
         }.get(display_mode, DisplayMode.default)
         self._animate_emoji = animate_emoji
 

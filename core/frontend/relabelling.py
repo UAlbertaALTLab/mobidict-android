@@ -28,7 +28,29 @@ def label_setting_to_relabeller(label_setting: str):
         "linguistic": labels.linguistic_short,
         "source_language": labels.cree,
     }.get(label_setting, labels.english)
+
+
+
+def relabel_source(pos: str):
+    """
+    Should take in a class and return the plain english labelling for it
+    So if I pass in "VTA-1", I should get back:
+    tâpiskôc: wîcihêw
+    """
+    return read_labels().cree.get(pos)
     
-    
-    
-    
+def relabel_plain_english(pos: str):
+    """
+    Should take in a class and return the plain english labelling for it
+    So if I pass in "VTA-1", I should get back:
+    like: wîcihêw
+    """
+    return read_labels().english.get(pos)
+
+def relabel_linguistic_long(pos: str):
+    """
+    Should take in a class and return the plain english labelling for it
+    So if I pass in "VTA-1", I should get back:
+    transitive animate verb – class 1: regular
+    """
+    return read_labels().linguistic_long.get(pos)
