@@ -1,3 +1,5 @@
+# Welcome to Mobidict
+
 To start the code,
 
 (Assumes virtualenv is installed)- if not, go "pip3 install virtualenv"
