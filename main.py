@@ -409,7 +409,7 @@ class MainLayout(BoxLayout):
                     dynamic_tile_height += int(ceil(len(d) / 30)) * 35
             
             # If linguistic mode, increase dynamic height to give space for the larger subtitle
-            if app.index_selected_paradigms == 1:
+            if app.index_selected_paradigms == 1 or app.index_selected_paradigms == 2:
                 dynamic_tile_height += 20
             
                
