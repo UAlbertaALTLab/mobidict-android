@@ -24,24 +24,23 @@ Resources:
 Steps to release from scratch:
 1. Make a new folder for the build.
 2. Clone the mobidict-android repository.
-3. Rename searchRun.py to SearchRun.py
-4. Create a virtualenv by "virtualenv [name of environment]". For eg. "virtualenv mobidict"
-5. Activate the environment by source "mobidict/bin/activate"
-6. Make the DB the usual way from morphodict and take the test_db.sqlite3 file and paste it in the root directory of the project. (mobidict-android/) where main.py is found.
-7. Rename the db to main_db.sqlite3
-8. Run the app using "python3 main.py" from the root directory. 
+3. Create a virtualenv by "virtualenv [name of environment]". For eg. "virtualenv mobidict"
+4. Activate the environment by source "mobidict/bin/activate"
+5. Make the DB the usual way from morphodict and take the test_db.sqlite3 file and paste it in the root directory of the project. (mobidict-android/) where main.py is found.
+6. Rename the db to main_db.sqlite3
+7. Run the app using "python3 main.py" from the root directory. 
 
 Now the app should run successfully. Only proceed once it is running properly.
 
-9. To continue the build, deactivate the virtualenv by "deactivate"
-10. Follow the steps on https://buildozer.readthedocs.io/en/latest/ (installation) to install all dependencies required to run buildozer.
-11. Once it's installed using all the dependencies, go "buildozer init" in the root directory. This should create buildozer.spec.
-12. Remove all the contents of buildozer.spec and paste everything from the buildozer.spec on branch release-v5 on mobidict-android. (I have modified it to include all dependencies we are using in the app)
-13. Lastly, go "buildozer -v android debug" to make the .apk file.
-14. To test it, we would need a x86_64 environment. So make sure when you use a virtual emulator from Android Studio, it has the environment x86_64 set up. 
-15. Just drag the .apk file onto the emulator to test. 
+8. To continue the build, deactivate the virtualenv by "deactivate"
+9. Follow the steps on https://buildozer.readthedocs.io/en/latest/ (installation) to install all dependencies required to run buildozer.
+10. Once it's installed using all the dependencies, go "buildozer init" in the root directory. This should create buildozer.spec.
+11. Remove all the contents of buildozer.spec and paste everything from the buildozer.spec on branch release-v5 on mobidict-android. (I have modified it to include all dependencies we are using in the app)
+12. Lastly, go "buildozer -v android debug" to make the .apk file.
+13. To test it, we would need a x86_64 environment. So make sure when you use a virtual emulator from Android Studio, it has the environment x86_64 set up. 
+14. Just drag the .apk file onto the emulator to test. 
 
-16. Alternatively, you can also use a physical device connected to your desktop/laptop - just follow the steps on https://buildozer.readthedocs.io/en/latest/quickstart.html
+15. Alternatively, you can also use a physical device connected to your desktop/laptop - just follow the steps on https://buildozer.readthedocs.io/en/latest/quickstart.html
 
 Notes and Resources for Troubleshooting the build:
 - I came across weird errors while building the app with "buildozer -v android debug" - so this website helped me:
