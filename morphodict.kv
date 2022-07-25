@@ -355,21 +355,6 @@ MainScreen:
                     id: paradigm_label_settings_dropdown
                     text: "Plain English Labels"
                     on_release: app.paradigm_labels_menu.open()
-
-                MDBoxLayout:
-                    size_hint: (1, 0.3)
-                    Label:
-                        text: "Linguistic Mode"
-                        size_hint: (0.5, 1)
-                        color: (0, 0, 0, 1)
-                        text_size: self.size
-                        padding_x: "5dp"
-                        halign: 'left'
-                    ModeSwitch:
-                        id: linguistic_community_mode
-                        on_active: self.change_mode()
-                        pos_hint: {'center_y': 0.3}
-                        active: app.linguistic_mode
                 
                 MDBoxLayout:
                     size_hint: (1, 0.3)

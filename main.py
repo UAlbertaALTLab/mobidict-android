@@ -49,7 +49,7 @@ from cree_sro_syllabics import sro2syllabics
 from backend import get_main_page_results_list
 from api.api import get_sound
 from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
-from core.frontend.relabelling import relabel
+from core.frontend.relabelling import relabel, relabel_source, relabel_plain_english, relabel_linguistic_long
 
 initial_data_list = []
 initial_result_list = []
@@ -67,26 +67,6 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     Class for the tooltip icon next to title
     '''
     pass
-
-class ModeSwitch(MDSwitch):
-    def change_mode(self):
-        app = App.get_running_app()
-        store = JsonStore('store.json')
-        if self.active:
-            app.linguistic_mode = True
-            store.put('linguistic_mode', linguistic_mode = True)
-        else:
-            app.linguistic_mode = False
-            store.put('linguistic_mode', linguistic_mode = False)
-        app.root.ids.main_box_layout.on_submit_word()
-        second_page_population_list = app.root.ids.specific_result_main_list
-        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
-                                                              second_page_population_list.emojis, 
-                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
-                                                              second_page_population_list.default_title,
-                                                              second_page_population_list.inflectional_category,
-                                                              second_page_population_list.paradigm_type,
-                                                              second_page_population_list.definitions)
 
 
 class EmojiSwitch(MDSwitch):
@@ -328,8 +308,10 @@ class MainLayout(BoxLayout):
         
         ling_mode = "community"
         
-        if app.linguistic_mode:
+        if app.index_selected_paradigms == 1:
             ling_mode = "linguistic"
+        elif app.index_selected_paradigms == 2:
+            ling_mode = "source_language"
         
         output_res = get_main_page_results_list(current_query, ling_mode)
         print_presentable_output(output_res)
@@ -354,14 +336,19 @@ class MainLayout(BoxLayout):
             
             paradigm_type = data['lemma_wordform']['paradigm'] if data['is_lemma'] else None
             
+            # Note that the ic can also be set using relabel_plain_english and relabel_linguistic_long
+            
             inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] else "None"
             
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
-            if app.linguistic_mode:
+            if app.index_selected_paradigms == 1:
                 ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
                 if ic is not None and 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
                     ic += " (" + data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
+            
+            if app.index_selected_paradigms == 2 and inflectional_category != "None":
+                ic = relabel_source(inflectional_category)
             
             emoji = data['lemma_wordform']['wordclass_emoji']
             
@@ -422,7 +409,7 @@ class MainLayout(BoxLayout):
                     dynamic_tile_height += int(ceil(len(d) / 30)) * 35
             
             # If linguistic mode, increase dynamic height to give space for the larger subtitle
-            if app.linguistic_mode:
+            if app.index_selected_paradigms == 1:
                 dynamic_tile_height += 20
             
                
@@ -1125,7 +1112,6 @@ class MorphodictApp(MDApp):
         self.index_selected = 0
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
-        self.linguistic_mode = False
         self.display_emoji_mode = False
         self.display_inflectional_category = False
         self.last_result_list_index_click = None
@@ -1154,11 +1140,6 @@ class MorphodictApp(MDApp):
         
         self.root.ids.paradigm_label_settings_dropdown.set_item(self.paradigm_label_type_list[self.index_selected_paradigms])
         
-        if not store.exists("linguistic_mode"):
-            store.put('linguistic_mode', linguistic_mode = False)
-        else:
-            self.linguistic_mode = store.get('linguistic_mode')['linguistic_mode']
-        self.root.ids.linguistic_community_mode.active = self.linguistic_mode
         if not store.exists('display_emoji_mode'):
             store.put('display_emoji_mode', display_emoji_mode = False)
         else:
@@ -1302,6 +1283,7 @@ class MorphodictApp(MDApp):
         self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
         
         # Make additional callbacks here
+        self.root.ids.main_box_layout.on_submit_word()
         second_page_population_list = self.root.ids.specific_result_main_list
         self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
                                                               second_page_population_list.emojis, 
