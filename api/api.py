@@ -27,7 +27,7 @@ def get_sound(query):
         sound_file = open("sound.m4a", "wb")
         
         with requests.get(audio_url) as f:
-            sound_bytes = f.read()
+            sound_bytes = f.content
             sound_file.write(sound_bytes)
         
         # Convert to .wav
@@ -54,7 +54,7 @@ def get_sound(query):
             sound_file = open("sound.m4a", "wb")
             
             with requests.get(audio_url) as f:
-                sound_bytes = f.read()
+                sound_bytes = f.content
                 sound_file.write(sound_bytes)
             
             # Convert to .wav
