@@ -332,70 +332,63 @@ MainScreen:
             ContentNavigationDrawer:
                 orientation: 'vertical'
                 spacing: "10dp"
-                padding: "8dp"
+                padding: 8, 0, 0, 0
+                ScrollView:
+                    MDList:
+                        MDLabel:
+                            text: ""
+                            size_hint: 1, 0.05
+                        Image:
+                            source: 'images/itwewina-with-text.png'
+                            size: "175dp", "90dp"
+                            size_hint: None, None
+                            pos_hint: {'x': 0.01}
 
-                MDLabel:
-                    text: ""
-                    size_hint: 1, 0.05
-                Image:
-                    source: 'images/itwewina-with-text.png'
-                    size: "175dp", "250dp"
-                    size_hint: None, 0.6
-                    pos_hint: {'x': 0.01}
-
-                DrawerList:
-                    id: navigation_drawer_list
-                
-                MDDropDownItem:
-                    id: label_settings_dropdown
-                    text: app.label_type_list[app.index_selected]
-                    on_release: app.menu.open()
-                
-                MDDropDownItem:
-                    id: paradigm_label_settings_dropdown
-                    text: "Plain English Labels"
-                    on_release: app.paradigm_labels_menu.open()
-                
-                MDBoxLayout:
-                    size_hint: (1, 0.3)
-                    Label:
-                        text: "Show Emojis"
-                        size_hint: (0.5, 1)
-                        color: (0, 0, 0, 1)
-                        text_size: self.size
-                        padding_x: "5dp"
-                        halign: 'left'
-                    EmojiSwitch:
-                        id: display_emoji_switch
-                        on_active: self.change_mode()
-                        pos_hint: {'center_y': 0.3}
-                        active: app.display_emoji_mode
-                MDBoxLayout:
-                    size_hint: (1, 0.3)
-                    Label:
-                        text: "Show Inflectional Category"
-                        size_hint: (0.5, 1)
-                        color: (0, 0, 0, 1)
-                        text_size: self.size
-                        padding_x: "5dp"
-                        halign: 'left'
-                    InflectionalSwitch:
-                        id: inflectional_switch
-                        on_active: self.change_mode()
-                        pos_hint: {'center_y': 0.3}
-                        active: app.display_inflectional_category
-
-                MDLabel:
-                    text: ""
-                    font_name: 'bjcrus.ttf'
-                    size_hint: 1, 0.01
-                # BoxLayout:
-                #     canvas.before:
-                #         Rectangle:
-                #             pos: self.pos
-                #             size: self.size
-                #             source: 'images/footer.jpg'
-
+                        DrawerList:
+                            id: navigation_drawer_list
+                        
+                        MDDropDownItem:
+                            id: label_settings_dropdown
+                            text: app.label_type_list[app.index_selected]
+                            on_release: app.menu.open()
+                        
+                        MDDropDownItem:
+                            id: paradigm_label_settings_dropdown
+                            text: "Plain English Labels"
+                            on_release: app.paradigm_labels_menu.open()
+                        
+                        MDBoxLayout:
+                            size_hint: 1, None
+                            height: "40dp"
+                            Label:
+                                text: "Show Emojis"
+                                size_hint: (0.5, 1)
+                                color: (0, 0, 0, 1)
+                                text_size: self.size
+                                padding_x: "5dp"
+                                halign: 'left'
+                                valign: 'center'
+                            EmojiSwitch:
+                                id: display_emoji_switch
+                                on_active: self.change_mode()
+                                pos_hint: {'center_y': 0.5}
+                                active: app.display_emoji_mode
+                        MDBoxLayout:
+                            size_hint: 1, None
+                            height: "40dp"
+                            Label:
+                                text: "Show Inflectional Category"
+                                size_hint: (0.5, 1)
+                                color: (0, 0, 0, 1)
+                                text_size: self.size
+                                padding_x: "5dp"
+                                halign: 'left'
+                                valign: 'center'
+                            InflectionalSwitch:
+                                id: inflectional_switch
+                                on_active: self.change_mode()
+                                pos_hint: {'center_y': 0.5}
+                                active: app.display_inflectional_category
                         
 
                 
