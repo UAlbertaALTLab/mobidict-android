@@ -338,7 +338,7 @@ class MainLayout(BoxLayout):
             
             # Note that the ic can also be set using relabel_plain_english and relabel_linguistic_long
             
-            inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] else "None"
+            inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
             
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
