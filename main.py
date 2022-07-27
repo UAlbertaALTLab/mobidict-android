@@ -39,7 +39,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
-from kivymd.uix.selectioncontrol import MDSwitch
+from kivymd.uix.selectioncontrol import MDSwitch, MDCheckbox
 from kivymd.toast import toast
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
 from kivy.graphics import Rectangle, Color
@@ -69,7 +69,7 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     pass
 
 
-class EmojiSwitch(MDSwitch):
+class EmojiSwitch(MDCheckbox):
     def change_mode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
@@ -90,7 +90,7 @@ class EmojiSwitch(MDSwitch):
                                                               second_page_population_list.paradigm_type,
                                                               second_page_population_list.definitions)
 
-class InflectionalSwitch(MDSwitch):
+class InflectionalSwitch(MDCheckbox):
     def change_mode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
