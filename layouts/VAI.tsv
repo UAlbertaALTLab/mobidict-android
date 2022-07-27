@@ -1,5 +1,4 @@
-# AI	
-	| Prs | Ind
+		| Prs | Ind
 _ 1Sg	${lemma}+V+AI+Ind+1Sg
 _ 2Sg	${lemma}+V+AI+Ind+2Sg
 _ 3Sg	${lemma}+V+AI+Ind+3Sg

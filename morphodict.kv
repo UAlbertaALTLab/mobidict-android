@@ -331,7 +331,7 @@ MainScreen:
 
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                spacing: "10dp"
+                spacing: "15dp"
                 padding: 8, 0, 0, 0
                 ScrollView:
                     MDList:
@@ -359,10 +359,11 @@ MainScreen:
                         
                         MDBoxLayout:
                             size_hint: 1, None
-                            height: "40dp"
+                            height: "50dp"
+                            padding: 0, 8, 0, 0
                             Label:
                                 text: "Show Emojis"
-                                size_hint: (0.5, 1)
+                                size_hint: (0.85, 1)
                                 color: (0, 0, 0, 1)
                                 text_size: self.size
                                 padding_x: "5dp"
@@ -375,10 +376,10 @@ MainScreen:
                                 active: app.display_emoji_mode
                         MDBoxLayout:
                             size_hint: 1, None
-                            height: "40dp"
+                            height: "50dp"
                             Label:
                                 text: "Show Inflectional Category"
-                                size_hint: (0.5, 1)
+                                size_hint: (0.85, 1)
                                 color: (0, 0, 0, 1)
                                 text_size: self.size
                                 padding_x: "5dp"

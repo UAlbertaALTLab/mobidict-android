@@ -39,7 +39,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
-from kivymd.uix.selectioncontrol import MDSwitch
+from kivymd.uix.selectioncontrol import MDSwitch, MDCheckbox
 from kivymd.toast import toast
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
 from kivy.graphics import Rectangle, Color
@@ -69,7 +69,7 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     pass
 
 
-class EmojiSwitch(MDSwitch):
+class EmojiSwitch(MDCheckbox):
     def change_mode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
@@ -90,7 +90,7 @@ class EmojiSwitch(MDSwitch):
                                                               second_page_population_list.paradigm_type,
                                                               second_page_population_list.definitions)
 
-class InflectionalSwitch(MDSwitch):
+class InflectionalSwitch(MDCheckbox):
     def change_mode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
@@ -1250,6 +1250,7 @@ class MorphodictApp(MDApp):
             return
         
         store = JsonStore('store.json')
+        app = App.get_running_app()
         
         paradigm_settings_items = [{'index': 0, 
                                  'text': "Plain English Labels", 
@@ -1287,7 +1288,7 @@ class MorphodictApp(MDApp):
         second_page_population_list = self.root.ids.specific_result_main_list
         self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
                                                               second_page_population_list.emojis, 
-                                                              second_page_population_list.subtitle,
+                                                              app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
