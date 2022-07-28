@@ -68,6 +68,16 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     '''
     pass
 
+class ParadigmExpansionPanel(MDExpansionPanel):
+    def __init__(self, is_first, **kwargs ):
+        super().__init__(**kwargs)
+        self.is_first = is_first
+        Clock.schedule_once(self.panel_op, 0)
+    def panel_op(self, args):
+        if self.is_first:
+            self.check_open_panel(self)
+        
+
 
 class EmojiSwitch(MDCheckbox):
     def change_mode(self):
@@ -1046,27 +1056,30 @@ class SpecificResultMainList(MDList):
                     all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
             
             print("=" * 80)
-            
+        first_panel_flag = True
         for each_pane in all_panes:
-            self.add_widget(MDExpansionPanel(
-                            icon="bookshelf",
-                            content=ParadigmLabelContent(each_pane['pane']),
-                            panel_cls=MDExpansionPanelTwoLine(
-                                text= each_pane['header'],
-                                secondary_text= each_pane['subheader']
-                            ),
-                            ))
-        
-        # pane_1 = MDExpansionPanel(
-        #             icon="bookshelf",
-        #             content=ParadigmLabelContent(paradigm_data),
-        #             panel_cls=MDExpansionPanelTwoLine(
-        #                 text= 'Paradigms',
-        #                 secondary_text= 'Click to expand'
-        #             ),
-        #         )
-        
-        # self.add_widget(pane_1)
+            if first_panel_flag:
+                panel = ParadigmExpansionPanel(
+                                is_first = first_panel_flag,
+                                icon="bookshelf",
+                                content=ParadigmLabelContent(each_pane['pane']),
+                                panel_cls=MDExpansionPanelTwoLine(
+                                    text= each_pane['header'],
+                                    secondary_text= each_pane['subheader']
+                                )
+                                )
+                first_panel_flag = False
+                self.add_widget(panel)
+            else:
+                self.add_widget(ParadigmExpansionPanel(
+                                is_first = first_panel_flag,
+                                icon="bookshelf",
+                                content=ParadigmLabelContent(each_pane['pane']),
+                                panel_cls=MDExpansionPanelTwoLine(
+                                    text= each_pane['header'],
+                                    secondary_text= each_pane['subheader']
+                                )
+                                ))
         
     def play_sound(self, *args):
         print("Default title: ", self.default_title)
