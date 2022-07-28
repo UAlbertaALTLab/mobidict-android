@@ -1,6 +1,7 @@
 # Welcome to Mobidict
 
-To start the code,
+## Steps to run the app locally
+---
 
 (Assumes virtualenv is installed)- if not, go "pip3 install virtualenv"
 
@@ -21,7 +22,9 @@ Resources:
 3. https://kivycoder.com/using-sqlite3-database-with-kivy-python-kivy-gui-tutorial-55/
 4. https://kivymd.readthedocs.io/en/latest/getting-started/
 
-Steps to release from scratch:
+## Steps to release the app from scratch
+---
+
 1. Make a new folder for the build.
 2. Clone the mobidict-android repository.
 3. Create a virtualenv by "virtualenv [name of environment]". For eg. "virtualenv mobidict"
