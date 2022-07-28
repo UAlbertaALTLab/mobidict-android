@@ -1,7 +1,6 @@
 # Welcome to Mobidict
 
 ## Steps to run the app locally
----
 
 (Assumes virtualenv is installed)- if not, go "pip3 install virtualenv"
 
@@ -23,7 +22,6 @@ Resources:
 4. https://kivymd.readthedocs.io/en/latest/getting-started/
 
 ## Steps to release the app from scratch
----
 
 1. Make a new folder for the build.
 2. Clone the mobidict-android repository.
