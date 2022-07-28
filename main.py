@@ -852,6 +852,10 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # No audio found
             toast("No recording available for this word.")
             return
+        elif audio_fetch_status == 4:
+            # No audio found
+            toast("Audio currently unavailable.")
+            return
         
         toast("Playing sound...", duration = 1)
         
@@ -1101,6 +1105,11 @@ class SpecificResultMainList(MDList):
             # No audio found
             app.spinner2_active = False
             toast("No recording available for this word.")
+            return
+        elif audio_fetch_status == 4:
+            # No audio found
+            app.spinner2_active = False
+            toast("Audio currently unavailable.")
             return
         
         # Instead of audio URL, play the file just loaded

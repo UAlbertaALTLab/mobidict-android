@@ -8,10 +8,15 @@ def get_sound(query):
     '''
     Fetches the sound from the speech-db api
     
-    Returns status. 1 = Successful. 2 = Connection Error, 3 = No audio available
+    Returns status. 
+    (1 = Successful. 2 = Connection Error, 
+    3 = No audio available, 4 = Audio currently unavailable due to server problems)
     '''
     try:
         response = requests.get(SPEECH_DB_BASE_URL + "/maskwacis/api/bulk_search" + "?" + "q=" + query)
+        if not response.ok:
+            # Audio not available as speech-db is probably down/bad request.
+            return 4 
     except:
         print("Connection error!")
         return 2 # Connection error
@@ -40,6 +45,9 @@ def get_sound(query):
         # Make a call to the moswacihk api to get the recording.
         try:
             response = requests.get(SPEECH_DB_BASE_URL + "/moswacihk/api/bulk_search" + "?" + "q=" + query)
+            if not response.ok:
+            # Audio not available as speech-db is probably down/bad request.
+                return 4
         except:
             print("Connection error!")
             return 2 # Connection error
