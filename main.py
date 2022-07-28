@@ -69,13 +69,16 @@ class InfoTooltipButton(MDIconButton, MDTooltip):
     pass
 
 class ParadigmExpansionPanel(MDExpansionPanel):
-    def __init__(self, is_first, **kwargs ):
+    def __init__(self, is_first, dynamic_height, **kwargs ):
         super().__init__(**kwargs)
         self.is_first = is_first
+        self.dynamic_height = dynamic_height
         Clock.schedule_once(self.panel_op, 0)
     def panel_op(self, args):
         if self.is_first:
-            self.check_open_panel(self)
+            # self.check_open_panel(self)
+            self.height += self.dynamic_height
+            self.open_panel()
         
 
 
@@ -1061,6 +1064,7 @@ class SpecificResultMainList(MDList):
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
+                                dynamic_height= len(each_pane['pane']['tr_rows']) * 45,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
@@ -1073,6 +1077,7 @@ class SpecificResultMainList(MDList):
             else:
                 self.add_widget(ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
+                                dynamic_height= 0,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
