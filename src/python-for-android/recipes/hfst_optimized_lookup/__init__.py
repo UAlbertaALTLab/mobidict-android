@@ -16,7 +16,7 @@ class HfstolRecipe(CythonRecipe):
 
     def get_recipe_env(self, arch):
         env = super().get_recipe_env(arch)
-        env['LDFLAGS'] += ' -lc++_shared'
+        env['LDFLAGS'] += ' -need_stl_shared'
         return env
 
 
