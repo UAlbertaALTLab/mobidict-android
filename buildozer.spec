@@ -37,7 +37,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.9.12,hostpython3==3.9.12,kivy,kivymd,sqlite3,cree_sro_syllabics,snowballstemmer,marshmallow,hfst_optimized_lookup,typing_extensions,future,dawg,pydub,paradigm-panes,requests
+requirements = python3==3.9.12,hostpython3==3.9.12,kivy,kivymd,sqlite3,cree_sro_syllabics,snowballstemmer,marshmallow,hfst_optimized_lookup,typing_extensions,future,dawg,pydub,paradigm-panes,requests,more-itertools==8.7.0
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -306,7 +306,7 @@ p4a.branch = develop
 #p4a.source_dir =
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
-#p4a.local_recipes =
+p4a.local_recipes = ../../../../.buildozer/android/platform/python-for-android/recipes
 
 # (str) Filename to the hook for p4a
 #p4a.hook =
