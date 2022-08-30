@@ -50,3 +50,7 @@ Note that it's in Chinese and you can convert it to an English page to understan
 
 - I was using the Python version 3.9.12 - note that this is extremely important to work with the current buildozer.spec - because if you have any later version, the build may/may not work - and you will need to change the buildozer.spec requirements (python3, hostpython3)
 - In case pip3 install buildozer gives problems on step 10, follow the buildozer steps on https://kivy.org/doc/stable/guide/packaging-android.html. This helped me make buildozer work on terminal.
+
+### Errors encountered while packaging the app
+1. dlopen failed - [x].so has a bad ELF magic. This usually means the library you have added needs a custom recipe. Add this recipe to .buildozer/android/platform/python-for-android/pythonforandroid/recipes/[name of library]/__init__.py - The recipe template looks like: https://pastebin.com/MHd0FdH0. Don't forget to add the source files from github (you can just git clone the source files from the home directory of that project) in the path specified.
+2. No module named [x]: This is pretty straightforward. This usually means you are missing this library name in the requirements in the buildozer.spec file. 
