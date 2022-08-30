@@ -37,7 +37,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.9.12,hostpython3==3.9.12,kivy,kivymd,sqlite3,cree_sro_syllabics,snowballstemmer,marshmallow,hfst_optimized_lookup,typing_extensions,future,dawg,pydub,paradigm-panes,requests,more-itertools==8.7.0
+requirements = python3==3.9.12,hostpython3==3.9.12,kivy,kivymd,sqlite3,cree_sro_syllabics,snowballstemmer,marshmallow,hfst_optimized_lookup,typing_extensions,future,dawg,pydub,paradigm-panes,requests,more-itertools==8.7.0,pillow,packaging,urllib3,charset_normalizer,idna
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -102,10 +102,10 @@ android.permissions = INTERNET,READ_EXTERNAL_STORAGE
 #android.api = 27
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 21
+android.minapi = 24
 
 # (int) Android SDK version to use
-#android.sdk = 20
+android.sdk = 24
 
 # (str) Android NDK version to use
 #android.ndk = 19b
@@ -294,7 +294,7 @@ android.allow_backup = True
 #p4a.url =
 
 # (str) python-for-android fork to use in case if p4a.url is not specified, defaults to upstream (kivy)
-#p4a.fork = kivy
+p4a.fork = misl6
 
 # (str) python-for-android branch to use, defaults to master
 p4a.branch = develop
@@ -306,7 +306,7 @@ p4a.branch = develop
 #p4a.source_dir =
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
-p4a.local_recipes = ../../../../.buildozer/android/platform/python-for-android/recipes
+p4a.local_recipes = ../../../../.buildozer/android/platform/python-for-android/pythonforandroid/recipes
 
 # (str) Filename to the hook for p4a
 #p4a.hook =

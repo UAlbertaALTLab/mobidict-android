@@ -27,7 +27,6 @@ from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.storage.jsonstore import JsonStore
 
-
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
@@ -553,13 +552,13 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
                 tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                    tooltip_text= tooltip_content,
-                                                                   user_font_size="20dp",
+                                                                   font_size="20dp",
                                                                    size_hint_x = 0.5,
                                                                    pos_hint = {'center_y': 0.5},
                                                                    pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                                user_font_size="20dp",
+                                                                font_size="20dp",
                                                                 on_release=self.play_sound,
                                                                 size_hint_x = 0.5,
                                                                 pos_hint = {'center_y': 0.5},
@@ -712,13 +711,13 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
-                                                               user_font_size="20dp",
+                                                               font_size="20dp",
                                                                size_hint_x = 0.5,
                                                                pos_hint = {'center_y': 0.5},
                                                                pos = (app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
             
         tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                            user_font_size="20dp",
+                                                            font_size="20dp",
                                                             on_release=self.play_sound,
                                                             size_hint_x = 0.5,
                                                             pos_hint = {'center_y': 0.5},
@@ -927,7 +926,7 @@ class SpecificResultMainList(MDList):
         
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                               user_font_size="20dp",
+                                                               font_size="20dp",
                                                                on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
