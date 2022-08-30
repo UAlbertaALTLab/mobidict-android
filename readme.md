@@ -43,6 +43,8 @@ Now the app should run successfully. Only proceed once it is running properly.
 
 15. Alternatively, you can also use a physical device connected to your desktop/laptop - just follow the steps on https://buildozer.readthedocs.io/en/latest/quickstart.html
 
+16. Instead of buildozer -v android debug, we could also go "buildozer -v android debug deploy run logcat" if a device is connected (make sure the developer mode is enabled and so is USB debugging. Many times, just turning the USB debugging off and on solves the unauthorized device problem.) To clean before running the latter command, one can go "buildozer android clean" to clean and refresh the build or if one wants to refresh a recipe, they can go "buildozer android p4a -- clean_recipe_build [recipe name]".
+
 Notes and Resources for Troubleshooting the build:
 - I came across weird errors while building the app with "buildozer -v android debug" - so this website helped me:
 https://vucavucalife.com/build-apk-with-buildozer-and-install-to-androidemu-on-macos-12-4-m1-macbook/
@@ -52,5 +54,5 @@ Note that it's in Chinese and you can convert it to an English page to understan
 - In case pip3 install buildozer gives problems on step 10, follow the buildozer steps on https://kivy.org/doc/stable/guide/packaging-android.html. This helped me make buildozer work on terminal.
 
 ### Errors encountered while packaging the app
-1. dlopen failed - [x].so has a bad ELF magic. This usually means the library you have added needs a custom recipe. Add this recipe to .buildozer/android/platform/python-for-android/pythonforandroid/recipes/[name of library]/__init__.py - The recipe template looks like: https://pastebin.com/MHd0FdH0. Don't forget to add the source files from github (you can just git clone the source files from the home directory of that project) in the path specified.
-2. No module named [x]: This is pretty straightforward. This usually means you are missing this library name in the requirements in the buildozer.spec file. 
+1. dlopen failed - [x].so has a bad ELF magic. This usually means the library you have added needs a custom recipe. Add this recipe to .buildozer/android/platform/python-for-android/pythonforandroid/recipes/[name of library]/__init__.py - The recipe template looks like: https://pastebin.com/MHd0FdH0. Don't forget to add the source files from github (you can just git clone the source files from the home directory of that project) in the path specified. The same needs to have a setup.py - so that once you have cloned everything into the [project folder name] in the root directory of our main project, just go into that folder and go 'python3 setup.py install'. This will "cythonize" your library.
+2. No module named [x]: This is pretty straightforward. This usually means you are missing this library name in the requirements in the buildozer.spec file.
