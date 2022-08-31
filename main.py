@@ -455,11 +455,6 @@ class MainLayout(BoxLayout):
         print("INITIAL RES LIST::", initial_result_list)
         
         root.ids.result_list_main.update_data(initial_result_list)
-        
-        # self.ids.results_scroll_view.clear_widgets()
-        # self.ids.results_scroll_view.add_widget(result_list_view)
-
-# Builder.load_file("morphodict.kv")
 
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
@@ -562,7 +557,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                                                 on_release=self.play_sound,
                                                                 size_hint_x = 0.5,
                                                                 pos_hint = {'center_y': 0.5},
-                                                                pos=(app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width + 30)))
+                                                                pos=(app.root.ids.input_word.pos[0] + title_label_width + 60, title_label_width + 60)))
 
             title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
             self.add_widget(title_icon_box_layout)
@@ -721,7 +716,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                                             on_release=self.play_sound,
                                                             size_hint_x = 0.5,
                                                             pos_hint = {'center_y': 0.5},
-                                                            pos = (app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width)))
+                                                            pos = (app.root.ids.input_word.pos[0] + title_label_width + 60, title_label_width)))
         
         title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
         self.add_widget(title_icon_box_layout)

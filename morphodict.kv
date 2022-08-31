@@ -90,7 +90,7 @@ MainScreen:
                             [['menu', lambda x: nav_drawer.set_state("open")]]
                     Image:
                         source: 'images/itwewina-with-text.png'
-                        size: "175dp", "250dp"
+                        size: "175dp", "400dp"
                         size_hint: None, 0.2
                         pos_hint: {'x': 0.08}
                         
@@ -121,7 +121,7 @@ MainScreen:
                         size_hint: 0.8, None
                         height: self.texture_size[1] + 20
                         width: self.texture_size[0] + 20
-                        font_size: 13
+                        font_size: 18
                         pos_hint: {"x": 0.1}
                         canvas.before:
                             Color:
@@ -134,6 +134,8 @@ MainScreen:
                         size_hint: 1, 0.05
                     ScrollView:
                         id: results_scroll_view
+                        do_scroll_x: False
+                        do_scroll_y: True
                         ResultView:
                             id: result_list_main
                     Label:
@@ -189,7 +191,7 @@ MainScreen:
                             bold: True 
                             size_hint: 1, None
                             height: self.texture_size[1] + 10
-                            font_size: 20
+                            font_size: 28
                         ScrollView:
                             MDList:
                                 MDLabel:
@@ -224,7 +226,7 @@ MainScreen:
                             bold: True 
                             size_hint: 1, None
                             height: self.texture_size[1] + 10
-                            font_size: 20
+                            font_size: 28
                         ScrollView:
                             MDList:
                                 MDLabel:
@@ -262,7 +264,7 @@ MainScreen:
                                     bold: True 
                                     size_hint: 1, None
                                     height: self.texture_size[1] + 10
-                                    font_size: 20
+                                    font_size: 28
                                 MDLabel:
                                     text: app.about_text_source_material
                                     markup: True
@@ -277,7 +279,7 @@ MainScreen:
                                     bold: True 
                                     size_hint: 1, None
                                     height: self.texture_size[1] + 10
-                                    font_size: 20
+                                    font_size: 28
                                 MDLabel:
                                     text: app.about_text_credit
                                     markup: True
