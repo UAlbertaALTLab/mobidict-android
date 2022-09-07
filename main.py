@@ -15,6 +15,7 @@ from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -610,9 +611,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the inflectional category only if the option is on
             
             if app.display_inflectional_category:
-                inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label = Label(text="[size=24]" + self.inflectional_category + "[/size]", markup=True)
                 inflection_label._label.refresh()
-                inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+                inflection_label = MDLabel(text="[size=24]" + self.inflectional_category + "[/size]", 
                                     markup=True,
                                     size_hint=(None, 1),
                                     width=inflection_label._label.texture.size[0] + 5)
@@ -623,9 +624,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             additional_emoji_margin = 0 if not self.emojis else 10
             
             # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-            emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+            emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
             emoji_label._label.refresh()
-            emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+            emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -633,7 +634,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             if self.subtitle == "":
                 self.subtitle = "None"
         
-            desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+            desc_label = MDLabel(text="[size=24]" + self.subtitle + "[/size]", markup=True)
             
             
             if app.display_emoji_mode == True:
@@ -769,9 +770,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=24]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=24]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -780,9 +781,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         additional_emoji_margin = 0 if not self.emojis else 10
         
-        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                               markup=True,
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -790,7 +791,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         if self.subtitle == "":
             self.subtitle = "None"
         
-        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=24]" + self.subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode == True:
             description_box_layout.add_widget(emoji_label)
@@ -892,7 +893,7 @@ class SpecificResultMainList(MDList):
         dynamic_details_height = 0
         
         for d in definitions:
-            dynamic_details_height += max(int(ceil(len(d) / 30)) * 35, 60)
+            dynamic_details_height += max(int(ceil(len(d) / 30)) * 40, 60)
         
         details_box_layout_height = max(dynamic_details_height, 100)
         
@@ -906,9 +907,9 @@ class SpecificResultMainList(MDList):
         
         txt_main_title = app.get_syllabics_sro_correct_label(title)
         
-        title_label = Label(text="[font=bjcrus.ttf][size=22]" + txt_main_title + "[/font][/size]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][size=28]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + txt_main_title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=28]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -937,9 +938,9 @@ class SpecificResultMainList(MDList):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=24]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=24]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -949,14 +950,14 @@ class SpecificResultMainList(MDList):
         additional_emoji_margin = 0 if not emojis else 10
         
         # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
                             markup=True,
                             size_hint=(None, 1),
                             width=emoji_label._label.texture.size[0] + additional_emoji_margin)
     
-        desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=24]" + subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode:
             description_box_layout.add_widget(emoji_label)
@@ -1062,7 +1063,7 @@ class SpecificResultMainList(MDList):
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
-                                dynamic_height= len(each_pane['pane']['tr_rows']) * 45,
+                                dynamic_height= len(each_pane['pane']['tr_rows']) * 80,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
