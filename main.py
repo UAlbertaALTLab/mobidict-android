@@ -4,9 +4,10 @@ import webbrowser
 import threading
 import paradigm_panes
 import os
+import time
 
 from kivy.properties import ObjectProperty
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
@@ -84,6 +85,16 @@ class ParadigmExpansionPanel(MDExpansionPanel):
 
 class EmojiSwitch(MDCheckbox):
     def change_mode(self):
+
+        app = App.get_running_app()
+        Clock.schedule_once(self.update_emoji_ui, 2.5)
+
+        time.sleep(3)
+
+        print("Done loading in background!")
+        app.main_loader_spinner_toggle()
+    
+    def update_emoji_ui(self, *args):
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
@@ -102,6 +113,11 @@ class EmojiSwitch(MDCheckbox):
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
                                                               second_page_population_list.definitions)
+
+    def emoji_display_thread(self):
+        app = App.get_running_app()
+        app.main_loader_spinner_toggle()
+        threading.Thread(target=(self.change_mode)).start()
 
 class InflectionalSwitch(MDCheckbox):
     def change_mode(self):
@@ -278,6 +294,9 @@ class ContentNavigationDrawer(MDBoxLayout):
 class SoundLoadSpinner2(MDSpinner):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+
+class MainLoaderSpinner(MDSpinner):
+    pass
 
 class AboutMDList(MDList):
     pass
@@ -1127,6 +1146,7 @@ class MorphodictApp(MDApp):
     about_text_credit = ABOUT_TEXT_CREDITS
     spinner2_active = BooleanProperty(defaultvalue = False)
     # result_default_size = NumericProperty(defaultvalue = dp(200))
+    main_loader_active = BooleanProperty(defaultvalue = False)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1318,8 +1338,17 @@ class MorphodictApp(MDApp):
         
         
         self.paradigm_labels_menu.dismiss()
-    
-    
+
+    @mainthread
+    def main_loader_spinner_toggle(self):
+        app = self.get_running_app()
+        if app.root.ids.main_loader_spinner.active == False:
+            app.root.ids.main_loader_spinner.active = True
+            self.main_loader_active = True
+        else:
+            app.root.ids.main_loader_spinner.active = False
+            self.main_loader_active = False
+
     def on_start(self):
         # Preload these things
         def on_release_help(arg):

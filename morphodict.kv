@@ -88,6 +88,12 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['menu', lambda x: nav_drawer.set_state("open")]]
+                    MainLoaderSpinner:
+                        id: main_loader_spinner
+                        size_hint: None, None
+                        size: dp(46), dp(46)
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        active: app.main_loader_active
                     Image:
                         source: 'images/itwewina-with-text.png'
                         size: "175dp", "400dp"
@@ -372,7 +378,7 @@ MainScreen:
                                 valign: 'center'
                             EmojiSwitch:
                                 id: display_emoji_switch
-                                on_active: self.change_mode()
+                                on_active: self.emoji_display_thread()
                                 pos_hint: {'center_y': 0.5}
                                 active: app.display_emoji_mode
                         MDBoxLayout:
