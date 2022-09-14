@@ -27,7 +27,7 @@ def get_main_page_results_list(query: str, linguistic_mode = "community"):
             dict_source=dict_source,
             display_mode=linguistic_mode
         )
-        
+
         did_search = True
 
         search_results = should_show_form_of(

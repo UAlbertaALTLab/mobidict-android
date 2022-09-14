@@ -85,14 +85,13 @@ class ParadigmExpansionPanel(MDExpansionPanel):
 
 class EmojiSwitch(MDCheckbox):
     def change_mode(self):
-
         app = App.get_running_app()
-        Clock.schedule_once(self.update_emoji_ui, 2.5)
-
-        time.sleep(3)
+        
+        get_main_page_results_list("amisk", "community")
+        Clock.schedule_once(self.update_emoji_ui)
+        time.sleep(1)
 
         print("Done loading in background!")
-        app.main_loader_spinner_toggle()
     
     def update_emoji_ui(self, *args):
         app = App.get_running_app()
@@ -113,6 +112,7 @@ class EmojiSwitch(MDCheckbox):
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
                                                               second_page_population_list.definitions)
+        app.main_loader_spinner_toggle()
 
     def emoji_display_thread(self):
         app = App.get_running_app()
@@ -1160,7 +1160,7 @@ class MorphodictApp(MDApp):
         self.newest_result_list = []
         self.label_type_list = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
         self.paradigm_label_type_list = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
-        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI"]
+        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI", "NAD", "NI", "NID", "VTA", "VTI"]
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
