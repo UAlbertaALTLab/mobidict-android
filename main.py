@@ -1,5 +1,6 @@
 __version__ = "1.0.0"
 from math import ceil
+from functools import partial
 import webbrowser
 import threading
 import paradigm_panes
@@ -84,16 +85,16 @@ class ParadigmExpansionPanel(MDExpansionPanel):
 
 
 class EmojiSwitch(MDCheckbox):
-    def change_mode(self):
+    def change_mode(self, current_query, ling_mode):
         app = App.get_running_app()
-        
-        get_main_page_results_list("amisk", "community")
-        Clock.schedule_once(self.update_emoji_ui)
+        output_result_list = get_main_page_results_list(current_query, ling_mode)
+        print("Output results fetched!")
+        Clock.schedule_once(partial(self.update_emoji_ui, output_result_list))
         time.sleep(1)
 
         print("Done loading in background!")
     
-    def update_emoji_ui(self, *args):
+    def update_emoji_ui(self, prefetched_list, *args):
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
@@ -103,7 +104,7 @@ class EmojiSwitch(MDCheckbox):
             app.display_emoji_mode = False
             store.put('display_emoji_mode', display_emoji_mode = False)
         
-        app.root.ids.main_box_layout.on_submit_word()
+        app.root.ids.main_box_layout.on_submit_word(prefetched_result_list=prefetched_list)
         second_page_population_list = app.root.ids.specific_result_main_list
         app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
                                                               second_page_population_list.emojis,
@@ -117,7 +118,18 @@ class EmojiSwitch(MDCheckbox):
     def emoji_display_thread(self):
         app = App.get_running_app()
         app.main_loader_spinner_toggle()
-        threading.Thread(target=(self.change_mode)).start()
+
+        current_query = app.root.ids.input_word.text
+        
+        ling_mode = "community"
+        
+        if app.index_selected_paradigms == 1:
+            ling_mode = "linguistic"
+        elif app.index_selected_paradigms == 2:
+            ling_mode = "source_language"
+
+        # https://docs.python.org/3/library/multiprocessing.html - use this!
+        threading.Thread(target=(self.change_mode), args=[current_query, ling_mode]).start()
 
 class InflectionalSwitch(MDCheckbox):
     def change_mode(self):
@@ -325,7 +337,7 @@ class DrawerList(MDList):
     pass
 
 class MainLayout(BoxLayout):
-    def on_submit_word(self, widget= None):
+    def on_submit_word(self, widget= None, prefetched_result_list = None):
         root = App.get_running_app().root
         app = App.get_running_app()
         
@@ -345,9 +357,12 @@ class MainLayout(BoxLayout):
         elif app.index_selected_paradigms == 2:
             ling_mode = "source_language"
         
-        output_res = get_main_page_results_list(current_query, ling_mode)
-        print_presentable_output(output_res)
-        print("Output:", output_res)
+        output_res = prefetched_result_list
+
+        if prefetched_result_list is None:
+            output_res = get_main_page_results_list(current_query, ling_mode)
+        # print_presentable_output(output_res)
+        # print("Output:", output_res)
         
         resultToPrint = output_res.copy()
         self.display_result_list(resultToPrint)
@@ -472,7 +487,7 @@ class MainLayout(BoxLayout):
         
         root = App.get_running_app().root
         
-        print("INITIAL RES LIST::", initial_result_list)
+        # print("INITIAL RES LIST::", initial_result_list)
         
         root.ids.result_list_main.update_data(initial_result_list)
 
