@@ -108,13 +108,20 @@ MainScreen:
                         height: "35dp"
                         pos_hint: {"center_x": 0.5}
                         hint_text: "Search in Cree or English"
-                        on_text_validate: root.ids.main_box_layout.on_submit_word(self)
+                        on_text_validate: 
+                            altlab_develop_text_label.height = "0dp"
+                            altlab_develop_text_label.text = ""
+                            altlab_develop_text_label.size_hint_y = None
+                            altlab_develop_text_label.opacity = 0
+                            altlab_develop_text_label.disabled = True
+                            root.ids.main_box_layout.on_submit_word(self)
                         line_color_focus: get_color_from_hex("#8B0000")
                         font_name: 'bjcrus.ttf'
                     Label:
                         text:''
                         size_hint: 1, 0.05
                     Label:
+                        id: altlab_develop_text_label
                         text: "This is an intelligent dictionary for Plains Cree, made by the [color=0000ff][ref=https://altlab.ualberta.ca][u]Alberta Language Technology Lab (ALTLab)[/u].[/ref][/color]"
                         color: (0, 0, 0, 1)
                         text_size: self.width, None
