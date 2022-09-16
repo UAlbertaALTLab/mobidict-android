@@ -112,6 +112,7 @@ class EmojiSwitch(MDCheckbox):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
         app.main_loader_spinner_toggle()
 
@@ -150,6 +151,7 @@ class InflectionalSwitch(MDCheckbox):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
@@ -241,14 +243,14 @@ class WindowManager(ScreenManager):
     def switch_to_result_screen(self, index, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
-        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions)
+        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, None, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
-    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
+    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = lemma
-        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions)
+        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -377,16 +379,17 @@ class MainLayout(BoxLayout):
         app = App.get_running_app()
         
         for data in data_list:
-            
+            print("-"*80)
+            print(data)
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
             paradigm_type = data['lemma_wordform']['paradigm'] if data['is_lemma'] else None
+            lemma_paradigm_type = None
             
             # Note that the ic can also be set using relabel_plain_english and relabel_linguistic_long
             
             inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
-            
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
             if app.index_selected_paradigms == 1:
@@ -450,6 +453,7 @@ class MainLayout(BoxLayout):
                 dynamic_tile_height += int(ceil(len(d) / 30)) * 35
             
             if not data['is_lemma'] and data['show_form_of']:
+                lemma_paradigm_type = data['lemma_wordform']['paradigm']
                 dynamic_tile_height += 15
                 for d in lemma_definitions:
                     dynamic_tile_height += 30
@@ -468,6 +472,7 @@ class MainLayout(BoxLayout):
                                         'subtitle': subtitle,
                                         'inflectional_category': inflectional_category,
                                         'paradigm_type': paradigm_type,
+                                        'lemma_paradigm_type': lemma_paradigm_type,
                                         'lemma_definitions': lemma_definitions,
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
                                         'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
@@ -513,6 +518,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
     emojis = ObjectProperty()
     inflectional_category = ObjectProperty()
     paradigm_type = ObjectProperty(allownone = True)
+    lemma_paradigm_type = ObjectProperty(allownone = True)
     lemma_definitions = ObjectProperty()
     friendly_linguistic_breakdown_head = ObjectProperty()
     friendly_linguistic_breakdown_tail = ObjectProperty()
@@ -870,7 +876,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.definitions)
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.lemma_paradigm_type, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
@@ -904,9 +910,10 @@ class SpecificResultMainList(MDList):
         self.default_title = None
         self.inflectional_category = None
         self.paradigm_type = None
+        self.lemma_paradigm_type = None
         self.definitions = None
     
-    def populate_page(self, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
+    def populate_page(self, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
         '''
         Populates the second result-specific page
         '''
@@ -916,6 +923,7 @@ class SpecificResultMainList(MDList):
         self.default_title = default_title
         self.inflectional_category = inflectional_category
         self.paradigm_type = paradigm_type
+        self.lemma_paradigm_type = lemma_paradigm_type
         self.definitions = definitions
         
         app = App.get_running_app()
@@ -1015,10 +1023,17 @@ class SpecificResultMainList(MDList):
         
         paradigm = {'panes': []}
         
-        if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
-            paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+        if lemma_paradigm_type is None:
+            if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
+                paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+            elif paradigm_type is None:
+                print("Paradigm Type (currently unavailable): ", paradigm_type)
+                return
+        elif lemma_paradigm_type in app.paradigm_pane_layouts_available:
+            paradigm = pane_generator.generate_pane(default_title, lemma_paradigm_type)
         else:
             print("Paradigm Type (currently unavailable): ", paradigm_type)
+            return
         
         paradigm_data = paradigm.copy()
         
@@ -1300,6 +1315,7 @@ class MorphodictApp(MDApp):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
         self.menu.dismiss()
     
@@ -1351,6 +1367,7 @@ class MorphodictApp(MDApp):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
         
         
