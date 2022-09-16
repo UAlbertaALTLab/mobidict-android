@@ -580,9 +580,10 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 if len(tooltip_content) > 0:
                     tooltip_content = tooltip_content[:-1]
                 
-                tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
+                tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information",
                                                                    tooltip_text= tooltip_content,
                                                                    font_size="20dp",
+                                                                   shift_y="100dp",
                                                                    size_hint_x = 0.5,
                                                                    pos_hint = {'center_y': 0.5},
                                                                    pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
@@ -741,6 +742,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
+                                                               shift_y="100dp",
                                                                font_size="20dp",
                                                                size_hint_x = 0.5,
                                                                pos_hint = {'center_y': 0.5},
