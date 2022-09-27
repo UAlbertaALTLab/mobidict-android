@@ -689,7 +689,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 definitions_to_display = self.lemma_definitions
             
             for definition in definitions_to_display:
-                definition_label = MDLabel(text=definition)
+                definition_label = MDLabel(text="[size=20]" + definition + "[/size]", markup = True)
                 self.add_widget(definition_label)
         
         else:
@@ -848,7 +848,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             definitions_to_display = self.lemma_definitions
         
         for definition in definitions_to_display:
-            definition_label = MDLabel(text=definition)
+            definition_label = MDLabel(text="[size=20]" + definition + "[/size]", markup = True)
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
