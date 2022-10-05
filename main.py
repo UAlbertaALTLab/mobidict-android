@@ -7,6 +7,8 @@ import paradigm_panes
 import os
 import time
 
+os.environ['KIVY_TEXT'] = 'pil'
+
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock, mainthread
 from kivy.app import App
@@ -555,12 +557,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             title_icon_box_layout = BoxLayout()
             
-            main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=26]" + self.title + "[/size][/color][/u][/font]"
+            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]"
             
             if not self.is_lemma and self.show_form_of:
                 main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
                 
-            title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=26]" + self.title + "[/size][/color][/u][/font]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
             title_label._label.refresh()
 
             title_label_width = title_label._label.texture.size[0] + 10
@@ -615,9 +617,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 # Add the "form of" first
                 form_of_box_layout = BoxLayout()
                 
-                form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+                form_of = Label(text="[size=14dp][i]form of[/i][/size]", markup=True)
                 form_of._label.refresh()
-                form_of = MDLabel(text="[size=13][i]form of[/i][/size]", 
+                form_of = MDLabel(text="[size=14dp][i]form of[/i][/size]", 
                                        markup = True,
                                        size_hint=(None, 1),
                                        width = form_of._label.texture.size[0] + 10)
@@ -625,7 +627,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
                 form_of_box_layout.add_widget(form_of)
                 
-                lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+                lemma_wordform_text = "[size=14dp][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
                 
                 form_of_lemma = ClickableLabel(text=lemma_wordform_text,
                                                markup=True, 
@@ -652,9 +654,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the inflectional category only if the option is on
             
             if app.display_inflectional_category:
-                inflection_label = Label(text="[size=20]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label = Label(text="[size=16dp]" + self.inflectional_category + "[/size]", markup=True)
                 inflection_label._label.refresh()
-                inflection_label = MDLabel(text="[size=20]" + self.inflectional_category + "[/size]", 
+                inflection_label = MDLabel(text="[size=16dp]" + self.inflectional_category + "[/size]", 
                                     markup=True,
                                     size_hint=(None, 1),
                                     width=inflection_label._label.texture.size[0] + 5)
@@ -664,10 +666,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             additional_emoji_margin = 0 if not self.emojis else 10
             
-            # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-            emoji_label = Label(text="[size=20][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+            emoji_label = Label(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
             emoji_label._label.refresh()
-            emoji_label = MDLabel(text="[size=20][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+            emoji_label = MDLabel(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -675,7 +676,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             if self.subtitle == "":
                 self.subtitle = "None"
         
-            desc_label = MDLabel(text="[size=20]" + self.subtitle + "[/size]", markup=True)
+            desc_label = MDLabel(text="[size=16dp]" + self.subtitle + "[/size]", markup=True)
             
             
             if app.display_emoji_mode == True:
@@ -689,7 +690,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 definitions_to_display = self.lemma_definitions
             
             for definition in definitions_to_display:
-                definition_label = MDLabel(text="[size=20]" + definition + "[/size]", markup = True)
+                definition_label = MDLabel(text="[size=16dp]" + definition + "[/size]", markup = True)
                 self.add_widget(definition_label)
         
         else:
@@ -713,12 +714,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         title_icon_box_layout = BoxLayout()
         
-        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=26]" + self.title + "[/size][/color][/u][/font]"
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]"
             
         if not self.is_lemma and self.show_form_of:
             main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
-        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=26]" + self.title + "[/size][/color][/u][/font]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
         title_label._label.refresh()
         
         title_label_width = title_label._label.texture.size[0] + 10
@@ -772,16 +773,16 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the "form of" first
             form_of_box_layout = BoxLayout()
             
-            form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+            form_of = Label(text="[size=14dp][i]form of[/i][/size]", markup=True)
             form_of._label.refresh()
-            form_of = MDLabel(text="[size=13][i]form of[/i][/size]",
+            form_of = MDLabel(text="[size=14dp][i]form of[/i][/size]",
                                     markup = True,
                                     size_hint=(None, 1),
                                     width = form_of._label.texture.size[0] + 10)
             
             form_of_box_layout.add_widget(form_of)
             
-            lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+            lemma_wordform_text = "[size=14dp][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
             
             app = App.get_running_app()
             
@@ -812,9 +813,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=20]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=16dp]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=20]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=16dp]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -823,9 +824,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         additional_emoji_margin = 0 if not self.emojis else 10
         
-        emoji_label = Label(text="[size=20][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=20][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                               markup=True,
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -833,7 +834,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         if self.subtitle == "":
             self.subtitle = "None"
         
-        desc_label = MDLabel(text="[size=20]" + self.subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=16dp]" + self.subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode == True:
             description_box_layout.add_widget(emoji_label)
@@ -848,7 +849,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             definitions_to_display = self.lemma_definitions
         
         for definition in definitions_to_display:
-            definition_label = MDLabel(text="[size=20]" + definition + "[/size]", markup = True)
+            definition_label = MDLabel(text="[size=16dp]" + definition + "[/size]", markup = True)
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
