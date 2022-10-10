@@ -1,12 +1,14 @@
 __version__ = "1.0.0"
 from math import ceil
+from functools import partial
 import webbrowser
 import threading
 import paradigm_panes
 import os
+import time
 
 from kivy.properties import ObjectProperty
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
@@ -15,6 +17,7 @@ from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -82,7 +85,16 @@ class ParadigmExpansionPanel(MDExpansionPanel):
 
 
 class EmojiSwitch(MDCheckbox):
-    def change_mode(self):
+    def change_mode(self, current_query, ling_mode):
+        app = App.get_running_app()
+        output_result_list = get_main_page_results_list(current_query, ling_mode)
+        print("Output results fetched!")
+        Clock.schedule_once(partial(self.update_emoji_ui, output_result_list))
+        time.sleep(1)
+
+        print("Done loading in background!")
+    
+    def update_emoji_ui(self, prefetched_list, *args):
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
@@ -92,7 +104,7 @@ class EmojiSwitch(MDCheckbox):
             app.display_emoji_mode = False
             store.put('display_emoji_mode', display_emoji_mode = False)
         
-        app.root.ids.main_box_layout.on_submit_word()
+        app.root.ids.main_box_layout.on_submit_word(prefetched_result_list=prefetched_list)
         second_page_population_list = app.root.ids.specific_result_main_list
         app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
                                                               second_page_population_list.emojis,
@@ -100,7 +112,25 @@ class EmojiSwitch(MDCheckbox):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
+        app.main_loader_spinner_toggle()
+
+    def emoji_display_thread(self):
+        app = App.get_running_app()
+        app.main_loader_spinner_toggle()
+
+        current_query = app.root.ids.input_word.text
+        
+        ling_mode = "community"
+        
+        if app.index_selected_paradigms == 1:
+            ling_mode = "linguistic"
+        elif app.index_selected_paradigms == 2:
+            ling_mode = "source_language"
+
+        # https://docs.python.org/3/library/multiprocessing.html - use this!
+        threading.Thread(target=(self.change_mode), args=[current_query, ling_mode]).start()
 
 class InflectionalSwitch(MDCheckbox):
     def change_mode(self):
@@ -121,6 +151,7 @@ class InflectionalSwitch(MDCheckbox):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
@@ -212,14 +243,14 @@ class WindowManager(ScreenManager):
     def switch_to_result_screen(self, index, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
-        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions)
+        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, None, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
-    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
+    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = lemma
-        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions)
+        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -278,6 +309,9 @@ class SoundLoadSpinner2(MDSpinner):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
+class MainLoaderSpinner(MDSpinner):
+    pass
+
 class AboutMDList(MDList):
     pass
 
@@ -305,7 +339,7 @@ class DrawerList(MDList):
     pass
 
 class MainLayout(BoxLayout):
-    def on_submit_word(self, widget= None):
+    def on_submit_word(self, widget= None, prefetched_result_list = None):
         root = App.get_running_app().root
         app = App.get_running_app()
         
@@ -325,9 +359,12 @@ class MainLayout(BoxLayout):
         elif app.index_selected_paradigms == 2:
             ling_mode = "source_language"
         
-        output_res = get_main_page_results_list(current_query, ling_mode)
-        print_presentable_output(output_res)
-        print("Output:", output_res)
+        output_res = prefetched_result_list
+
+        if prefetched_result_list is None:
+            output_res = get_main_page_results_list(current_query, ling_mode)
+        # print_presentable_output(output_res)
+        # print("Output:", output_res)
         
         resultToPrint = output_res.copy()
         self.display_result_list(resultToPrint)
@@ -342,16 +379,17 @@ class MainLayout(BoxLayout):
         app = App.get_running_app()
         
         for data in data_list:
-            
+            print("-"*80)
+            print(data)
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
             paradigm_type = data['lemma_wordform']['paradigm'] if data['is_lemma'] else None
+            lemma_paradigm_type = None
             
             # Note that the ic can also be set using relabel_plain_english and relabel_linguistic_long
             
             inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
-            
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
             if app.index_selected_paradigms == 1:
@@ -415,6 +453,7 @@ class MainLayout(BoxLayout):
                 dynamic_tile_height += int(ceil(len(d) / 30)) * 35
             
             if not data['is_lemma'] and data['show_form_of']:
+                lemma_paradigm_type = data['lemma_wordform']['paradigm']
                 dynamic_tile_height += 15
                 for d in lemma_definitions:
                     dynamic_tile_height += 30
@@ -433,6 +472,7 @@ class MainLayout(BoxLayout):
                                         'subtitle': subtitle,
                                         'inflectional_category': inflectional_category,
                                         'paradigm_type': paradigm_type,
+                                        'lemma_paradigm_type': lemma_paradigm_type,
                                         'lemma_definitions': lemma_definitions,
                                         'friendly_linguistic_breakdown_head': data['friendly_linguistic_breakdown_head'],
                                         'friendly_linguistic_breakdown_tail': data['friendly_linguistic_breakdown_tail'],
@@ -452,14 +492,9 @@ class MainLayout(BoxLayout):
         
         root = App.get_running_app().root
         
-        print("INITIAL RES LIST::", initial_result_list)
+        # print("INITIAL RES LIST::", initial_result_list)
         
         root.ids.result_list_main.update_data(initial_result_list)
-        
-        # self.ids.results_scroll_view.clear_widgets()
-        # self.ids.results_scroll_view.add_widget(result_list_view)
-
-# Builder.load_file("morphodict.kv")
 
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
@@ -483,6 +518,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
     emojis = ObjectProperty()
     inflectional_category = ObjectProperty()
     paradigm_type = ObjectProperty(allownone = True)
+    lemma_paradigm_type = ObjectProperty(allownone = True)
     lemma_definitions = ObjectProperty()
     friendly_linguistic_breakdown_head = ObjectProperty()
     friendly_linguistic_breakdown_tail = ObjectProperty()
@@ -519,12 +555,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             title_icon_box_layout = BoxLayout()
             
-            main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]"
             
             if not self.is_lemma and self.show_form_of:
                 main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
                 
-            title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
             title_label._label.refresh()
 
             title_label_width = title_label._label.texture.size[0] + 10
@@ -550,9 +586,10 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 if len(tooltip_content) > 0:
                     tooltip_content = tooltip_content[:-1]
                 
-                tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
+                tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information",
                                                                    tooltip_text= tooltip_content,
                                                                    font_size="20dp",
+                                                                   shift_y="100dp",
                                                                    size_hint_x = 0.5,
                                                                    pos_hint = {'center_y': 0.5},
                                                                    pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
@@ -562,7 +599,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                                                 on_release=self.play_sound,
                                                                 size_hint_x = 0.5,
                                                                 pos_hint = {'center_y': 0.5},
-                                                                pos=(app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width + 30)))
+                                                                pos=(app.root.ids.input_word.pos[0] + title_label_width + 60, title_label_width + 60)))
 
             title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
             self.add_widget(title_icon_box_layout)
@@ -578,9 +615,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 # Add the "form of" first
                 form_of_box_layout = BoxLayout()
                 
-                form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+                form_of = Label(text="[size=14dp][i]form of[/i][/size]", markup=True)
                 form_of._label.refresh()
-                form_of = MDLabel(text="[size=13][i]form of[/i][/size]", 
+                form_of = MDLabel(text="[size=14dp][i]form of[/i][/size]", 
                                        markup = True,
                                        size_hint=(None, 1),
                                        width = form_of._label.texture.size[0] + 10)
@@ -588,7 +625,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
                 form_of_box_layout.add_widget(form_of)
                 
-                lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+                lemma_wordform_text = "[size=14dp][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
                 
                 form_of_lemma = ClickableLabel(text=lemma_wordform_text,
                                                markup=True, 
@@ -615,9 +652,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the inflectional category only if the option is on
             
             if app.display_inflectional_category:
-                inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
                 inflection_label._label.refresh()
-                inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+                inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
                                     markup=True,
                                     size_hint=(None, 1),
                                     width=inflection_label._label.texture.size[0] + 5)
@@ -627,10 +664,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             additional_emoji_margin = 0 if not self.emojis else 10
             
-            # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-            emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+            emoji_label = Label(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
             emoji_label._label.refresh()
-            emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+            emoji_label = MDLabel(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -638,7 +674,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             if self.subtitle == "":
                 self.subtitle = "None"
         
-            desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+            desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
             
             
             if app.display_emoji_mode == True:
@@ -652,7 +688,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 definitions_to_display = self.lemma_definitions
             
             for definition in definitions_to_display:
-                definition_label = MDLabel(text=definition)
+                definition_label = MDLabel(text="[size=14dp]" + definition + "[/size]", markup = True)
                 self.add_widget(definition_label)
         
         else:
@@ -676,12 +712,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         title_icon_box_layout = BoxLayout()
         
-        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]"
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]"
             
         if not self.is_lemma and self.show_form_of:
             main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
-        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121]" + self.title + "[/color][/u][/font]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
         title_label._label.refresh()
         
         title_label_width = title_label._label.texture.size[0] + 10
@@ -711,6 +747,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
+                                                               shift_y="100dp",
                                                                font_size="20dp",
                                                                size_hint_x = 0.5,
                                                                pos_hint = {'center_y': 0.5},
@@ -721,7 +758,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                                                             on_release=self.play_sound,
                                                             size_hint_x = 0.5,
                                                             pos_hint = {'center_y': 0.5},
-                                                            pos = (app.root.ids.input_word.pos[0] + title_label_width + 30, title_label_width)))
+                                                            pos = (app.root.ids.input_word.pos[0] + title_label_width + 60, title_label_width)))
         
         title_icon_box_layout.add_widget(tooltip_and_sound_float_layout)
         self.add_widget(title_icon_box_layout)
@@ -734,16 +771,16 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the "form of" first
             form_of_box_layout = BoxLayout()
             
-            form_of = Label(text="[size=13][i]form of[/i][/size]", markup=True)
+            form_of = Label(text="[size=14dp][i]form of[/i][/size]", markup=True)
             form_of._label.refresh()
-            form_of = MDLabel(text="[size=13][i]form of[/i][/size]",
+            form_of = MDLabel(text="[size=14dp][i]form of[/i][/size]",
                                     markup = True,
                                     size_hint=(None, 1),
                                     width = form_of._label.texture.size[0] + 10)
             
             form_of_box_layout.add_widget(form_of)
             
-            lemma_wordform_text = "[size=13][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
+            lemma_wordform_text = "[size=14dp][font=bjcrus.ttf][u][color=4C0121]" + self.lemma_wordform['text'] + "[/color][/u][/font][/size]"
             
             app = App.get_running_app()
             
@@ -774,9 +811,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -785,9 +822,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         additional_emoji_margin = 0 if not self.emojis else 10
         
-        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                               markup=True,
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -795,7 +832,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         if self.subtitle == "":
             self.subtitle = "None"
         
-        desc_label = MDLabel(text="[size=14]" + self.subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode == True:
             description_box_layout.add_widget(emoji_label)
@@ -810,7 +847,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             definitions_to_display = self.lemma_definitions
         
         for definition in definitions_to_display:
-            definition_label = MDLabel(text=definition)
+            definition_label = MDLabel(text="[size=14dp]" + definition + "[/size]", markup = True)
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
@@ -838,7 +875,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.definitions)
+        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.lemma_paradigm_type, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
@@ -872,9 +909,10 @@ class SpecificResultMainList(MDList):
         self.default_title = None
         self.inflectional_category = None
         self.paradigm_type = None
+        self.lemma_paradigm_type = None
         self.definitions = None
     
-    def populate_page(self, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
+    def populate_page(self, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
         '''
         Populates the second result-specific page
         '''
@@ -884,6 +922,7 @@ class SpecificResultMainList(MDList):
         self.default_title = default_title
         self.inflectional_category = inflectional_category
         self.paradigm_type = paradigm_type
+        self.lemma_paradigm_type = lemma_paradigm_type
         self.definitions = definitions
         
         app = App.get_running_app()
@@ -897,7 +936,7 @@ class SpecificResultMainList(MDList):
         dynamic_details_height = 0
         
         for d in definitions:
-            dynamic_details_height += max(int(ceil(len(d) / 30)) * 35, 60)
+            dynamic_details_height += max(int(ceil(len(d) / 30)) * 40, 60)
         
         details_box_layout_height = max(dynamic_details_height, 100)
         
@@ -911,9 +950,9 @@ class SpecificResultMainList(MDList):
         
         txt_main_title = app.get_syllabics_sro_correct_label(title)
         
-        title_label = Label(text="[font=bjcrus.ttf][size=22]" + txt_main_title + "[/font][/size]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][size=28]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=22]" + txt_main_title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=28]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -942,9 +981,9 @@ class SpecificResultMainList(MDList):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=14]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=24]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=14]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=24]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -954,14 +993,14 @@ class SpecificResultMainList(MDList):
         additional_emoji_margin = 0 if not emojis else 10
         
         # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
-        emoji_label = Label(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
                             markup=True,
                             size_hint=(None, 1),
                             width=emoji_label._label.texture.size[0] + additional_emoji_margin)
     
-        desc_label = MDLabel(text="[size=14]" + subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=24]" + subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode:
             description_box_layout.add_widget(emoji_label)
@@ -983,10 +1022,17 @@ class SpecificResultMainList(MDList):
         
         paradigm = {'panes': []}
         
-        if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
-            paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+        if lemma_paradigm_type is None:
+            if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
+                paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+            elif paradigm_type is None:
+                print("Paradigm Type (currently unavailable): ", paradigm_type)
+                return
+        elif lemma_paradigm_type in app.paradigm_pane_layouts_available:
+            paradigm = pane_generator.generate_pane(default_title, lemma_paradigm_type)
         else:
             print("Paradigm Type (currently unavailable): ", paradigm_type)
+            return
         
         paradigm_data = paradigm.copy()
         
@@ -1067,7 +1113,7 @@ class SpecificResultMainList(MDList):
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
-                                dynamic_height= len(each_pane['pane']['tr_rows']) * 45,
+                                dynamic_height= len(each_pane['pane']['tr_rows']) * 80,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
@@ -1131,6 +1177,7 @@ class MorphodictApp(MDApp):
     about_text_credit = ABOUT_TEXT_CREDITS
     spinner2_active = BooleanProperty(defaultvalue = False)
     # result_default_size = NumericProperty(defaultvalue = dp(200))
+    main_loader_active = BooleanProperty(defaultvalue = False)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1144,7 +1191,7 @@ class MorphodictApp(MDApp):
         self.newest_result_list = []
         self.label_type_list = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
         self.paradigm_label_type_list = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
-        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI"]
+        self.paradigm_pane_layouts_available = ["NA", "VII", "VAI", "NAD", "NI", "NID", "VTA", "VTI"]
     
     def build(self):
         # self.theme_cls.theme_style = "Dark"  # "Light" - comment this on for dark theme.
@@ -1267,6 +1314,7 @@ class MorphodictApp(MDApp):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
         self.menu.dismiss()
     
@@ -1318,12 +1366,22 @@ class MorphodictApp(MDApp):
                                                               second_page_population_list.default_title,
                                                               second_page_population_list.inflectional_category,
                                                               second_page_population_list.paradigm_type,
+                                                              second_page_population_list.lemma_paradigm_type,
                                                               second_page_population_list.definitions)
         
         
         self.paradigm_labels_menu.dismiss()
-    
-    
+
+    @mainthread
+    def main_loader_spinner_toggle(self):
+        app = self.get_running_app()
+        if app.root.ids.main_loader_spinner.active == False:
+            app.root.ids.main_loader_spinner.active = True
+            self.main_loader_active = True
+        else:
+            app.root.ids.main_loader_spinner.active = False
+            self.main_loader_active = False
+
     def on_start(self):
         # Preload these things
         def on_release_help(arg):
