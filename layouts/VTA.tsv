@@ -1,23 +1,23 @@
-# TA										
-	| Core 									
-	| Prs+Ind									
-_ 1Sg _ 2SgO	${lemma}+V+TA+Ind+1Sg+2SgO									
-_ 1Sg _ 3SgO	${lemma}+V+TA+Ind+1Sg+3SgO									
-_ 2Sg _ 1SgO	${lemma}+V+TA+Ind+2Sg+1SgO									
-_ 2Sg _ 3SgO	${lemma}+V+TA+Ind+2Sg+3SgO									
-_ 3Sg _ 4Sg/PlO	${lemma}+V+TA+Ind+3Sg+4Sg/PlO									
-_ 4Sg/Pl _ 3Sg	${lemma}+V+TA+Ind+4Sg/Pl+3SgO									
-	| Prs+Cnj									
-_ 1Sg _ 2SgO	PV/e+${lemma}+V+TA+Cnj+1Sg+2SgO									
-_ 1Sg _ 3SgO	PV/e+${lemma}+V+TA+Cnj+1Sg+3SgO									
-_ 2Sg _ 1SgO	PV/e+${lemma}+V+TA+Cnj+2Sg+1SgO									
-_ 2Sg _ 3SgO	PV/e+${lemma}+V+TA+Cnj+2Sg+3SgO									
-_ 3Sg _ 4Sg/PlO	PV/e+${lemma}+V+TA+Cnj+3Sg+4Sg/PlO									
-_ 4Sg/Pl _ 3Sg	PV/e+${lemma}+V+TA+Cnj+4Sg/Pl+3SgO									
-	| Imp									
-_ 2Sg _ 1SgO	${lemma}+V+TA+Imp+Imm+2Sg+1SgO									
-_ 2Sg _ 3SgO	${lemma}+V+TA+Imp+Imm+2Sg+3SgO									
-										
+# TA
+	| Core
+	| Prs+Ind
+_ 1Sg _ 2SgO	${lemma}+V+TA+Ind+1Sg+2SgO
+_ 1Sg _ 3SgO	${lemma}+V+TA+Ind+1Sg+3SgO
+_ 2Sg _ 1SgO	${lemma}+V+TA+Ind+2Sg+1SgO
+_ 2Sg _ 3SgO	${lemma}+V+TA+Ind+2Sg+3SgO
+_ 3Sg _ 4Sg/PlO	${lemma}+V+TA+Ind+3Sg+4Sg/PlO
+_ 4Sg/Pl _ 3Sg	${lemma}+V+TA+Ind+4Sg/Pl+3SgO
+	| Prs+Cnj
+_ 1Sg _ 2SgO	PV/e+${lemma}+V+TA+Cnj+1Sg+2SgO
+_ 1Sg _ 3SgO	PV/e+${lemma}+V+TA+Cnj+1Sg+3SgO
+_ 2Sg _ 1SgO	PV/e+${lemma}+V+TA+Cnj+2Sg+1SgO
+_ 2Sg _ 3SgO	PV/e+${lemma}+V+TA+Cnj+2Sg+3SgO
+_ 3Sg _ 4Sg/PlO	PV/e+${lemma}+V+TA+Cnj+3Sg+4Sg/PlO
+_ 4Sg/Pl _ 3Sg	PV/e+${lemma}+V+TA+Cnj+4Sg/Pl+3SgO
+	| Imp
+_ 2Sg _ 1SgO	${lemma}+V+TA+Imp+Imm+2Sg+1SgO
+_ 2Sg _ 3SgO	${lemma}+V+TA+Imp+Imm+2Sg+3SgO
+
 	| Prs | Ind	| Prs | Cnj	| Prt | Ind	| Prt | Cnj	| Fut+Int | Ind	| Fut+Int | Cnj	| Fut+Def | Ind	| Inf | PV/ka	| Inf | PV/ta	| Fut | Cond
 	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg	| 1Sg
 _ 1Sg _ 2SgO	${lemma}+V+TA+Ind+1Sg+2SgO	PV/e+${lemma}+V+TA+Cnj+1Sg+2SgO	PV/ki+${lemma}+V+TA+Ind+1Sg+2SgO	PV/e+PV/ki+${lemma}+V+TA+Cnj+1Sg+2SgO	PV/wi+${lemma}+V+TA+Ind+1Sg+2SgO	PV/e+PV/wi+${lemma}+V+TA+Cnj+1Sg+2SgO	PV/ka+${lemma}+V+TA+Ind+1Sg+2SgO	PV/ka+${lemma}+V+TA+Cnj+1Sg+2SgO	PV/ta+${lemma}+V+TA+Cnj+1Sg+2SgO	${lemma}+V+TA+Fut+Cond+1Sg+2SgO
@@ -93,18 +93,18 @@ _ X _ 12PlO	${lemma}+V+TA+Ind+X+12PlO	PV/e+${lemma}+V+TA+Cnj+X+12PlO	PV/ki+${lem
 _ X _ 2PlO	${lemma}+V+TA+Ind+X+2PlO	PV/e+${lemma}+V+TA+Cnj+X+2PlO	PV/ki+${lemma}+V+TA+Ind+X+2PlO	PV/e+PV/ki+${lemma}+V+TA+Cnj+X+2PlO	PV/wi+${lemma}+V+TA+Ind+X+2PlO	PV/e+PV/wi+${lemma}+V+TA+Cnj+X+2PlO	PV/ka+${lemma}+V+TA+Ind+X+2PlO	PV/ka+${lemma}+V+TA+Cnj+X+2PlO	PV/ta+${lemma}+V+TA+Cnj+X+2PlO	${lemma}+V+TA+Fut+Cond+X+2PlO
 _ X _ 3PlPlO	${lemma}+V+TA+Ind+X+3PlO	PV/e+${lemma}+V+TA+Cnj+X+3PlO	PV/ki+${lemma}+V+TA+Ind+X+3PlO	PV/e+PV/ki+${lemma}+V+TA+Cnj+X+3PlO	PV/wi+${lemma}+V+TA+Ind+X+3PlO	PV/e+PV/wi+${lemma}+V+TA+Cnj+X+3PlO	PV/ka+${lemma}+V+TA+Ind+X+3PlO	PV/ka+${lemma}+V+TA+Cnj+X+3PlO	PV/ta+${lemma}+V+TA+Cnj+X+3PlO	${lemma}+V+TA+Fut+Cond+X+3PlO
 _ X _ 4Sg/PlO	${lemma}+V+TA+Ind+X+4Sg/PlO	PV/e+${lemma}+V+TA+Cnj+X+4Sg/PlO	PV/ki+${lemma}+V+TA+Ind+X+4Sg/PlO	PV/e+PV/ki+${lemma}+V+TA+Cnj+X+4Sg/PlO	PV/wi+${lemma}+V+TA+Ind+X+4Sg/PlO	PV/e+PV/wi+${lemma}+V+TA+Cnj+X+4Sg/PlO	PV/ka+${lemma}+V+TA+Ind+X+4Sg/PlO	PV/ka+${lemma}+V+TA+Cnj+X+4Sg/PlO	PV/ta+${lemma}+V+TA+Cnj+X+4Sg/PlO	${lemma}+V+TA+Fut+Cond+X+4Sg/PlO
-										
-	| Imp | Imm	| Imp | Del								
-	| 2Sg	| 2Sg								
-_ 2Sg _ 1SgO	${lemma}+V+TA+Imp+Imm+2Sg+1SgO	${lemma}+V+TA+Imp+Del+2Sg+1SgO								
-_ 2Sg _ 1PlO	${lemma}+V+TA+Imp+Imm+2Sg+1PlO	${lemma}+V+TA+Imp+Del+2Sg+1PlO								
-_ 2Sg _ 3SgO	${lemma}+V+TA+Imp+Imm+2Sg+3SgO	${lemma}+V+TA+Imp+Del+2Sg+3SgO								
-_ 2Sg _ 3PlO	${lemma}+V+TA+Imp+Imm+2Sg+3PlO	${lemma}+V+TA+Imp+Del+2Sg+3PlO								
-	| 12Pl	| 12Pl								
-_ 12Pl _ 3SgO	${lemma}+V+TA+Imp+Imm+12Pl+3SgO	${lemma}+V+TA+Imp+Del+12Pl+3SgO								
-_ 12Pl _ 3PlO	${lemma}+V+TA+Imp+Imm+12Pl+3PlO	${lemma}+V+TA+Imp+Del+12Pl+3PlO								
-	| 2Pl	| 2Pl								
-_ 2Pl _ 1SgO	${lemma}+V+TA+Imp+Imm+2Pl+1SgO	${lemma}+V+TA+Imp+Del+2Pl+1SgO								
-_ 2Pl _ 1PlO	${lemma}+V+TA+Imp+Imm+2Pl+1PlO	${lemma}+V+TA+Imp+Del+2Pl+1PlO								
-_ 2Pl _ 3SgO	${lemma}+V+TA+Imp+Imm+2Pl+3SgO	${lemma}+V+TA+Imp+Del+2Pl+3SgO								
-_ 2Pl _ 3PlO	${lemma}+V+TA+Imp+Imm+2Pl+3PlO	${lemma}+V+TA+Imp+Del+2Pl+3PlO								
+
+	| Imp | Imm	| Imp | Del
+	| 2Sg	| 2Sg
+_ 2Sg _ 1SgO	${lemma}+V+TA+Imp+Imm+2Sg+1SgO	${lemma}+V+TA+Imp+Del+2Sg+1SgO
+_ 2Sg _ 1PlO	${lemma}+V+TA+Imp+Imm+2Sg+1PlO	${lemma}+V+TA+Imp+Del+2Sg+1PlO
+_ 2Sg _ 3SgO	${lemma}+V+TA+Imp+Imm+2Sg+3SgO	${lemma}+V+TA+Imp+Del+2Sg+3SgO
+_ 2Sg _ 3PlO	${lemma}+V+TA+Imp+Imm+2Sg+3PlO	${lemma}+V+TA+Imp+Del+2Sg+3PlO
+	| 12Pl	| 12Pl
+_ 12Pl _ 3SgO	${lemma}+V+TA+Imp+Imm+12Pl+3SgO	${lemma}+V+TA+Imp+Del+12Pl+3SgO
+_ 12Pl _ 3PlO	${lemma}+V+TA+Imp+Imm+12Pl+3PlO	${lemma}+V+TA+Imp+Del+12Pl+3PlO
+	| 2Pl	| 2Pl
+_ 2Pl _ 1SgO	${lemma}+V+TA+Imp+Imm+2Pl+1SgO	${lemma}+V+TA+Imp+Del+2Pl+1SgO
+_ 2Pl _ 1PlO	${lemma}+V+TA+Imp+Imm+2Pl+1PlO	${lemma}+V+TA+Imp+Del+2Pl+1PlO
+_ 2Pl _ 3SgO	${lemma}+V+TA+Imp+Imm+2Pl+3SgO	${lemma}+V+TA+Imp+Del+2Pl+3SgO
+_ 2Pl _ 3PlO	${lemma}+V+TA+Imp+Imm+2Pl+3PlO	${lemma}+V+TA+Imp+Del+2Pl+3PlO

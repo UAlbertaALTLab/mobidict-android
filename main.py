@@ -7,8 +7,6 @@ import paradigm_panes
 import os
 import time
 
-os.environ['KIVY_TEXT'] = 'pil'
-
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock, mainthread
 from kivy.app import App
@@ -654,9 +652,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the inflectional category only if the option is on
             
             if app.display_inflectional_category:
-                inflection_label = Label(text="[size=16dp]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
                 inflection_label._label.refresh()
-                inflection_label = MDLabel(text="[size=16dp]" + self.inflectional_category + "[/size]", 
+                inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
                                     markup=True,
                                     size_hint=(None, 1),
                                     width=inflection_label._label.texture.size[0] + 5)
@@ -666,9 +664,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             additional_emoji_margin = 0 if not self.emojis else 10
             
-            emoji_label = Label(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+            emoji_label = Label(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
             emoji_label._label.refresh()
-            emoji_label = MDLabel(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+            emoji_label = MDLabel(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -676,7 +674,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             if self.subtitle == "":
                 self.subtitle = "None"
         
-            desc_label = MDLabel(text="[size=16dp]" + self.subtitle + "[/size]", markup=True)
+            desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
             
             
             if app.display_emoji_mode == True:
@@ -690,7 +688,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 definitions_to_display = self.lemma_definitions
             
             for definition in definitions_to_display:
-                definition_label = MDLabel(text="[size=16dp]" + definition + "[/size]", markup = True)
+                definition_label = MDLabel(text="[size=14dp]" + definition + "[/size]", markup = True)
                 self.add_widget(definition_label)
         
         else:
@@ -813,9 +811,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         # Add the inflectional category
         if app.display_inflectional_category:
-            inflection_label = Label(text="[size=16dp]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=16dp]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -824,9 +822,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         additional_emoji_margin = 0 if not self.emojis else 10
         
-        emoji_label = Label(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=16dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=15dp][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", 
                               markup=True,
                               size_hint=(None, 1),
                               width=emoji_label._label.texture.size[0] + additional_emoji_margin)
@@ -834,7 +832,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         if self.subtitle == "":
             self.subtitle = "None"
         
-        desc_label = MDLabel(text="[size=16dp]" + self.subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
         
         if app.display_emoji_mode == True:
             description_box_layout.add_widget(emoji_label)
@@ -849,7 +847,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             definitions_to_display = self.lemma_definitions
         
         for definition in definitions_to_display:
-            definition_label = MDLabel(text="[size=16dp]" + definition + "[/size]", markup = True)
+            definition_label = MDLabel(text="[size=14dp]" + definition + "[/size]", markup = True)
             self.add_widget(definition_label)
             # definitions_box_layout.add_widget(definition_label)
         
