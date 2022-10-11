@@ -88,11 +88,8 @@ class EmojiSwitch(MDCheckbox):
     def change_mode(self, current_query, ling_mode):
         app = App.get_running_app()
         output_result_list = get_main_page_results_list(current_query, ling_mode)
-        print("Output results fetched!")
         Clock.schedule_once(partial(self.update_emoji_ui, output_result_list))
         time.sleep(1)
-
-        print("Done loading in background!")
     
     def update_emoji_ui(self, prefetched_list, *args):
         app = App.get_running_app()
@@ -555,12 +552,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             title_icon_box_layout = BoxLayout()
             
-            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]"
+            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=20dp][u]" + self.title + "[/u][/size][/color][/font]"
             
             if not self.is_lemma and self.show_form_of:
                 main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
                 
-            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=20dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
             title_label._label.refresh()
 
             title_label_width = title_label._label.texture.size[0] + 10
@@ -588,14 +585,14 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
                 tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information",
                                                                    tooltip_text= tooltip_content,
-                                                                   font_size="20dp",
+                                                                   icon_size="19dp",
                                                                    shift_y="100dp",
                                                                    size_hint_x = 0.5,
                                                                    pos_hint = {'center_y': 0.5},
                                                                    pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                                font_size="20dp",
+                                                                icon_size="19dp",
                                                                 on_release=self.play_sound,
                                                                 size_hint_x = 0.5,
                                                                 pos_hint = {'center_y': 0.5},
@@ -712,12 +709,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         title_icon_box_layout = BoxLayout()
         
-        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]"
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=20dp]" + self.title + "[/size][/color][/u][/font]"
             
         if not self.is_lemma and self.show_form_of:
             main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
-        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=20dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
         title_label._label.refresh()
         
         title_label_width = title_label._label.texture.size[0] + 10
@@ -748,13 +745,13 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
                                                                shift_y="100dp",
-                                                               font_size="20dp",
+                                                               icon_size="19dp",
                                                                size_hint_x = 0.5,
                                                                pos_hint = {'center_y': 0.5},
                                                                pos = (app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
             
         tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                            font_size="20dp",
+                                                            icon_size="19dp",
                                                             on_release=self.play_sound,
                                                             size_hint_x = 0.5,
                                                             pos_hint = {'center_y': 0.5},
@@ -965,7 +962,7 @@ class SpecificResultMainList(MDList):
         
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                               font_size="20dp",
+                                                               icon_size="19dp",
                                                                on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
@@ -1025,6 +1022,8 @@ class SpecificResultMainList(MDList):
         if lemma_paradigm_type is None:
             if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
                 paradigm = pane_generator.generate_pane(default_title, paradigm_type)
+                print("Paradigm types: ", paradigm)
+                print("="*80)
             elif paradigm_type is None:
                 print("Paradigm Type (currently unavailable): ", paradigm_type)
                 return
