@@ -926,7 +926,7 @@ class SpecificResultMainList(MDList):
         root = App.get_running_app().root
         self.clear_widgets()
         
-        if title == None and default_title == None and definitions == None:
+        if title is None and default_title is None and definitions is None:
             # This page is still empty, don't do anything!
             return
         
@@ -1456,3 +1456,19 @@ class MorphodictApp(MDApp):
 if __name__ == '__main__':
     # Run the main app
     MorphodictApp().run()
+
+
+# Pane separation algorithm
+
+# FOR HEADERS/SUBHEADERS:
+# If cells has 2 label_for == col and 1st label_col == Core:
+    # header = 1st label col
+    # subheader = 2nd label col
+# elif cells have 1 label_col:
+    # header = the main is_header
+    # subheader = label_col
+# else:
+    # header = the main is_header
+    # subheader -> corresponding label_for col
+
+# For more than one 
