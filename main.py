@@ -10,16 +10,10 @@ import time
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock, mainthread
 from kivy.app import App
-from kivy.lang import Builder
-from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
-from kivy.uix.widget import Widget
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
@@ -31,7 +25,7 @@ from kivy.core.audio import SoundLoader
 from kivy.storage.jsonstore import JsonStore
 
 from kivymd.app import MDApp
-from kivymd.theming import ThemableBehavior
+
 from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard, MDSeparator
@@ -41,16 +35,15 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
-from kivymd.uix.selectioncontrol import MDSwitch, MDCheckbox
+from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.toast import toast
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
-from kivy.graphics import Rectangle, Color
 
 from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
+from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, cells_contains_only_column_labels, is_core_column_header
 from core.frontend.relabelling import relabel, relabel_source, relabel_plain_english, relabel_linguistic_long
 
 initial_data_list = []
@@ -1037,76 +1030,36 @@ class SpecificResultMainList(MDList):
         
         # Decide how many panels to add
         all_panes = []
+        header, subheader = None, None
         
-        for index, pane in enumerate(paradigm_data['panes']):
-            pane_header = None
-            
-            subheader_flag_idx = 1
-            
-            if len(pane['tr_rows']) > 0 and pane['tr_rows'][0]['is_header']:
-                pane_header = pane['tr_rows'][0]
-            
-            
-            pane_first_row = {'cells': []}
-            
-            if pane_header is None and len(pane['tr_rows']) > 0:
-                pane_first_row = pane['tr_rows'][0]
-                subheader_flag_idx = 0
-            elif pane_header is not None and len(pane['tr_rows']) > 1:
-                pane_first_row = pane['tr_rows'][1]
-            
-            only_labels_in_first_row = True
-            nlabels = 0
-            
-            paradigm_header = ""
-            paradigm_subheader = ""
-            
-            if index == 0:
-                paradigm_header = "Paradigms"
-                paradigm_subheader = "core"
-            else:
-                paradigm_header = "Paradigms"
-                paradigm_subheader = relabel(pane_header['label'], "english") if pane_header is not None else relabel(pane_first_row['cells'][1]['label'], "english")
-                print("Paradigm subheader: ", paradigm_subheader)
-            for cell in pane_first_row['cells']:
-                if cell['should_suppress_output']:
-                    continue
-                elif cell['is_label']:
-                    nlabels += 1
-                elif cell['is_missing'] or cell['is_empty']:
-                    pass
-                else:
-                    only_labels_in_first_row = False
-                    break
-            
-            if len(pane_first_row['cells']) == 0:
-                only_labels_in_first_row = False
-            
-            if not only_labels_in_first_row:
-                print("Adding pane directly!")
-                all_panes.append({'pane': pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
-            else:
-                # We need to separately add the pane.
-                print("Need to divide pane - nlabels columns: ", nlabels)
-                for i in range(1, nlabels + 1):
-                    current_columns = [0, i]
-                    altered_pane = {'tr_rows': []}
-                    for i1, row in enumerate(pane['tr_rows']):
-                        if row['is_header']:
-                            paradigm_header = relabel(row['label'], "english")
-                            altered_pane['tr_rows'].append(row)
-                        else:
-                            cells_dict = row.copy()
-                            cells_dict['cells'] = []
-                            for idx, cell in enumerate(row['cells']):
-                                if idx in current_columns:
-                                    cells_dict['cells'].append(cell)
-                                    if i1 == subheader_flag_idx and idx == current_columns[1] and cell["is_label"]:
-                                        paradigm_subheader = relabel(cell["label"], "english")
-                            altered_pane['tr_rows'].append(cells_dict)
-                    all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
-            
-            print("=" * 80)
+        for pane_idx, pane in enumerate(paradigm_data['panes']):
+            is_core_pane = False
+            current_num_cols = 0
+            current_panes = []
+            for row_idx, tr_row in enumerate(pane['tr_rows']):
+                if not tr_row['is_header']:
+                    
+                    # Check if the pane is a Core pane
+                    if not is_core_pane and cells_contains_only_column_labels(tr_row['cells'])[0] and is_core_column_header[tr_row['cells']]:
+                        header = "Core"
+                        is_core_pane = True
+                        continue
+                    
+                    # Check if a row contains only column labels
+                    is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
+                    if is_row_only_col_labels:
+                        num_cols = current_num_cols
+                        for _ in range(current_num_cols):
+                            current_panes.append({'tr_rows': []})
+                        continue
+                        
+                    
+
+
+
+                        
+
+        
         first_panel_flag = True
         for each_pane in all_panes:
             if first_panel_flag:
@@ -1456,19 +1409,3 @@ class MorphodictApp(MDApp):
 if __name__ == '__main__':
     # Run the main app
     MorphodictApp().run()
-
-
-# Pane separation algorithm
-
-# FOR HEADERS/SUBHEADERS:
-# If cells has 2 label_for == col and 1st label_col == Core:
-    # header = 1st label col
-    # subheader = 2nd label col
-# elif cells have 1 label_col:
-    # header = the main is_header
-    # subheader = label_col
-# else:
-    # header = the main is_header
-    # subheader -> corresponding label_for col
-
-# For more than one 
