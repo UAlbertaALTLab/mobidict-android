@@ -51,7 +51,7 @@ def cells_contains_only_column_labels(cells):
     label_amount = 0
     for cell in cells:
         if not cell['is_inflection'] and (cell['is_empty'] or cell['label_for'] == 'col'):
-            if cell['label_for'] == 'col':
+            if not cell['is_empty'] and cell['label_for'] == 'col':
                 label_amount += 1
             continue
         else:
