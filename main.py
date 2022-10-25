@@ -1049,14 +1049,23 @@ class SpecificResultMainList(MDList):
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
                         current_num_cols = num_cols
-                        for _ in range(current_num_cols):
-                            current_panes.append({'tr_rows': []})
+                        for cell_idx, cell in enumerate(tr_row['cells']):
+                            # Check if it's not the first cell of the cells
+                            # as that's usually empty!
+                            if cell_idx != 0:
+                                current_panes.append({'tr_rows': []})
                         continue
                         
                     current_row = tr_row.copy()
                     current_row['cells'] = []
                     for cell_idx, cell in enumerate(tr_row['cells']):
                         if cell_idx == 0:
+                            if is_core_pane and is_row_only_col_labels:
+                                for current_pane in current_panes:
+                                    final_pane = {'pane': current_pane, 'header': 'Test header', 'subheader': 'Test subheader'}
+                                    all_panes.append(final_pane)
+                                current_panes = list()
+                            
                             # Add to all current panes
                             for current_pane in current_panes:
                                 # Add the row labels to all the current panes
@@ -1069,11 +1078,11 @@ class SpecificResultMainList(MDList):
                             continue
                         
                         # Append the index appropriate cell to the pane
-                        print("TEST", current_panes, cell_idx - 1)
-                        print("For cell:", cell)
+                        print("For cell:", cell_idx, cell)
+                        print("Current panes: ", current_panes)
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
                     
-                # Go through all the current panes and add them to all_panes
+            # Go through all the current panes and add them to all_panes
             for current_pane in current_panes:
                 final_pane = {'pane': current_pane, 'header': 'Test header', 'subheader': 'Test subheader'}
                 all_panes.append(final_pane)
