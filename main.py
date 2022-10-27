@@ -1057,7 +1057,8 @@ class SpecificResultMainList(MDList):
                         print("[Test] Current cell: ", cell)
                         if cell_idx == 0:
                             print("[Test] Cell idx = 0")
-                            if is_core_pane and is_next_row_after_labels:
+                            if current_num_cols == 1 and is_next_row_after_labels:
+                                is_next_row_after_labels = False
                                 for current_pane_idx in range(len(current_panes) - 1):
                                     final_pane = {'pane': current_panes[current_pane_idx], 'header': 'Test header', 'subheader': 'Test subheader'}
                                     print("[Test] Adding this to final panes:", final_pane)
@@ -1067,21 +1068,24 @@ class SpecificResultMainList(MDList):
                                     current_panes_temp = current_panes.copy()
                                     current_panes = list()
                                     current_panes.append(current_panes_temp[-1])
+                                    print("Current panes after removal: ", current_panes)
                             
                             # Add to all current panes
                             for current_pane in current_panes:
                                 # Add the row labels to all the current panes
                                 current_row['cells'].append(cell)
-                                current_pane['tr_rows'].append(current_row)
-                                
+                                current_pane['tr_rows'].append(current_row.copy())
+                                print("[TEST] Added cell to pane: ", current_pane)
+
+
                                 # Refresh the cells
                                 current_row = tr_row.copy()
                                 current_row['cells'] = []
                             continue
                         
                         # Append the index appropriate cell to the pane
-                        print("Current panes: ", current_panes)
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
+                        print("Current panes: ", current_panes)
                     
             # Go through all the current panes and add them to all_panes
             for current_pane in current_panes:
