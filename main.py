@@ -353,12 +353,9 @@ class MainLayout(BoxLayout):
 
         if prefetched_result_list is None:
             output_res = get_main_page_results_list(current_query, ling_mode)
-        # print_presentable_output(output_res)
-        # print("Output:", output_res)
         
         resultToPrint = output_res.copy()
         self.display_result_list(resultToPrint)
-        # self.root.ids.result_label.text = output_res does the same thing as the above line
     
     def display_result_list(self, data_list):
         result_list_view = MDList()
@@ -369,8 +366,6 @@ class MainLayout(BoxLayout):
         app = App.get_running_app()
         
         for data in data_list:
-            print("-"*80)
-            print(data)
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
@@ -481,8 +476,6 @@ class MainLayout(BoxLayout):
             initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': [root.ids.input_word.text]})
         
         root = App.get_running_app().root
-        
-        # print("INITIAL RES LIST::", initial_result_list)
         
         root.ids.result_list_main.update_data(initial_result_list)
 
@@ -1015,8 +1008,6 @@ class SpecificResultMainList(MDList):
         if lemma_paradigm_type is None:
             if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
                 paradigm = pane_generator.generate_pane(default_title, paradigm_type)
-                print("Paradigm types: ", paradigm)
-                print("="*80)
             elif paradigm_type is None:
                 print("Paradigm Type (currently unavailable): ", paradigm_type)
                 return
@@ -1034,9 +1025,11 @@ class SpecificResultMainList(MDList):
         
         for pane_idx, pane in enumerate(paradigm_data['panes']):
             is_core_pane = False
+            is_next_row_after_labels = False
             current_num_cols = 0
             current_panes = []
             for row_idx, tr_row in enumerate(pane['tr_rows']):
+                print("[Test] current row: ", tr_row)
                 if not tr_row['is_header']:
                     
                     # Check if the pane is a Core pane
@@ -1049,22 +1042,31 @@ class SpecificResultMainList(MDList):
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
                         current_num_cols = num_cols
+                        is_next_row_after_labels = True
                         for cell_idx, cell in enumerate(tr_row['cells']):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
                             if cell_idx != 0:
                                 current_panes.append({'tr_rows': []})
                         continue
-                        
+                    
+                    print("Current panes: every iteration", current_panes)
                     current_row = tr_row.copy()
                     current_row['cells'] = []
                     for cell_idx, cell in enumerate(tr_row['cells']):
+                        print("[Test] Current cell: ", cell)
                         if cell_idx == 0:
-                            if is_core_pane and is_row_only_col_labels:
-                                for current_pane in current_panes:
-                                    final_pane = {'pane': current_pane, 'header': 'Test header', 'subheader': 'Test subheader'}
+                            print("[Test] Cell idx = 0")
+                            if is_core_pane and is_next_row_after_labels:
+                                for current_pane_idx in range(len(current_panes) - 1):
+                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': 'Test header', 'subheader': 'Test subheader'}
+                                    print("[Test] Adding this to final panes:", final_pane)
                                     all_panes.append(final_pane)
-                                current_panes = list()
+                                
+                                if len(current_panes) > 0:
+                                    current_panes_temp = current_panes.copy()
+                                    current_panes = list()
+                                    current_panes.append(current_panes_temp[-1])
                             
                             # Add to all current panes
                             for current_pane in current_panes:
@@ -1078,7 +1080,6 @@ class SpecificResultMainList(MDList):
                             continue
                         
                         # Append the index appropriate cell to the pane
-                        print("For cell:", cell_idx, cell)
                         print("Current panes: ", current_panes)
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
                     
@@ -1117,7 +1118,6 @@ class SpecificResultMainList(MDList):
                                 ))
         
     def play_sound(self, *args):
-        print("Default title: ", self.default_title)
         app = App.get_running_app()
         app.spinner2_active = True
         audio_fetch_status = get_sound(self.default_title)
@@ -1146,7 +1146,6 @@ class SpecificResultMainList(MDList):
             sound.play()
         
     def stop_loader(self):
-        print("Sound stopped")
         app = App.get_running_app()
         app.spinner2_active = False
         
