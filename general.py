@@ -46,3 +46,21 @@ ABOUT_TEXT_CREDITS = '''
 The [i]mîkiwâhp[/i] (teepee) logo was created by Tasha Powers.
 This project has been supported by the Social Sciences and Humanities Research Council (SSHRC) of Canada, through grants 895-2019-1012, 611-2016-0207, and 890-2013-0047, and it contains contributions from the [ref=about-12][u][i][color=#0000ff]Canadian Indigenous languages technology project[/u][/i][/color][/ref], a part of the [ref=about-13][u][i][color=#0000ff]National Research Council Canada[/u][/i][/color][/ref].[/size]
 '''
+
+def cells_contains_only_column_labels(cells):
+    label_amount = 0
+    for cell in cells:
+        if not cell['is_inflection'] and (cell['is_empty'] or cell['label_for'] == 'col'):
+            if not cell['is_empty'] and cell['label_for'] == 'col':
+                label_amount += 1
+            continue
+        else:
+            return [False, 0]
+    return [True, label_amount]
+
+
+def is_core_column_header(cells):
+    for cell in cells:
+        if not cell['is_empty'] and cell['is_label'] and cell['label'][0] == "Core":
+            return True
+    return False

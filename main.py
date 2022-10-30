@@ -10,16 +10,10 @@ import time
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock, mainthread
 from kivy.app import App
-from kivy.lang import Builder
-from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.uix.image import Image
-from kivy.uix.widget import Widget
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
@@ -31,7 +25,7 @@ from kivy.core.audio import SoundLoader
 from kivy.storage.jsonstore import JsonStore
 
 from kivymd.app import MDApp
-from kivymd.theming import ThemableBehavior
+
 from kivymd.uix.list import MDList, OneLineListItem, OneLineIconListItem, IconLeftWidget
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard, MDSeparator
@@ -41,16 +35,15 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
-from kivymd.uix.selectioncontrol import MDSwitch, MDCheckbox
+from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.toast import toast
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
-from kivy.graphics import Rectangle, Color
 
 from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS
+from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, cells_contains_only_column_labels, is_core_column_header
 from core.frontend.relabelling import relabel, relabel_source, relabel_plain_english, relabel_linguistic_long
 
 initial_data_list = []
@@ -88,11 +81,8 @@ class EmojiSwitch(MDCheckbox):
     def change_mode(self, current_query, ling_mode):
         app = App.get_running_app()
         output_result_list = get_main_page_results_list(current_query, ling_mode)
-        print("Output results fetched!")
         Clock.schedule_once(partial(self.update_emoji_ui, output_result_list))
         time.sleep(1)
-
-        print("Done loading in background!")
     
     def update_emoji_ui(self, prefetched_list, *args):
         app = App.get_running_app()
@@ -363,12 +353,9 @@ class MainLayout(BoxLayout):
 
         if prefetched_result_list is None:
             output_res = get_main_page_results_list(current_query, ling_mode)
-        # print_presentable_output(output_res)
-        # print("Output:", output_res)
         
         resultToPrint = output_res.copy()
         self.display_result_list(resultToPrint)
-        # self.root.ids.result_label.text = output_res does the same thing as the above line
     
     def display_result_list(self, data_list):
         result_list_view = MDList()
@@ -379,8 +366,6 @@ class MainLayout(BoxLayout):
         app = App.get_running_app()
         
         for data in data_list:
-            print("-"*80)
-            print(data)
             title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             default_title = data['lemma_wordform']['text'] if data['is_lemma'] else data['wordform_text']
             
@@ -492,8 +477,6 @@ class MainLayout(BoxLayout):
         
         root = App.get_running_app().root
         
-        # print("INITIAL RES LIST::", initial_result_list)
-        
         root.ids.result_list_main.update_data(initial_result_list)
 
 class ResultView(RecycleView):
@@ -555,12 +538,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
             title_icon_box_layout = BoxLayout()
             
-            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]"
+            main_title_label_text_markup = "[font=bjcrus.ttf][color=4C0121][size=20dp][u]" + self.title + "[/u][/size][/color][/font]"
             
             if not self.is_lemma and self.show_form_of:
                 main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
                 
-            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=18dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
+            title_label = Label(text="[font=bjcrus.ttf][color=4C0121][size=20dp][u]" + self.title + "[/u][/size][/color][/font]", markup=True)
             title_label._label.refresh()
 
             title_label_width = title_label._label.texture.size[0] + 10
@@ -588,14 +571,14 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
                 
                 tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information",
                                                                    tooltip_text= tooltip_content,
-                                                                   font_size="20dp",
+                                                                   icon_size="19dp",
                                                                    shift_y="100dp",
                                                                    size_hint_x = 0.5,
                                                                    pos_hint = {'center_y': 0.5},
                                                                    pos=(app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
                 
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                                font_size="20dp",
+                                                                icon_size="19dp",
                                                                 on_release=self.play_sound,
                                                                 size_hint_x = 0.5,
                                                                 pos_hint = {'center_y': 0.5},
@@ -712,12 +695,12 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             
         title_icon_box_layout = BoxLayout()
         
-        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]"
+        main_title_label_text_markup = "[font=bjcrus.ttf][u][color=4C0121][size=20dp]" + self.title + "[/size][/color][/u][/font]"
             
         if not self.is_lemma and self.show_form_of:
             main_title_label_text_markup = "[font=bjcrus.ttf]" + self.title + "[/font]"
 
-        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=16dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][u][color=4C0121][size=20dp]" + self.title + "[/size][/color][/u][/font]", markup=True)
         title_label._label.refresh()
         
         title_label_width = title_label._label.texture.size[0] + 10
@@ -748,13 +731,13 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="information", 
                                                                tooltip_text= tooltip_content,
                                                                shift_y="100dp",
-                                                               font_size="20dp",
+                                                               icon_size="19dp",
                                                                size_hint_x = 0.5,
                                                                pos_hint = {'center_y': 0.5},
                                                                pos = (app.root.ids.input_word.pos[0] + title_label_width, title_label_width)))
             
         tooltip_and_sound_float_layout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                            font_size="20dp",
+                                                            icon_size="19dp",
                                                             on_release=self.play_sound,
                                                             size_hint_x = 0.5,
                                                             pos_hint = {'center_y': 0.5},
@@ -929,7 +912,7 @@ class SpecificResultMainList(MDList):
         root = App.get_running_app().root
         self.clear_widgets()
         
-        if title == None and default_title == None and definitions == None:
+        if title is None and default_title is None and definitions is None:
             # This page is still empty, don't do anything!
             return
         
@@ -965,7 +948,7 @@ class SpecificResultMainList(MDList):
         
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                               font_size="20dp",
+                                                               icon_size="19dp",
                                                                on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
@@ -1038,82 +1021,85 @@ class SpecificResultMainList(MDList):
         
         # Decide how many panels to add
         all_panes = []
+        header, subheader = None, None
         
-        for index, pane in enumerate(paradigm_data['panes']):
-            pane_header = None
+        for pane_idx, pane in enumerate(paradigm_data['panes']):
+            is_core_pane = False
+            is_next_row_after_labels = False
+            current_num_cols = 0
+            current_panes = []
+            for row_idx, tr_row in enumerate(pane['tr_rows']):
+                print("[Test] current row: ", tr_row)
+                if not tr_row['is_header']:
+                    
+                    # Check if the pane is a Core pane
+                    if not is_core_pane and cells_contains_only_column_labels(tr_row['cells'])[0] and is_core_column_header(tr_row['cells']):
+                        header = "Core"
+                        is_core_pane = True
+                        continue
+                    
+                    # Check if a row contains only column labels
+                    is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
+                    if is_row_only_col_labels:
+                        current_num_cols = num_cols
+                        is_next_row_after_labels = True
+                        for cell_idx, cell in enumerate(tr_row['cells']):
+                            # Check if it's not the first cell of the cells
+                            # as that's usually empty!
+                            if cell_idx != 0:
+                                current_panes.append({'tr_rows': []})
+                        continue
+                    
+                    print("Current panes: every iteration", current_panes)
+                    current_row = tr_row.copy()
+                    current_row['cells'] = []
+                    for cell_idx, cell in enumerate(tr_row['cells']):
+                        print("[Test] Current cell: ", cell)
+                        if cell_idx == 0:
+                            print("[Test] Cell idx = 0")
+                            if current_num_cols == 1 and is_next_row_after_labels:
+                                is_next_row_after_labels = False
+                                for current_pane_idx in range(len(current_panes) - 1):
+                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': 'Test header', 'subheader': 'Test subheader'}
+                                    print("[Test] Adding this to final panes:", final_pane)
+                                    all_panes.append(final_pane)
+                                
+                                if len(current_panes) > 0:
+                                    current_panes_temp = current_panes.copy()
+                                    current_panes = list()
+                                    current_panes.append(current_panes_temp[-1])
+                                    print("Current panes after removal: ", current_panes)
+                            
+                            # Add to all current panes
+                            for current_pane in current_panes:
+                                # Add the row labels to all the current panes
+                                current_row['cells'].append(cell)
+                                current_pane['tr_rows'].append(current_row.copy())
+                                print("[TEST] Added cell to pane: ", current_pane)
+
+
+                                # Refresh the cells
+                                current_row = tr_row.copy()
+                                current_row['cells'] = []
+                            continue
+                        
+                        # Append the index appropriate cell to the pane
+                        current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
+                        print("Current panes: ", current_panes)
+                    
+            # Go through all the current panes and add them to all_panes
+            for current_pane in current_panes:
+                final_pane = {'pane': current_pane, 'header': 'Test header', 'subheader': 'Test subheader'}
+                all_panes.append(final_pane)
             
-            subheader_flag_idx = 1
-            
-            if len(pane['tr_rows']) > 0 and pane['tr_rows'][0]['is_header']:
-                pane_header = pane['tr_rows'][0]
-            
-            
-            pane_first_row = {'cells': []}
-            
-            if pane_header is None and len(pane['tr_rows']) > 0:
-                pane_first_row = pane['tr_rows'][0]
-                subheader_flag_idx = 0
-            elif pane_header is not None and len(pane['tr_rows']) > 1:
-                pane_first_row = pane['tr_rows'][1]
-            
-            only_labels_in_first_row = True
-            nlabels = 0
-            
-            paradigm_header = ""
-            paradigm_subheader = ""
-            
-            if index == 0:
-                paradigm_header = "Paradigms"
-                paradigm_subheader = "core"
-            else:
-                paradigm_header = "Paradigms"
-                paradigm_subheader = relabel(pane_header['label'], "english") if pane_header is not None else relabel(pane_first_row['cells'][1]['label'], "english")
-                print("Paradigm subheader: ", paradigm_subheader)
-            for cell in pane_first_row['cells']:
-                if cell['should_suppress_output']:
-                    continue
-                elif cell['is_label']:
-                    nlabels += 1
-                elif cell['is_missing'] or cell['is_empty']:
-                    pass
-                else:
-                    only_labels_in_first_row = False
-                    break
-            
-            if len(pane_first_row['cells']) == 0:
-                only_labels_in_first_row = False
-            
-            if not only_labels_in_first_row:
-                print("Adding pane directly!")
-                all_panes.append({'pane': pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
-            else:
-                # We need to separately add the pane.
-                print("Need to divide pane - nlabels columns: ", nlabels)
-                for i in range(1, nlabels + 1):
-                    current_columns = [0, i]
-                    altered_pane = {'tr_rows': []}
-                    for i1, row in enumerate(pane['tr_rows']):
-                        if row['is_header']:
-                            paradigm_header = relabel(row['label'], "english")
-                            altered_pane['tr_rows'].append(row)
-                        else:
-                            cells_dict = row.copy()
-                            cells_dict['cells'] = []
-                            for idx, cell in enumerate(row['cells']):
-                                if idx in current_columns:
-                                    cells_dict['cells'].append(cell)
-                                    if i1 == subheader_flag_idx and idx == current_columns[1] and cell["is_label"]:
-                                        paradigm_subheader = relabel(cell["label"], "english")
-                            altered_pane['tr_rows'].append(cells_dict)
-                    all_panes.append({'pane': altered_pane, 'header': paradigm_header, 'subheader': paradigm_subheader})
-            
-            print("=" * 80)
+            current_panes = []
+        
         first_panel_flag = True
         for each_pane in all_panes:
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
-                                dynamic_height= len(each_pane['pane']['tr_rows']) * 80,
+                                dynamic_height= dp(len(each_pane['pane']['tr_rows']) * 60),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
@@ -1136,7 +1122,6 @@ class SpecificResultMainList(MDList):
                                 ))
         
     def play_sound(self, *args):
-        print("Default title: ", self.default_title)
         app = App.get_running_app()
         app.spinner2_active = True
         audio_fetch_status = get_sound(self.default_title)
@@ -1165,7 +1150,6 @@ class SpecificResultMainList(MDList):
             sound.play()
         
     def stop_loader(self):
-        print("Sound stopped")
         app = App.get_running_app()
         app.spinner2_active = False
         
