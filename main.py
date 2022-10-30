@@ -1099,7 +1099,7 @@ class SpecificResultMainList(MDList):
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
                                 is_first = first_panel_flag,
-                                dynamic_height= len(each_pane['pane']['tr_rows']) * 80,
+                                dynamic_height= dp(len(each_pane['pane']['tr_rows']) * 60),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
