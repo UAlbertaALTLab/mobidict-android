@@ -1047,7 +1047,7 @@ class SpecificResultMainList(MDList):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
                             if cell_idx != 0:
-                                current_panes.append({'tr_rows': []})
+                                current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
                         continue
                     
                     print("Current panes: every iteration", current_panes)
@@ -1060,7 +1060,7 @@ class SpecificResultMainList(MDList):
                             if current_num_cols == 1 and is_next_row_after_labels:
                                 is_next_row_after_labels = False
                                 for current_pane_idx in range(len(current_panes) - 1):
-                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': 'Test header', 'subheader': 'Test subheader'}
+                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
                                     print("[Test] Adding this to final panes:", final_pane)
                                     all_panes.append(final_pane)
                                 
@@ -1089,7 +1089,7 @@ class SpecificResultMainList(MDList):
                     
             # Go through all the current panes and add them to all_panes
             for current_pane in current_panes:
-                final_pane = {'pane': current_pane, 'header': 'Test header', 'subheader': 'Test subheader'}
+                final_pane = {'pane': current_pane, 'header': current_pane['headerTitle'], 'subheader': current_pane['subheaderTitle']}
                 all_panes.append(final_pane)
             
             current_panes = []
