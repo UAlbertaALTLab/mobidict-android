@@ -1055,6 +1055,9 @@ class SpecificResultMainList(MDList):
                     current_row['cells'] = []
                     for cell_idx, cell in enumerate(tr_row['cells']):
                         print("[Test] Current cell: ", cell)
+                        if cell_idx > current_num_cols:
+                            # row_span > 1 not considered.
+                            break
                         if cell_idx == 0:
                             print("[Test] Cell idx = 0")
                             if current_num_cols == 1 and is_next_row_after_labels:
