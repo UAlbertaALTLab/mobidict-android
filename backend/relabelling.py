@@ -5,9 +5,9 @@ import os
 from typing import Iterable, Optional, TextIO, Tuple, TypedDict, NewType
 from enum import IntEnum
 from threading import Lock
-from core.typesCore import cast_away_optional
+from backend.typesCore import cast_away_optional
 
-from core.types import Label, FSTLemma, FSTTag, ConcatAnalysis
+from backend.types import Label, FSTLemma, FSTTag, ConcatAnalysis
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
