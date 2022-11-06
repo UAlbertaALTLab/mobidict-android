@@ -4,17 +4,17 @@ import sqlite3
 import os
 import json
 
-from core.typesCore import Result
+from backend.typesCore import Result
 
-from core.WordForm import rich_analyze_relaxed, strict_generator
+from backend.WordForm import rich_analyze_relaxed, strict_generator
 
-from core.english_keyword_extraction import stem_keywords
+from backend.english_keyword_extraction import stem_keywords
 
-from core.SearchRun import SearchRun
-from core.WordForm import Wordform
-from core.affix import to_source_language_keyword
+from backend.SearchRun import SearchRun
+from backend.WordForm import Wordform
+from backend.affix import to_source_language_keyword
 
-from core.cree_lev_dist import get_modified_distance
+from backend.cree_lev_dist import get_modified_distance
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

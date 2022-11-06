@@ -2,8 +2,8 @@ import re
 import sqlite3
 import snowballstemmer
 from typing import Set
-from core.runner import search
-from core.preferences import DisplayMode, AnimateEmoji
+from backend.runner import search
+from backend.preferences import DisplayMode, AnimateEmoji
 
 
 def get_main_page_results_list(query: str, linguistic_mode = "community"):
