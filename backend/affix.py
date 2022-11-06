@@ -8,10 +8,10 @@ from itertools import chain
 
 import unicodedata
 from unicodedata import normalize
-from core.SearchRun import SearchRun
-from core.typesCore import Result
-from core.cree_lev_dist import get_modified_distance
-from core.WordForm import Wordform
+from backend.SearchRun import SearchRun
+from backend.typesCore import Result
+from backend.cree_lev_dist import get_modified_distance
+from backend.WordForm import Wordform
 
 InternalForm = NewType("InternalForm", str)
 
