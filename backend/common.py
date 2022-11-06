@@ -2,7 +2,7 @@
 import sqlite3
 import os
 
-from core.WordForm import Wordform
+from backend.WordForm import Wordform
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

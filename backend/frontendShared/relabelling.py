@@ -1,5 +1,5 @@
-from core.types import FSTTag
-from core.relabelling import read_labels
+from backend.types import FSTTag
+from backend.relabelling import read_labels
 
 
 # Check here - how are the tags that are passed None?

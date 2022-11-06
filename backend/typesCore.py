@@ -10,7 +10,7 @@ import json
 
 from typing import NewType, Optional, TypeVar
 
-from core.WordForm import Wordform
+from backend.WordForm import Wordform
 
 from . import ranking
 
@@ -187,7 +187,7 @@ class Result:
 
     # This is a separate method instead of a magic cached property because:
     #  1. When experimenting with ranking methods, completely unrelated code
-    #     might want to set a relevance score.
+    #     might want to set a relevance sbackend.
     #  2. While we want the relevance score to be cached for sorting, it
     #     should also be invalidated if the object is mutated. For now code
     #     that uses Result lists is responsible for calling this method
