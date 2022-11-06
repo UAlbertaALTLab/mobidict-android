@@ -1,15 +1,11 @@
 import re
 
-from core.affix import (
+from backend.affix import (
     do_source_language_affix_search,
     do_target_language_affix_search
 )
-from core.SearchRun import SearchRun
-# from CreeDictionary.API.search.espt import EsptSearch
-from core.lookup import fetch_results
-# from CreeDictionary.API.search.query import CvdSearchType
-# from CreeDictionary.API.search.types import Result
-# from CreeDictionary.API.search.util import first_non_none_value
+from backend.SearchRun import SearchRun
+from backend.lookup import fetch_results
 
 CREE_LONG_VOWEL = re.compile("[êîôâēīōā]")
 

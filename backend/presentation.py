@@ -3,24 +3,23 @@ from __future__ import annotations
 import sqlite3
 import os
 
-import core
+import backend
 
-from core.common import make_wordform_dict
+from backend.common import make_wordform_dict
 
-from core.models import Definition
-from core.typesCore import Result
-# from core.SearchRun import SearchRun
-from core.preferences import AnimateEmoji, DisplayMode
-from core.relabelling import Relabelling, read_labels
+from backend.models import Definition
+from backend.typesCore import Result
+from backend.preferences import AnimateEmoji, DisplayMode
+from backend.relabelling import Relabelling, read_labels
 from shared.generalData import MORPHODICT_TAG_STYLE
-from core.WordForm import RichAnalysis, Wordform
+from backend.WordForm import RichAnalysis, Wordform
 from dataclasses import dataclass
-from core.schema import SerializedWordform, SerializedDefinition
+from backend.schema import SerializedWordform, SerializedDefinition
 
 from typing import List, Dict, Optional, Literal, Iterable, cast, TypedDict, Any
 
-from core.types import Label, FSTLemma, FSTTag, ConcatAnalysis
-from core.cree_lev_dist import get_modified_distance
+from backend.types import Label, FSTLemma, FSTTag, ConcatAnalysis
+from backend.cree_lev_dist import get_modified_distance
 
 Preverb = Wordform
 LexicalEntryType = Literal["Preverb", "Reduplication", "Initial Change"]
@@ -95,7 +94,7 @@ class PresentationResult:
         self,
         result: Result,
         *,
-        search_run: core.SearchRun.SearchRun,
+        search_run: backend.SearchRun.SearchRun,
         display_mode="community",
         animate_emoji=AnimateEmoji.default,
         dict_source=None,
