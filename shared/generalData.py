@@ -47,20 +47,18 @@ The [i]mîkiwâhp[/i] (teepee) logo was created by Tasha Powers.
 This project has been supported by the Social Sciences and Humanities Research Council (SSHRC) of Canada, through grants 895-2019-1012, 611-2016-0207, and 890-2013-0047, and it contains contributions from the [ref=about-12][u][i][color=#0000ff]Canadian Indigenous languages technology project[/u][/i][/color][/ref], a part of the [ref=about-13][u][i][color=#0000ff]National Research Council Canada[/u][/i][/color][/ref].[/size]
 '''
 
-def cells_contains_only_column_labels(cells):
-    label_amount = 0
-    for cell in cells:
-        if not cell['is_inflection'] and (cell['is_empty'] or cell['label_for'] == 'col'):
-            if not cell['is_empty'] and cell['label_for'] == 'col':
-                label_amount += 1
-            continue
-        else:
-            return [False, 0]
-    return [True, label_amount]
-
-
-def is_core_column_header(cells):
-    for cell in cells:
-        if not cell['is_empty'] and cell['is_label'] and cell['label'][0] == "Core":
-            return True
-    return False
+ABOUT_URL_LINKS = {
+    "about-1": "https://uofrpress.ca/Books/C/Cree-Words",
+    "about-2": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Snoek_et_al_CEL1_2014.pdf",
+    "about-3": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Harrigan_Schmirler_Arppe_Antonsen_Trosterud_Wolvengrey_2017fc.pdf",
+    "about-4": "https://uofrpress.ca/Books/C/Cree-Words",
+    "about-5": "https://www.altlab.dev/maskwacis/dictionary.html",
+    "about-6": "https://www.altlab.dev/maskwacis/",
+    "about-7": "https://www.maskwacised.ca",
+    "about-8": "https://altlab.ualberta.ca",
+    "about-9": "https://www.altlab.dev/maskwacis/Speakers/speakers.html",
+    "about-10": "https://github.com/UAlbertaALTLab/morphodict",
+    "about-11": "https://github.com/UAlbertaALTLab/morphodict/blob/main/AUTHORS.md",
+    "about-12": "https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project",
+    "about-13": "https://nrc.canada.ca/en"
+}
