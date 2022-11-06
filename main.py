@@ -47,10 +47,22 @@ from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CO
 from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
 from backend.frontendShared.relabelling import relabel, relabel_source
 
+######################################################
+
+# Global variable declarations
+
+######################################################
+
 initial_data_list = []
 initial_result_list = []
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+######################################################
+
+# Custom component declarations
+
+######################################################
 
 class ClickableLabel(ButtonBehavior, MDLabel):
     pass
@@ -59,10 +71,61 @@ class ClickableImage(ButtonBehavior, Image):
     pass
 
 class InfoTooltipButton(MDIconButton, MDTooltip):
-    '''
-    Class for the tooltip icon next to title
-    '''
     pass
+
+class MainLoaderSpinner(MDSpinner):
+    pass
+
+class SoundLoadSpinner(MDSpinner):
+    pass
+
+class AboutMDList(MDList):
+    pass
+
+class DrawerList(MDList):
+    pass
+
+######################################################
+
+# Custom screens declarations
+
+######################################################
+
+class HomeScreen(MDScreen):
+    pass
+
+class ResultScreen(MDScreen):
+    pass
+
+class LegendOfAbbrPage(MDScreen):
+    pass
+
+class ContactUsScreen(MDScreen):
+    pass
+
+class AboutScreen(MDScreen):
+    pass
+
+class ResultPageMainLayout(MDBoxLayout):
+    pass
+
+class LegendPageMainLayout(MDBoxLayout):
+    pass
+
+class ContactPageMainLayout(MDBoxLayout):
+    pass
+
+class AboutPageMainLayout(MDBoxLayout):
+    pass
+
+class ContentNavigationDrawer(MDBoxLayout):
+    pass
+
+######################################################
+
+# Logic componenents
+
+######################################################
 
 class ParadigmExpansionPanel(MDExpansionPanel):
     def __init__(self, is_first, dynamic_height, **kwargs ):
@@ -263,48 +326,6 @@ class WindowManager(ScreenManager):
         root = App.get_running_app().root
         root.ids.nav_drawer.set_state("close")
         self.current = "About"
-        
-
-
-class HomeScreen(MDScreen):
-    pass
-
-class ResultScreen(MDScreen):
-    pass
-
-class LegendOfAbbrPage(MDScreen):
-    pass
-
-class ContactUsScreen(MDScreen):
-    pass
-
-class AboutScreen(MDScreen):
-    pass
-
-class ResultPageMainLayout(MDBoxLayout):
-    pass
-
-class LegendPageMainLayout(MDBoxLayout):
-    pass
-
-class ContactPageMainLayout(MDBoxLayout):
-    pass
-
-class AboutPageMainLayout(MDBoxLayout):
-    pass
-
-class ContentNavigationDrawer(MDBoxLayout):
-    pass
-
-class SoundLoadSpinner2(MDSpinner):
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-
-class MainLoaderSpinner(MDSpinner):
-    pass
-
-class AboutMDList(MDList):
-    pass
 
 class LabelSettingsItem(OneLineListItem):
     text = StringProperty()
@@ -325,9 +346,6 @@ def replace_hats_to_lines_SRO(string):
     string = string.replace("â", "ā")
     
     return string
-
-class DrawerList(MDList):
-    pass
 
 class MainLayout(BoxLayout):
     def on_submit_word(self, widget= None, prefetched_result_list = None):
@@ -954,7 +972,7 @@ class SpecificResultMainList(MDList):
                                                                pos_hint={'center_y': 1}))
         
         # Add loading spinner
-        title_and_sound_boxlayout.add_widget(SoundLoadSpinner2())
+        title_and_sound_boxlayout.add_widget(SoundLoadSpinner())
         
         
         top_details_box_layout.add_widget(title_and_sound_boxlayout)
@@ -1002,7 +1020,7 @@ class SpecificResultMainList(MDList):
         pane_generator = paradigm_panes.PaneGenerator()
         
         pane_generator.set_layouts_dir(BASE_DIR + "/layouts")
-        pane_generator.set_fst_filepath(BASE_DIR + "/core/resourcesFST/crk-strict-generator.hfstol")
+        pane_generator.set_fst_filepath(BASE_DIR + "/backend/resourcesFST/crk-strict-generator.hfstol")
         
         paradigm = {'panes': []}
         
