@@ -43,7 +43,8 @@ from cree_sro_syllabics import sro2syllabics
 
 from backend import get_main_page_results_list
 from api.api import get_sound
-from general import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, cells_contains_only_column_labels, is_core_column_header
+from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
 from core.frontend.relabelling import relabel, relabel_source, relabel_plain_english, relabel_linguistic_long
 
 initial_data_list = []
@@ -1413,23 +1414,7 @@ class MorphodictApp(MDApp):
         webbrowser.open(HELP_CONTACT_FORM_LINK)
         
     def on_about_ref_press(self, instance, ref):
-        about_url_links = {
-            "about-1": "https://uofrpress.ca/Books/C/Cree-Words",
-            "about-2": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Snoek_et_al_CEL1_2014.pdf",
-            "about-3": "https://altlab.ualberta.ca/wp-content/uploads/2019/01/Harrigan_Schmirler_Arppe_Antonsen_Trosterud_Wolvengrey_2017fc.pdf",
-            "about-4": "https://uofrpress.ca/Books/C/Cree-Words",
-            "about-5": "https://www.altlab.dev/maskwacis/dictionary.html",
-            "about-6": "https://www.altlab.dev/maskwacis/",
-            "about-7": "https://www.maskwacised.ca",
-            "about-8": "https://altlab.ualberta.ca",
-            "about-9": "https://www.altlab.dev/maskwacis/Speakers/speakers.html",
-            "about-10": "https://github.com/UAlbertaALTLab/morphodict",
-            "about-11": "https://github.com/UAlbertaALTLab/morphodict/blob/main/AUTHORS.md",
-            "about-12": "https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project",
-            "about-13": "https://nrc.canada.ca/en"
-        }
-        
-        webbrowser.open(about_url_links[ref])
+        webbrowser.open(ABOUT_URL_LINKS[ref])
     
     def get_syllabics_sro_correct_label(self, string: str) -> str:
         if self.index_selected == 2:
