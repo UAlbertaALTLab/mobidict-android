@@ -1,11 +1,11 @@
-from core.query import Query
+from backend.query import Query
 
-from typing import Iterable, Callable, Any, Optional, Union, TypeVar
+from typing import Iterable, Optional, Union, TypeVar
 
-import core.typesCore as types
+import backend.typesCore as types
 
-from core.preferences import AnimateEmoji, DisplayMode
-from core.presentation import PresentationResult
+from backend.preferences import AnimateEmoji, DisplayMode
+from backend.presentation import PresentationResult
 
 WordformKey = Union[int, tuple[str, str]]
 

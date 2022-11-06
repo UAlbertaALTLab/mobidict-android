@@ -45,7 +45,7 @@ from backend import get_main_page_results_list
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
 from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
-from core.frontend.relabelling import relabel, relabel_source, relabel_plain_english, relabel_linguistic_long
+from backend.frontendShared.relabelling import relabel, relabel_source
 
 initial_data_list = []
 initial_result_list = []
