@@ -12,7 +12,7 @@ from core.typesCore import Result
 # from core.SearchRun import SearchRun
 from core.preferences import AnimateEmoji, DisplayMode
 from core.relabelling import Relabelling, read_labels
-from general import MORPHODICT_TAG_STYLE
+from shared.generalData import MORPHODICT_TAG_STYLE
 from core.WordForm import RichAnalysis, Wordform
 from dataclasses import dataclass
 from core.schema import SerializedWordform, SerializedDefinition

@@ -1,5 +1,5 @@
 import requests
-from general import SOUND_FILE_NAME
+from shared.generalData import SOUND_FILE_NAME
 from pydub import AudioSegment
 
 SPEECH_DB_BASE_URL = "https://speech-db.altlab.app"
@@ -38,7 +38,7 @@ def get_sound(query):
         # Convert to .wav
         wav_sound = AudioSegment.from_file("sound.m4a", format="m4a")
         
-        wav_sound.export("sound.wav", format="wav")
+        wav_sound.export(SOUND_FILE_NAME, format="wav")
         
         sound_file.close()
     else:
@@ -68,7 +68,7 @@ def get_sound(query):
             # Convert to .wav
             wav_sound = AudioSegment.from_file("sound.m4a", format="m4a")
             
-            wav_sound.export("sound.wav", format="wav")
+            wav_sound.export(SOUND_FILE_NAME, format="wav")
             
             sound_file.close()
         else:

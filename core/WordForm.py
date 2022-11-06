@@ -5,7 +5,7 @@ from functools import cache
 
 from typing import Dict, Literal, Union
 
-from general import STRICT_ANALYZER_FST_FILENAME, RELAXED_ANALYZER_FST_FILENAME, STRICT_GENERATOR_FST_FILENAME
+from shared.generalData import STRICT_ANALYZER_FST_FILENAME, RELAXED_ANALYZER_FST_FILENAME, STRICT_GENERATOR_FST_FILENAME
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
