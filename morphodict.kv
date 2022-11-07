@@ -362,12 +362,12 @@ MainScreen:
                             id: navigation_drawer_list
                         
                         MDDropDownItem:
-                            id: label_settings_dropdown
-                            text: app.label_type_list[app.index_selected]
+                            id: labelSettingsDropdown
+                            text: app.label_type_list[app.labelTypeIndexSelected]
                             on_release: app.menu.open()
                         
                         MDDropDownItem:
-                            id: paradigm_label_settings_dropdown
+                            id: paradigmSettingsDropdown
                             text: "Plain English Labels"
                             on_release: app.paradigm_labels_menu.open()
                         
