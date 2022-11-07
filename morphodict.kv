@@ -19,7 +19,7 @@ MainScreen:
             width: 1.5
             rectangle: self.x, self.y, self.width, self.height
 
-<SoundLoadSpinner2>:
+<SoundLoadSpinner>:
     size_hint: None, None
     size: "15dp", "15dp"
     palette: [255/256, 204/256, 92/256, 1], [101/256, 30/256, 62/256, 1], [133/256, 30/256, 62/256, 1]
@@ -76,7 +76,7 @@ MainScreen:
             HomeScreen:
                 name: "Home"
                 MainLayout:
-                    id: main_box_layout
+                    id: mainBoxLayout
                     orientation: "vertical"
                     # padding: "10dp"
                     # spacing: "10dp"
@@ -114,7 +114,7 @@ MainScreen:
                             altlab_develop_text_label.size_hint_y = None
                             altlab_develop_text_label.opacity = 0
                             altlab_develop_text_label.disabled = True
-                            root.ids.main_box_layout.on_submit_word(self)
+                            root.ids.mainBoxLayout.onSubmitWord(self)
                         line_color_focus: get_color_from_hex("#8B0000")
                         font_name: 'bjcrus.ttf'
                     Label:
@@ -177,7 +177,7 @@ MainScreen:
                         ScrollView:
                             id: specific_result_page_scrollview
                             SpecificResultMainList:
-                                id: specific_result_main_list
+                                id: specificResultPageMainListLayout
             LegendOfAbbrPage:
                 name: "Legend"
                 LegendPageMainLayout:
@@ -387,7 +387,7 @@ MainScreen:
                                 id: display_emoji_switch
                                 on_active: self.emoji_display_thread()
                                 pos_hint: {'center_y': 0.5}
-                                active: app.display_emoji_mode
+                                active: app.displayEmojiMode
                         MDBoxLayout:
                             size_hint: 1, None
                             height: "50dp"
@@ -400,10 +400,10 @@ MainScreen:
                                 halign: 'left'
                                 valign: 'center'
                             InflectionalSwitch:
-                                id: inflectional_switch
-                                on_active: self.change_mode()
+                                id: inflectionalSwitch
+                                on_active: self.changeMode()
                                 pos_hint: {'center_y': 0.5}
-                                active: app.display_inflectional_category
+                                active: app.displayInflectionalCategory
                         
 
                 

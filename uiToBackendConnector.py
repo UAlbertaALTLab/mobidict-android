@@ -6,7 +6,7 @@ from backend.runner import search
 from backend.preferences import DisplayMode, AnimateEmoji
 
 
-def get_main_page_results_list(query: str, linguistic_mode = "community"):
+def getSearchResultsFromQuery(query: str, linguistic_mode = "community"):
     # user_query is the input word from the user
     user_query = query[:]
 
