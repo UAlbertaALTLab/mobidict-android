@@ -387,7 +387,7 @@ MainScreen:
                                 id: display_emoji_switch
                                 on_active: self.emoji_display_thread()
                                 pos_hint: {'center_y': 0.5}
-                                active: app.display_emoji_mode
+                                active: app.displayEmojiMode
                         MDBoxLayout:
                             size_hint: 1, None
                             height: "50dp"
@@ -401,7 +401,7 @@ MainScreen:
                                 valign: 'center'
                             InflectionalSwitch:
                                 id: inflectional_switch
-                                on_active: self.change_mode()
+                                on_active: self.changeMode()
                                 pos_hint: {'center_y': 0.5}
                                 active: app.display_inflectional_category
                         

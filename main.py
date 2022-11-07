@@ -53,9 +53,6 @@ from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
 
-initial_data_list = []
-initial_result_list = []
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ######################################################
@@ -128,35 +125,31 @@ class ContentNavigationDrawer(MDBoxLayout):
 ######################################################
 
 class ParadigmExpansionPanel(MDExpansionPanel):
-    def __init__(self, is_first, dynamic_height, **kwargs ):
+    def __init__(self, isFirst, dynamicHeight, **kwargs ):
         super().__init__(**kwargs)
-        self.is_first = is_first
-        self.dynamic_height = dynamic_height
+        self.isFirst = isFirst
+        self.dynamicHeight = dynamicHeight
         Clock.schedule_once(self.panel_op, 0)
     def panel_op(self, args):
-        if self.is_first:
-            # self.check_open_panel(self)
-            self.height += self.dynamic_height
+        if self.isFirst:
+            self.height += self.dynamicHeight
             self.open_panel()
-        
-
 
 class EmojiSwitch(MDCheckbox):
-    def change_mode(self, current_query, ling_mode):
-        app = App.get_running_app()
-        output_result_list = get_main_page_results_list(current_query, ling_mode)
-        Clock.schedule_once(partial(self.update_emoji_ui, output_result_list))
+    def changeMode(self, currentQuery, lingMode):
+        searchResultsList = get_main_page_results_list(currentQuery, lingMode)
+        Clock.schedule_once(partial(self.updateEmojiForUI, searchResultsList))
         time.sleep(1)
     
-    def update_emoji_ui(self, prefetched_list, *args):
+    def updateEmojiForUI(self, prefetched_list, *args):
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
-            app.display_emoji_mode = True
-            store.put('display_emoji_mode', display_emoji_mode = True)
+            app.displayEmojiMode = True
+            store.put('displayEmojiMode', displayEmojiMode = True)
         else:
-            app.display_emoji_mode = False
-            store.put('display_emoji_mode', display_emoji_mode = False)
+            app.displayEmojiMode = False
+            store.put('displayEmojiMode', displayEmojiMode = False)
         
         app.root.ids.main_box_layout.on_submit_word(prefetched_result_list=prefetched_list)
         second_page_population_list = app.root.ids.specific_result_main_list
@@ -184,10 +177,10 @@ class EmojiSwitch(MDCheckbox):
             ling_mode = "source_language"
 
         # https://docs.python.org/3/library/multiprocessing.html - use this!
-        threading.Thread(target=(self.change_mode), args=[current_query, ling_mode]).start()
+        threading.Thread(target=(self.changeMode), args=[current_query, ling_mode]).start()
 
 class InflectionalSwitch(MDCheckbox):
-    def change_mode(self):
+    def changeMode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
         if self.active:
@@ -501,7 +494,7 @@ class MainLayout(BoxLayout):
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
         super(ResultView, self).__init__(**kwargs)
-        self.data = initial_data_list
+        self.data = []
     
     def update_data(self, data):
         app = App.get_running_app()
@@ -679,7 +672,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
             
             
-            if app.display_emoji_mode == True:
+            if app.displayEmojiMode == True:
                 description_box_layout.add_widget(emoji_label)
             description_box_layout.add_widget(desc_label)
             
@@ -836,7 +829,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         desc_label = MDLabel(text="[size=15dp]" + self.subtitle + "[/size]", markup=True)
         
-        if app.display_emoji_mode == True:
+        if app.displayEmojiMode == True:
             description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
@@ -1004,7 +997,7 @@ class SpecificResultMainList(MDList):
     
         desc_label = MDLabel(text="[size=24]" + subtitle + "[/size]", markup=True)
         
-        if app.display_emoji_mode:
+        if app.displayEmojiMode:
             description_box_layout.add_widget(emoji_label)
         description_box_layout.add_widget(desc_label)
         
@@ -1120,8 +1113,8 @@ class SpecificResultMainList(MDList):
         for each_pane in all_panes:
             if first_panel_flag:
                 panel = ParadigmExpansionPanel(
-                                is_first = first_panel_flag,
-                                dynamic_height= dp(len(each_pane['pane']['tr_rows']) * 60),
+                                isFirst = first_panel_flag,
+                                dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 60),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
@@ -1133,8 +1126,8 @@ class SpecificResultMainList(MDList):
                 self.add_widget(panel)
             else:
                 self.add_widget(ParadigmExpansionPanel(
-                                is_first = first_panel_flag,
-                                dynamic_height= 0,
+                                isFirst = first_panel_flag,
+                                dynamicHeight= 0,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=MDExpansionPanelTwoLine(
@@ -1176,6 +1169,12 @@ class SpecificResultMainList(MDList):
         app.spinner2_active = False
         
 
+######################################################
+
+# Main application class
+
+######################################################
+
 class MorphodictApp(MDApp):
     legend_of_abbr_text = LEGEND_OF_ABBREVIATIONS_TEXT
     contact_us_text = CONTACT_US_TEXT
@@ -1191,7 +1190,7 @@ class MorphodictApp(MDApp):
         self.index_selected = 0
         self.index_selected_paradigms = 0
         self.paradigm_labels_menu = None
-        self.display_emoji_mode = False
+        self.displayEmojiMode = False
         self.display_inflectional_category = False
         self.last_result_list_index_click = None
         self.newest_result_list = []
@@ -1219,11 +1218,11 @@ class MorphodictApp(MDApp):
         
         self.root.ids.paradigm_label_settings_dropdown.set_item(self.paradigm_label_type_list[self.index_selected_paradigms])
         
-        if not store.exists('display_emoji_mode'):
-            store.put('display_emoji_mode', display_emoji_mode = False)
+        if not store.exists('displayEmojiMode'):
+            store.put('displayEmojiMode', displayEmojiMode = False)
         else:
-            self.display_emoji_mode = store.get('display_emoji_mode')['display_emoji_mode']
-        self.root.ids.display_emoji_switch.active = self.display_emoji_mode
+            self.displayEmojiMode = store.get('displayEmojiMode')['displayEmojiMode']
+        self.root.ids.display_emoji_switch.active = self.displayEmojiMode
         
         if not store.exists('display_inflectional_category'):
             store.put('display_inflectional_category', display_inflectional_category = True)
