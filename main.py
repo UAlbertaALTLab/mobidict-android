@@ -44,7 +44,7 @@ from cree_sro_syllabics import sro2syllabics
 from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
-from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO
 from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
@@ -81,6 +81,9 @@ class AboutMDList(MDList):
 
 class DrawerList(MDList):
     pass
+
+class LabelSettingsItem(OneLineListItem):
+    text = StringProperty()
 
 ######################################################
 
@@ -125,6 +128,9 @@ class ContentNavigationDrawer(MDBoxLayout):
 ######################################################
 
 class ParadigmExpansionPanel(MDExpansionPanel):
+    '''
+    This class represents each paradigm panel added on the second specific result page.
+    '''
     def __init__(self, isFirst, dynamicHeight, **kwargs ):
         super().__init__(**kwargs)
         self.isFirst = isFirst
@@ -136,6 +142,9 @@ class ParadigmExpansionPanel(MDExpansionPanel):
             self.open_panel()
 
 class EmojiSwitch(MDCheckbox):
+    '''
+    This class represents the emoji display switch in the options of drawer navigation.
+    '''
     def changeMode(self, currentQuery, lingMode):
         searchResultsList = getSearchResultsFromQuery(currentQuery, lingMode)
         Clock.schedule_once(partial(self.updateEmojiForUI, searchResultsList))
@@ -171,14 +180,18 @@ class EmojiSwitch(MDCheckbox):
         
         ling_mode = "community"
         
-        if app.index_selected_paradigms == 1:
+        if app.selectedParadigmOptionIndex == 1:
             ling_mode = "linguistic"
-        elif app.index_selected_paradigms == 2:
+        elif app.selectedParadigmOptionIndex == 2:
             ling_mode = "source_language"
 
         threading.Thread(target=(self.changeMode), args=[current_query, ling_mode]).start()
 
 class InflectionalSwitch(MDCheckbox):
+    '''
+    This class represents the inflectional category display switch
+    in the options of drawer navigation.
+    '''
     def changeMode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
@@ -201,7 +214,10 @@ class InflectionalSwitch(MDCheckbox):
                                                               specificResultPagePopulationList.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
-    '''Custom content for Expandible panels.'''
+    '''
+    This class represents the main box layout of paradigm panes in the main list.
+    We just attach one copy of this class to the main layout MDList.
+    '''
     
     def __init__(self, data, **kwargs ):
         super().__init__(**kwargs)
@@ -233,9 +249,9 @@ class ParadigmLabelContent(MDBoxLayout):
         for row in self.data['tr_rows']:
             row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
             if row['is_header']:
-                txt_label = relabel(row['label'], paradigm_parameter[app.index_selected_paradigms])
+                txt_label = relabel(row['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
                 
-                if app.index_selected_paradigms == 2:
+                if app.selectedParadigmOptionIndex == 2:
                     # source language labels
                     txt_label = app.get_syllabics_sro_correct_label(txt_label)
                     txt_label = "[font=bjcrus.ttf]" + txt_label + "[/font]"
@@ -252,9 +268,9 @@ class ParadigmLabelContent(MDBoxLayout):
                     if cell['should_suppress_output']:
                         continue
                     elif cell['is_label']:
-                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.index_selected_paradigms])
+                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
 
-                        if app.index_selected_paradigms == 2:
+                        if app.selectedParadigmOptionIndex == 2:
                             paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
                             paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
                         
@@ -283,6 +299,10 @@ class ParadigmLabelContent(MDBoxLayout):
         # self.add_widget(within_paradigm_scrollview)
 
 class WindowManager(ScreenManager):
+    '''
+    This is the navigation manager within the app.
+    Any screen changes should be declared here.
+    '''
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
@@ -318,27 +338,10 @@ class WindowManager(ScreenManager):
         root.ids.nav_drawer.set_state("close")
         self.current = "About"
 
-class LabelSettingsItem(OneLineListItem):
-    text = StringProperty()
-
-def print_presentable_output(output):
-    x = output.copy()
-    counter = 1
-    for y in x:
-        print(f'''Output [{counter}]: ''', y)
-        counter += 1
-        print("-" * 80)
-
-def replace_hats_to_lines_SRO(string):
-    
-    string = string.replace("ê", "ē")
-    string = string.replace("î", "ī")
-    string = string.replace("ô", "ō")
-    string = string.replace("â", "ā")
-    
-    return string
-
 class MainLayout(BoxLayout):
+    '''
+    This class is the main layout of the app (the first launch page).
+    '''
     def onSubmitWord(self, widget= None, prefetched_result_list = None):
         root = App.get_running_app().root
         app = App.get_running_app()
@@ -354,9 +357,9 @@ class MainLayout(BoxLayout):
         
         ling_mode = "community"
         
-        if app.index_selected_paradigms == 1:
+        if app.selectedParadigmOptionIndex == 1:
             ling_mode = "linguistic"
-        elif app.index_selected_paradigms == 2:
+        elif app.selectedParadigmOptionIndex == 2:
             ling_mode = "source_language"
         
         output_res = prefetched_result_list
@@ -387,12 +390,12 @@ class MainLayout(BoxLayout):
             inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
-            if app.index_selected_paradigms == 1:
+            if app.selectedParadigmOptionIndex == 1:
                 ic =  data['lemma_wordform']['inflectional_category_linguistic'] 
                 if ic is not None and 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
                     ic += " (" + data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
             
-            if app.index_selected_paradigms == 2 and inflectional_category != "None":
+            if app.selectedParadigmOptionIndex == 2 and inflectional_category != "None":
                 ic = relabel_source(inflectional_category)
             
             emoji = data['lemma_wordform']['wordclass_emoji']
@@ -429,12 +432,12 @@ class MainLayout(BoxLayout):
             
             defaultLemmaTitleText = data['lemma_wordform']['text']
             
-            if app.index_selected == 2:
+            if app.labelTypeIndexSelected == 2:
                 # Syllabics selected
                 title = sro2syllabics(title)
                 if not data['is_lemma'] and data['show_form_of']:
                     data['lemma_wordform']['text'] = sro2syllabics(data['lemma_wordform']['text'])
-            elif app.index_selected == 1:
+            elif app.labelTypeIndexSelected == 1:
                 # ēīōā selected
                 title = replace_hats_to_lines_SRO(title)
                 if not data['is_lemma'] and data['show_form_of']:
@@ -455,7 +458,7 @@ class MainLayout(BoxLayout):
                     dynamic_tile_height += int(ceil(len(d) / 30)) * 35
             
             # If linguistic mode, increase dynamic height to give space for the larger subtitle
-            if app.index_selected_paradigms == 1 or app.index_selected_paradigms == 2:
+            if app.selectedParadigmOptionIndex == 1 or app.selectedParadigmOptionIndex == 2:
                 dynamic_tile_height += 20
             
                
@@ -501,6 +504,10 @@ class ResultView(RecycleView):
         self.refresh_from_data()
 
 class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
+    '''
+    This class represents the view class of every result from the search query
+    on the main page (results list page).
+    '''
     _latest_data = None
     _rv = None
     
@@ -892,6 +899,10 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             sound.play()
             
 class SpecificResultMainList(MDList):
+    '''
+    This is the specific result page (2nd page) main list where
+    title, description, panes, etc. are added in order.
+    '''
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.title = None
@@ -1057,8 +1068,6 @@ class SpecificResultMainList(MDList):
                             if cell_idx != 0:
                                 current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
                         continue
-                    
-                    print("Current panes: every iteration", current_panes)
                     current_row = tr_row.copy()
                     current_row['cells'] = []
                     for cell_idx, cell in enumerate(tr_row['cells']):
@@ -1182,8 +1191,8 @@ class MorphodictApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.menu = None
-        self.index_selected = 0
-        self.index_selected_paradigms = 0
+        self.labelTypeIndexSelected = 0
+        self.selectedParadigmOptionIndex = 0
         self.paradigm_labels_menu = None
         self.displayEmojiMode = False
         self.displayInflectionalCategory = False
@@ -1200,18 +1209,18 @@ class MorphodictApp(MDApp):
         # Add properties to store if they don't exist
         store = JsonStore('store.json')
         if not store.exists("label_type"):
-            store.put('label_type', index_selected=0)
+            store.put('label_type', labelTypeIndexSelected=0)
         else:
-            self.index_selected = store.get('label_type')['index_selected']
+            self.labelTypeIndexSelected = store.get('label_type')['labelTypeIndexSelected']
         
-        self.root.ids.label_settings_dropdown.set_item(self.label_type_list[self.index_selected])
+        self.root.ids.labelSettingsDropdown.set_item(self.label_type_list[self.labelTypeIndexSelected])
         
-        if not store.exists("paradigm_labels_type"):
-            store.put('paradigm_labels_type', index_selected_paradigms=0)
+        if not store.exists("paradigmLabelsType"):
+            store.put('paradigmLabelsType', selectedParadigmOptionIndex=0)
         else:
-            self.index_selected_paradigms = store.get('paradigm_labels_type')['index_selected_paradigms']
+            self.selectedParadigmOptionIndex = store.get('paradigmLabelsType')['selectedParadigmOptionIndex']
         
-        self.root.ids.paradigm_label_settings_dropdown.set_item(self.paradigm_label_type_list[self.index_selected_paradigms])
+        self.root.ids.paradigmSettingsDropdown.set_item(self.paradigm_label_type_list[self.selectedParadigmOptionIndex])
         
         if not store.exists('displayEmojiMode'):
             store.put('displayEmojiMode', displayEmojiMode = False)
@@ -1231,47 +1240,47 @@ class MorphodictApp(MDApp):
                                  'text': "SRO(êîôâ)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(êîôâ)": self.set_item(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 0 else (0, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.labelTypeIndexSelected == 0 else (0, 0, 0, 1)},
                                 {'index': 1, 'text': "SRO(ēīōā)", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"SRO(ēīōā)": self.set_item(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 1 else (0, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.labelTypeIndexSelected == 1 else (0, 0, 0, 1)},
                                 {'index': 2, 
                                  'text': "Syllabics", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Syllabics": self.set_item(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected == 2 else (0, 0, 0, 1)}]
+                                 "text_color": (0.543, 0, 0, 1) if self.labelTypeIndexSelected == 2 else (0, 0, 0, 1)}]
         
         self.menu = MDDropdownMenu(
-            caller=self.root.ids.label_settings_dropdown,
+            caller=self.root.ids.labelSettingsDropdown,
             items=label_settings_items,
             width_mult=4,
         )
         
-        paradigm_settings_items = [{'index': 0, 
+        paradigmSettingsItems = [{'index': 0, 
                                  'text': "Plain English Labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected_paradigms == 0 else (0, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.selectedParadigmOptionIndex == 0 else (0, 0, 0, 1)},
                                 {'index': 1, 'text': "Linguistic labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Linguistic labels": self.set_item_paradigm(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected_paradigms == 1 else (0, 0, 0, 1)},
+                                 "text_color": (0.543, 0, 0, 1) if self.selectedParadigmOptionIndex == 1 else (0, 0, 0, 1)},
                                 {'index': 2, 
                                  'text': "nêhiyawêwin labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
-                                 "text_color": (0.543, 0, 0, 1) if self.index_selected_paradigms == 2 else (0, 0, 0, 1)}]
+                                 "text_color": (0.543, 0, 0, 1) if self.selectedParadigmOptionIndex == 2 else (0, 0, 0, 1)}]
         
         self.paradigm_labels_menu = MDDropdownMenu(
-            caller=self.root.ids.paradigm_label_settings_dropdown,
-            items=paradigm_settings_items,
+            caller=self.root.ids.paradigmSettingsDropdown,
+            items=paradigmSettingsItems,
             width_mult=4,
         )
         
     
     def set_item(self, text_item):
-        if self.root.ids.label_settings_dropdown.current_item == text_item:
+        if self.root.ids.labelSettingsDropdown.current_item == text_item:
             # Same option chosen, don't do anything
             return
         
@@ -1293,19 +1302,19 @@ class MorphodictApp(MDApp):
                                  "text_color": (0, 0, 0, 1)}]
         if text_item == "Syllabics":
             label_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected = 2
-            store.put('label_type', index_selected=2)
+            self.labelTypeIndexSelected = 2
+            store.put('label_type', labelTypeIndexSelected=2)
         elif text_item == "SRO(ēīōā)":
             label_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected = 1
-            store.put('label_type', index_selected=1)
+            self.labelTypeIndexSelected = 1
+            store.put('label_type', labelTypeIndexSelected=1)
         else:
             label_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected = 0
-            store.put('label_type', index_selected=0)
+            self.labelTypeIndexSelected = 0
+            store.put('label_type', labelTypeIndexSelected=0)
         
         self.menu.items = label_settings_items
-        self.root.ids.label_settings_dropdown.set_item(text_item)
+        self.root.ids.labelSettingsDropdown.set_item(text_item)
         self.root.ids.mainBoxLayout.onSubmitWord()
         specificResultPagePopulationList = self.root.ids.specificResultPageMainListLayout
         self.root.ids.specificResultPageMainListLayout.populate_page(specificResultPagePopulationList.title,
@@ -1319,14 +1328,14 @@ class MorphodictApp(MDApp):
         self.menu.dismiss()
     
     def set_item_paradigm(self, text_item):
-        if self.root.ids.paradigm_label_settings_dropdown.current_item == text_item:
+        if self.root.ids.paradigmSettingsDropdown.current_item == text_item:
             # Same option chosen, don't do anything
             return
         
         store = JsonStore('store.json')
         app = App.get_running_app()
         
-        paradigm_settings_items = [{'index': 0, 
+        paradigmSettingsItems = [{'index': 0, 
                                  'text': "Plain English Labels", 
                                  "viewclass": "LabelSettingsItem", 
                                  "on_release": lambda x=f"Plain English Labels": self.set_item_paradigm(x),
@@ -1342,20 +1351,20 @@ class MorphodictApp(MDApp):
                                  "text_color": (0, 0, 0, 1)}]
         
         if text_item == "nêhiyawêwin labels":
-            paradigm_settings_items[2]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected_paradigms = 2
-            store.put('paradigm_labels_type', index_selected_paradigms=2)
+            paradigmSettingsItems[2]["text_color"] = (0.543, 0, 0, 1)
+            self.selectedParadigmOptionIndex = 2
+            store.put('paradigmLabelsType', selectedParadigmOptionIndex=2)
         elif text_item == "Linguistic labels":
-            paradigm_settings_items[1]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected_paradigms = 1
-            store.put('paradigm_labels_type', index_selected_paradigms=1)
+            paradigmSettingsItems[1]["text_color"] = (0.543, 0, 0, 1)
+            self.selectedParadigmOptionIndex = 1
+            store.put('paradigmLabelsType', selectedParadigmOptionIndex=1)
         else:
-            paradigm_settings_items[0]["text_color"] = (0.543, 0, 0, 1)
-            self.index_selected_paradigms = 0
-            store.put('paradigm_labels_type', index_selected_paradigms=0)
+            paradigmSettingsItems[0]["text_color"] = (0.543, 0, 0, 1)
+            self.selectedParadigmOptionIndex = 0
+            store.put('paradigmLabelsType', selectedParadigmOptionIndex=0)
         
-        self.paradigm_labels_menu.items = paradigm_settings_items
-        self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
+        self.paradigm_labels_menu.items = paradigmSettingsItems
+        self.root.ids.paradigmSettingsDropdown.set_item(text_item)
         
         # Make additional callbacks here
         self.root.ids.mainBoxLayout.onSubmitWord()
@@ -1429,10 +1438,10 @@ class MorphodictApp(MDApp):
         webbrowser.open(ABOUT_URL_LINKS[ref])
     
     def get_syllabics_sro_correct_label(self, string: str) -> str:
-        if self.index_selected == 2:
+        if self.labelTypeIndexSelected == 2:
             # Syllabics
             string = sro2syllabics(string)
-        elif self.index_selected == 1:
+        elif self.labelTypeIndexSelected == 1:
             # ēīōā selected
             string = replace_hats_to_lines_SRO(string)
         
