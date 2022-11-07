@@ -41,7 +41,7 @@ from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
 
 from cree_sro_syllabics import sro2syllabics
 
-from uiToBackendConnector import get_main_page_results_list
+from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
 from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
@@ -129,15 +129,15 @@ class ParadigmExpansionPanel(MDExpansionPanel):
         super().__init__(**kwargs)
         self.isFirst = isFirst
         self.dynamicHeight = dynamicHeight
-        Clock.schedule_once(self.panel_op, 0)
-    def panel_op(self, args):
+        Clock.schedule_once(self.openFirstPanel, 0)
+    def openFirstPanel(self, args):
         if self.isFirst:
             self.height += self.dynamicHeight
             self.open_panel()
 
 class EmojiSwitch(MDCheckbox):
     def changeMode(self, currentQuery, lingMode):
-        searchResultsList = get_main_page_results_list(currentQuery, lingMode)
+        searchResultsList = getSearchResultsFromQuery(currentQuery, lingMode)
         Clock.schedule_once(partial(self.updateEmojiForUI, searchResultsList))
         time.sleep(1)
     
@@ -151,16 +151,16 @@ class EmojiSwitch(MDCheckbox):
             app.displayEmojiMode = False
             store.put('displayEmojiMode', displayEmojiMode = False)
         
-        app.root.ids.main_box_layout.on_submit_word(prefetched_result_list=prefetched_list)
-        second_page_population_list = app.root.ids.specific_result_main_list
-        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
-                                                              second_page_population_list.emojis,
+        app.root.ids.mainBoxLayout.onSubmitWord(prefetched_result_list=prefetched_list)
+        specificResultPagePopulationList = app.root.ids.specificResultPageMainListLayout
+        app.root.ids.specificResultPageMainListLayout.populate_page( specificResultPagePopulationList.title,
+                                                              specificResultPagePopulationList.emojis,
                                                               app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
-                                                              second_page_population_list.default_title,
-                                                              second_page_population_list.inflectional_category,
-                                                              second_page_population_list.paradigm_type,
-                                                              second_page_population_list.lemma_paradigm_type,
-                                                              second_page_population_list.definitions)
+                                                              specificResultPagePopulationList.default_title,
+                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.paradigm_type,
+                                                              specificResultPagePopulationList.lemma_paradigm_type,
+                                                              specificResultPagePopulationList.definitions)
         app.main_loader_spinner_toggle()
 
     def emoji_display_thread(self):
@@ -190,16 +190,16 @@ class InflectionalSwitch(MDCheckbox):
             app.display_inflectional_category = False
             store.put('display_inflectional_category', display_inflectional_category = False)
         
-        app.root.ids.main_box_layout.on_submit_word()
-        second_page_population_list = app.root.ids.specific_result_main_list
-        app.root.ids.specific_result_main_list.populate_page( second_page_population_list.title,
-                                                              second_page_population_list.emojis, 
+        app.root.ids.mainBoxLayout.onSubmitWord()
+        specificResultPagePopulationList = app.root.ids.specificResultPageMainListLayout
+        app.root.ids.specificResultPageMainListLayout.populate_page( specificResultPagePopulationList.title,
+                                                              specificResultPagePopulationList.emojis, 
                                                               app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
-                                                              second_page_population_list.default_title,
-                                                              second_page_population_list.inflectional_category,
-                                                              second_page_population_list.paradigm_type,
-                                                              second_page_population_list.lemma_paradigm_type,
-                                                              second_page_population_list.definitions)
+                                                              specificResultPagePopulationList.default_title,
+                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.paradigm_type,
+                                                              specificResultPagePopulationList.lemma_paradigm_type,
+                                                              specificResultPagePopulationList.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
     '''Custom content for Expandible panels.'''
@@ -287,17 +287,16 @@ class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
-    def switch_to_result_screen(self, index, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
+    def switch_to_result_screen(self, _, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, definitions):
         root = App.get_running_app().root
-        # root.ids.option_clicked.text = root.ids.result_list_main.data[index]['title']
-        root.ids.specific_result_main_list.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, None, definitions)
+        root.ids.specificResultPageMainListLayout.populate_page(title, emojis, subtitle, default_title, inflectional_category, paradigm_type, None, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
-    def switch_to_result_screen_lemma_click(self, lemma, title, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
+    def launchSpecificResultPageOnLemmaClick(self, lemma, _, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = lemma
-        root.ids.specific_result_main_list.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions)
+        root.ids.specificResultPageMainListLayout.populate_page(lemma, emojis, subtitle, default_title, inflectional_category, paradigm_type, lemma_paradigm_type, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -341,7 +340,7 @@ def replace_hats_to_lines_SRO(string):
     return string
 
 class MainLayout(BoxLayout):
-    def on_submit_word(self, widget= None, prefetched_result_list = None):
+    def onSubmitWord(self, widget= None, prefetched_result_list = None):
         root = App.get_running_app().root
         app = App.get_running_app()
         
@@ -364,7 +363,7 @@ class MainLayout(BoxLayout):
         output_res = prefetched_result_list
 
         if prefetched_result_list is None:
-            output_res = get_main_page_results_list(current_query, ling_mode)
+            output_res = getSearchResultsFromQuery(current_query, ling_mode)
         
         resultToPrint = output_res.copy()
         self.display_result_list(resultToPrint)
@@ -870,7 +869,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.switch_to_result_screen_lemma_click(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.lemma_paradigm_type, self.definitions)
+        root.ids.screen_manager.launchSpecificResultPageOnLemmaClick(lemma, self.title, self.emojis, self.subtitle, self.default_title_lemma, self.inflectional_category, self.paradigm_type, self.lemma_paradigm_type, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.default_title)
@@ -1311,16 +1310,16 @@ class MorphodictApp(MDApp):
         
         self.menu.items = label_settings_items
         self.root.ids.label_settings_dropdown.set_item(text_item)
-        self.root.ids.main_box_layout.on_submit_word()
-        second_page_population_list = self.root.ids.specific_result_main_list
-        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
-                                                              second_page_population_list.emojis, 
-                                                              second_page_population_list.subtitle,
-                                                              second_page_population_list.default_title,
-                                                              second_page_population_list.inflectional_category,
-                                                              second_page_population_list.paradigm_type,
-                                                              second_page_population_list.lemma_paradigm_type,
-                                                              second_page_population_list.definitions)
+        self.root.ids.mainBoxLayout.onSubmitWord()
+        specificResultPagePopulationList = self.root.ids.specificResultPageMainListLayout
+        self.root.ids.specificResultPageMainListLayout.populate_page(specificResultPagePopulationList.title,
+                                                              specificResultPagePopulationList.emojis, 
+                                                              specificResultPagePopulationList.subtitle,
+                                                              specificResultPagePopulationList.default_title,
+                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.paradigm_type,
+                                                              specificResultPagePopulationList.lemma_paradigm_type,
+                                                              specificResultPagePopulationList.definitions)
         self.menu.dismiss()
     
     def set_item_paradigm(self, text_item):
@@ -1363,16 +1362,16 @@ class MorphodictApp(MDApp):
         self.root.ids.paradigm_label_settings_dropdown.set_item(text_item)
         
         # Make additional callbacks here
-        self.root.ids.main_box_layout.on_submit_word()
-        second_page_population_list = self.root.ids.specific_result_main_list
-        self.root.ids.specific_result_main_list.populate_page(second_page_population_list.title,
-                                                              second_page_population_list.emojis, 
+        self.root.ids.mainBoxLayout.onSubmitWord()
+        specificResultPagePopulationList = self.root.ids.specificResultPageMainListLayout
+        self.root.ids.specificResultPageMainListLayout.populate_page(specificResultPagePopulationList.title,
+                                                              specificResultPagePopulationList.emojis, 
                                                               app.newest_result_list[app.last_result_list_index_click]['subtitle'] if app.last_result_list_index_click is not None else "",
-                                                              second_page_population_list.default_title,
-                                                              second_page_population_list.inflectional_category,
-                                                              second_page_population_list.paradigm_type,
-                                                              second_page_population_list.lemma_paradigm_type,
-                                                              second_page_population_list.definitions)
+                                                              specificResultPagePopulationList.default_title,
+                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.paradigm_type,
+                                                              specificResultPagePopulationList.lemma_paradigm_type,
+                                                              specificResultPagePopulationList.definitions)
         
         
         self.paradigm_labels_menu.dismiss()
@@ -1424,7 +1423,7 @@ class MorphodictApp(MDApp):
     def on_legend_ref_press(self, instance, ref):
         root = App.get_running_app().root
         root.ids.input_word.text = ref
-        root.ids.main_box_layout.on_submit_word()
+        root.ids.mainBoxLayout.onSubmitWord()
         root.ids.screen_manager.switch_back_home_screen()
     
     def on_contact_ref_press(self, instance, ref):
