@@ -1177,7 +1177,6 @@ class MorphodictApp(MDApp):
     about_text_source_material = ABOUT_TEXT_SOURCE_MATERIALS
     about_text_credit = ABOUT_TEXT_CREDITS
     spinner2_active = BooleanProperty(defaultvalue = False)
-    # result_default_size = NumericProperty(defaultvalue = dp(200))
     main_loader_active = BooleanProperty(defaultvalue = False)
     
     def __init__(self, **kwargs):
@@ -1224,7 +1223,7 @@ class MorphodictApp(MDApp):
             store.put('displayInflectionalCategory', displayInflectionalCategory = True)
         else:
             self.displayInflectionalCategory = store.get('displayInflectionalCategory')['displayInflectionalCategory']
-        self.root.ids.inflectional_switch.active = self.displayInflectionalCategory
+        self.root.ids.inflectionalSwitch.active = self.displayInflectionalCategory
         
         
         # Label Settings Menu
