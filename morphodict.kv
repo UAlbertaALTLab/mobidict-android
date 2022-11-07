@@ -87,7 +87,7 @@ MainScreen:
                         md_bg_color: get_color_from_hex("#8B0000")
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
-                            [['menu', lambda x: nav_drawer.set_state("open")]]
+                            [['menu', lambda x: drawerNavigator.set_state("open")]]
                     MainLoaderSpinner:
                         id: main_loader_spinner
                         size_hint: None, None
@@ -165,7 +165,7 @@ MainScreen:
                         specific_text_color: get_color_from_hex("#F5F2D0")
                         left_action_items:
                             [['arrow-left', lambda x: app.root.ids.screen_manager.switch_back_home_screen()]]
-                        right_action_items: [["dots-vertical", lambda x: nav_drawer.set_state("open")]]
+                        right_action_items: [["dots-vertical", lambda x: drawerNavigator.set_state("open")]]
                     Image:
                         source: 'images/itwewina-with-text.png'
                         size: "175dp", "250dp"
@@ -340,7 +340,7 @@ MainScreen:
                                         
 
         MDNavigationDrawer:
-            id: nav_drawer
+            id: drawerNavigator
             md_bg_color: get_color_from_hex("#f7f4e7")
 
             ContentNavigationDrawer:

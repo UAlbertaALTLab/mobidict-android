@@ -325,17 +325,17 @@ class WindowManager(ScreenManager):
     
     def switch_to_legend_screen(self):
         root = App.get_running_app().root
-        root.ids.nav_drawer.set_state("close")
+        root.ids.drawerNavigator.set_state("close")
         self.current = "Legend"
     
     def switch_to_contact_screen(self):
         root = App.get_running_app().root
-        root.ids.nav_drawer.set_state("close")
+        root.ids.drawerNavigator.set_state("close")
         self.current = "Contact"
     
     def switch_to_about_screen(self):
         root = App.get_running_app().root
-        root.ids.nav_drawer.set_state("close")
+        root.ids.drawerNavigator.set_state("close")
         self.current = "About"
 
 class MainLayout(BoxLayout):
@@ -850,15 +850,6 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             definition_label = MDLabel(text="[size=14dp]" + definition + "[/size]", markup = True)
             self.add_widget(definition_label)
         
-    # This method works if you want to detect a touch anywhere in the entire widget    
-    # def on_touch_down(self, touch):
-    #     if self.collide_point(*touch.pos):
-    #         # The touch has occurred inside the widgets area.
-    #         root = App.get_running_app().root
-    #         root.ids.screen_manager.switch_to_result_screen(self.index)
-            
-    #     return super(ResultWidget, self).on_touch_down(touch)
-        
     def on_click_label(self, touch):
         if not self.is_lemma and self.show_form_of:
             # Shouldn't be clicked/redirected.
@@ -994,7 +985,6 @@ class SpecificResultMainList(MDList):
             
         additional_emoji_margin = 0 if not emojis else 10
         
-        # emoji_label = MDLabel(text="[size=14][font=NotoEmoji-Regular.ttf]" + self.emojis + "[/font][/size]", size_hint=(0.2, 1), markup=True)
         emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
         emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
@@ -1019,20 +1009,26 @@ class SpecificResultMainList(MDList):
         # Add paradigm panes
         pane_generator = paradigm_panes.PaneGenerator()
         
+        # Set the right directory paths for the pane generator
         pane_generator.set_layouts_dir(BASE_DIR + "/layouts")
         pane_generator.set_fst_filepath(BASE_DIR + "/backend/resourcesFST/crk-strict-generator.hfstol")
         
         paradigm = {'panes': []}
         
+        # Check whether lemma was clicked on the "form of" line
+        # or the main title for that result was clicked
         if lemmaParadigmType is None:
+            # If lemma wasn't clicked, check if the current title paradigm type has a tsv
             if paradigm_type is not None and paradigm_type in app.paradigm_pane_layouts_available:
                 paradigm = pane_generator.generate_pane(defaultTitleText, paradigm_type)
             elif paradigm_type is None:
                 print("Paradigm Type (currently unavailable): ", paradigm_type)
                 return
         elif lemmaParadigmType in app.paradigm_pane_layouts_available:
+            # If lemma was clicked, check if the current lemma paradigm type has a tsv
             paradigm = pane_generator.generate_pane(defaultTitleText, lemmaParadigmType)
         else:
+            # No TSV file found, don't add any panes
             print("Paradigm Type (currently unavailable): ", paradigm_type)
             return
         
@@ -1042,13 +1038,17 @@ class SpecificResultMainList(MDList):
         all_panes = []
         header, subheader = None, None
         
+        # Go through every pane
         for pane_idx, pane in enumerate(paradigm_data['panes']):
+            # Reset all the initial values
             is_core_pane = False
             is_next_row_after_labels = False
             current_num_cols = 0
             current_panes = []
+            # Go through every row inside the pane
             for row_idx, tr_row in enumerate(pane['tr_rows']):
                 print("[Test] current row: ", tr_row)
+                # Ignore the row if it's a header row (just contains #NA for eg.)
                 if not tr_row['is_header']:
                     
                     # Check if the pane is a Core pane
@@ -1058,8 +1058,11 @@ class SpecificResultMainList(MDList):
                         continue
                     
                     # Check if a row contains only column labels
+                    # If so, record the number of column labels does it contains
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
+                        # If it does contain only column headers, let's add num_cols panes 
+                        # as those = number of panes for that "pane" in this for loop
                         current_num_cols = num_cols
                         is_next_row_after_labels = True
                         for cell_idx, cell in enumerate(tr_row['cells']):
@@ -1067,35 +1070,49 @@ class SpecificResultMainList(MDList):
                             # as that's usually empty!
                             if cell_idx != 0:
                                 current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
+                        # Let's look at the next row now that panes have been added
                         continue
+
+                    # Immitate the row minus the cells that we will just recreate
+                    # for every pane
                     current_row = tr_row.copy()
                     current_row['cells'] = []
                     for cell_idx, cell in enumerate(tr_row['cells']):
-                        print("[Test] Current cell: ", cell)
                         if cell_idx > current_num_cols:
-                            # row_span > 1 not considered.
+                            # We enter here when there's no 1:1 mapping for column header -> single row label's value
+                            # row_span > 1 not considered, we just take the first word found
                             break
                         if cell_idx == 0:
-                            print("[Test] Cell idx = 0")
                             if current_num_cols == 1 and is_next_row_after_labels:
+                                # Whenever looking at something like:
+                                # | Core
+                                #   | Poss
+                                #   ...
+                                #   | Nonposs
+                                #   ...
+                                # Whenever we hit Nonposs, make sure to add the Poss pane 
+                                # to all_panes. 
+                                # This is not required when we have current_num_cols > 1 
+                                # because they don't have only label row in middle of the output
+                                # so can be added in the end
                                 is_next_row_after_labels = False
                                 for current_pane_idx in range(len(current_panes) - 1):
                                     final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
-                                    print("[Test] Adding this to final panes:", final_pane)
                                     all_panes.append(final_pane)
                                 
+                                # Now that current panes so far have been added to all_panes,
+                                # reset the current_panes list to just contain the current row (which is on -1 idx)
                                 if len(current_panes) > 0:
                                     current_panes_temp = current_panes.copy()
                                     current_panes = list()
                                     current_panes.append(current_panes_temp[-1])
-                                    print("Current panes after removal: ", current_panes)
                             
-                            # Add to all current panes
+                            
+                            # Update the current_pane to include the new cell found in this iteration
                             for current_pane in current_panes:
                                 # Add the row labels to all the current panes
                                 current_row['cells'].append(cell)
                                 current_pane['tr_rows'].append(current_row.copy())
-                                print("[TEST] Added cell to pane: ", current_pane)
 
 
                                 # Refresh the cells
@@ -1107,7 +1124,7 @@ class SpecificResultMainList(MDList):
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
                         print("Current panes: ", current_panes)
                     
-            # Go through all the current panes and add them to all_panes
+            # End of a "pane", add all the panes in current_panes to all_panes
             for current_pane in current_panes:
                 final_pane = {'pane': current_pane, 'header': current_pane['headerTitle'], 'subheader': current_pane['subheaderTitle']}
                 all_panes.append(final_pane)
@@ -1117,6 +1134,7 @@ class SpecificResultMainList(MDList):
         first_panel_flag = True
         for each_pane in all_panes:
             if first_panel_flag:
+                # If first pane, we need to open it initially
                 panel = ParadigmExpansionPanel(
                                 isFirst = first_panel_flag,
                                 dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 60),
@@ -1130,6 +1148,8 @@ class SpecificResultMainList(MDList):
                 first_panel_flag = False
                 self.add_widget(panel)
             else:
+                # If not the first pane, no need to open it initially so dynamicHeight doesn't matter
+                # Note that dynamicHeight is only used for initial opening purposes
                 self.add_widget(ParadigmExpansionPanel(
                                 isFirst = first_panel_flag,
                                 dynamicHeight= 0,
