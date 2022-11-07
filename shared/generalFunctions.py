@@ -15,3 +15,12 @@ def is_core_column_header(cells):
         if not cell['is_empty'] and cell['is_label'] and cell['label'][0] == "Core":
             return True
     return False
+
+def replace_hats_to_lines_SRO(string):
+    
+    string = string.replace("ê", "ē")
+    string = string.replace("î", "ī")
+    string = string.replace("ô", "ō")
+    string = string.replace("â", "ā")
+    
+    return string

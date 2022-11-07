@@ -44,7 +44,7 @@ from cree_sro_syllabics import sro2syllabics
 from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
-from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO
 from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
@@ -81,6 +81,9 @@ class AboutMDList(MDList):
 
 class DrawerList(MDList):
     pass
+
+class LabelSettingsItem(OneLineListItem):
+    text = StringProperty()
 
 ######################################################
 
@@ -125,6 +128,9 @@ class ContentNavigationDrawer(MDBoxLayout):
 ######################################################
 
 class ParadigmExpansionPanel(MDExpansionPanel):
+    '''
+    This class represents each paradigm panel added on the second specific result page.
+    '''
     def __init__(self, isFirst, dynamicHeight, **kwargs ):
         super().__init__(**kwargs)
         self.isFirst = isFirst
@@ -136,6 +142,9 @@ class ParadigmExpansionPanel(MDExpansionPanel):
             self.open_panel()
 
 class EmojiSwitch(MDCheckbox):
+    '''
+    This class represents the emoji display switch in the options of drawer navigation.
+    '''
     def changeMode(self, currentQuery, lingMode):
         searchResultsList = getSearchResultsFromQuery(currentQuery, lingMode)
         Clock.schedule_once(partial(self.updateEmojiForUI, searchResultsList))
@@ -179,6 +188,10 @@ class EmojiSwitch(MDCheckbox):
         threading.Thread(target=(self.changeMode), args=[current_query, ling_mode]).start()
 
 class InflectionalSwitch(MDCheckbox):
+    '''
+    This class represents the inflectional category display switch
+    in the options of drawer navigation.
+    '''
     def changeMode(self):
         app = App.get_running_app()
         store = JsonStore('store.json')
@@ -201,7 +214,10 @@ class InflectionalSwitch(MDCheckbox):
                                                               specificResultPagePopulationList.definitions)
 
 class ParadigmLabelContent(MDBoxLayout):
-    '''Custom content for Expandible panels.'''
+    '''
+    This class represents the main box layout of paradigm panes in the main list.
+    We just attach one copy of this class to the main layout MDList.
+    '''
     
     def __init__(self, data, **kwargs ):
         super().__init__(**kwargs)
@@ -283,6 +299,10 @@ class ParadigmLabelContent(MDBoxLayout):
         # self.add_widget(within_paradigm_scrollview)
 
 class WindowManager(ScreenManager):
+    '''
+    This is the navigation manager within the app.
+    Any screen changes should be declared here.
+    '''
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
@@ -318,27 +338,10 @@ class WindowManager(ScreenManager):
         root.ids.nav_drawer.set_state("close")
         self.current = "About"
 
-class LabelSettingsItem(OneLineListItem):
-    text = StringProperty()
-
-def print_presentable_output(output):
-    x = output.copy()
-    counter = 1
-    for y in x:
-        print(f'''Output [{counter}]: ''', y)
-        counter += 1
-        print("-" * 80)
-
-def replace_hats_to_lines_SRO(string):
-    
-    string = string.replace("ê", "ē")
-    string = string.replace("î", "ī")
-    string = string.replace("ô", "ō")
-    string = string.replace("â", "ā")
-    
-    return string
-
 class MainLayout(BoxLayout):
+    '''
+    This class is the main layout of the app (the first launch page).
+    '''
     def onSubmitWord(self, widget= None, prefetched_result_list = None):
         root = App.get_running_app().root
         app = App.get_running_app()
