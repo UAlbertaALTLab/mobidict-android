@@ -1414,9 +1414,6 @@ class MorphodictApp(MDApp):
         def on_release_help(arg):
             webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
             
-        def on_release_settings(arg):
-            print("Settings pressed!")
-            
         def on_release_legend(arg):
             root = App.get_running_app().root
             root.ids.screen_manager.switch_to_legend_screen()
@@ -1434,7 +1431,6 @@ class MorphodictApp(MDApp):
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_about},
                              {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
-                             # {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}
                             ]
         
         for drawer_item in drawer_items_list:
