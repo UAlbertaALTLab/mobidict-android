@@ -166,7 +166,7 @@ class EmojiSwitch(MDCheckbox):
                                                               specificResultPagePopulationList.emojis,
                                                               app.latestSpecificResultPageMainList[app.latestResultClickIndex]['subtitle'] if app.latestResultClickIndex is not None else "",
                                                               specificResultPagePopulationList.defaultTitleText,
-                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.inflectionalCategory,
                                                               specificResultPagePopulationList.paradigm_type,
                                                               specificResultPagePopulationList.lemmaParadigmType,
                                                               specificResultPagePopulationList.definitions)
@@ -208,7 +208,7 @@ class InflectionalSwitch(MDCheckbox):
                                                               specificResultPagePopulationList.emojis, 
                                                               app.latestSpecificResultPageMainList[app.latestResultClickIndex]['subtitle'] if app.latestResultClickIndex is not None else "",
                                                               specificResultPagePopulationList.defaultTitleText,
-                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.inflectionalCategory,
                                                               specificResultPagePopulationList.paradigm_type,
                                                               specificResultPagePopulationList.lemmaParadigmType,
                                                               specificResultPagePopulationList.definitions)
@@ -306,16 +306,16 @@ class WindowManager(ScreenManager):
     def __init__(self, **kwargs):
         super(WindowManager, self).__init__(**kwargs)
     
-    def switch_to_result_screen(self, _, title, emojis, subtitle, defaultTitleText, inflectional_category, paradigm_type, definitions):
+    def switch_to_result_screen(self, _, title, emojis, subtitle, defaultTitleText, inflectionalCategory, paradigm_type, definitions):
         root = App.get_running_app().root
-        root.ids.specificResultPageMainListLayout.populate_page(title, emojis, subtitle, defaultTitleText, inflectional_category, paradigm_type, None, definitions)
+        root.ids.specificResultPageMainListLayout.populate_page(title, emojis, subtitle, defaultTitleText, inflectionalCategory, paradigm_type, None, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
-    def launchSpecificResultPageOnLemmaClick(self, lemma, _, emojis, subtitle, defaultTitleText, inflectional_category, paradigm_type, lemmaParadigmType, definitions):
+    def launchSpecificResultPageOnLemmaClick(self, lemma, _, emojis, subtitle, defaultTitleText, inflectionalCategory, paradigm_type, lemmaParadigmType, definitions):
         root = App.get_running_app().root
         # root.ids.option_clicked.text = lemma
-        root.ids.specificResultPageMainListLayout.populate_page(lemma, emojis, subtitle, defaultTitleText, inflectional_category, paradigm_type, lemmaParadigmType, definitions)
+        root.ids.specificResultPageMainListLayout.populate_page(lemma, emojis, subtitle, defaultTitleText, inflectionalCategory, paradigm_type, lemmaParadigmType, definitions)
         self.transition.direction = "left"
         self.current = "Result"
     
@@ -387,7 +387,7 @@ class MainLayout(BoxLayout):
             
             # Note that the ic can also be set using relabel_plain_english and relabel_linguistic_long
             
-            inflectional_category = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
+            inflectionalCategory = data['lemma_wordform']['inflectional_category'] if data['is_lemma'] or (not data['is_lemma'] and data['show_form_of']) else "None"
             ic = data['lemma_wordform']['inflectional_category_plain_english']
             
             if app.selectedParadigmOptionIndex == 1:
@@ -395,8 +395,8 @@ class MainLayout(BoxLayout):
                 if ic is not None and 'linguist_info' in data['lemma_wordform'] and data['lemma_wordform']['linguist_info']['inflectional_category'] is not None:
                     ic += " (" + data['lemma_wordform']['linguist_info']['inflectional_category'] + ")"
             
-            if app.selectedParadigmOptionIndex == 2 and inflectional_category != "None":
-                ic = relabel_source(inflectional_category)
+            if app.selectedParadigmOptionIndex == 2 and inflectionalCategory != "None":
+                ic = relabel_source(inflectionalCategory)
             
             emoji = data['lemma_wordform']['wordclass_emoji']
             
@@ -468,7 +468,7 @@ class MainLayout(BoxLayout):
                                         'title': title, 
                                         'emojis': emojis, 
                                         'subtitle': subtitle,
-                                        'inflectional_category': inflectional_category,
+                                        'inflectionalCategory': inflectionalCategory,
                                         'paradigm_type': paradigm_type,
                                         'lemmaParadigmType': lemmaParadigmType,
                                         'lemma_definitions': lemma_definitions,
@@ -516,7 +516,7 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
     title = ObjectProperty()
     subtitle = ObjectProperty()
     emojis = ObjectProperty()
-    inflectional_category = ObjectProperty()
+    inflectionalCategory = ObjectProperty()
     paradigm_type = ObjectProperty(allownone = True)
     lemmaParadigmType = ObjectProperty(allownone = True)
     lemma_definitions = ObjectProperty()
@@ -652,9 +652,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
             # Add the inflectional category only if the option is on
             
             if app.displayInflectionalCategory:
-                inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
+                inflection_label = Label(text="[size=15dp]" + self.inflectionalCategory + "[/size]", markup=True)
                 inflection_label._label.refresh()
-                inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
+                inflection_label = MDLabel(text="[size=15dp]" + self.inflectionalCategory + "[/size]", 
                                     markup=True,
                                     size_hint=(None, 1),
                                     width=inflection_label._label.texture.size[0] + 5)
@@ -811,9 +811,9 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         # Add the inflectional category
         if app.displayInflectionalCategory:
-            inflection_label = Label(text="[size=15dp]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=15dp]" + self.inflectionalCategory + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=15dp]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=15dp]" + self.inflectionalCategory + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -840,8 +840,6 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         
         self.add_widget(description_box_layout)
         
-        # definitions_box_layout = BoxLayout(orientation="vertical")
-        
         definitions_to_display = self.definitions
         if not self.is_lemma and self.show_form_of:
             definitions_to_display = self.lemma_definitions
@@ -857,14 +855,14 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         app = App.get_running_app()
         root = App.get_running_app().root
         app.latestResultClickIndex = self.index
-        root.ids.screen_manager.switch_to_result_screen(self.index, self.title, self.emojis, self.subtitle, self.defaultTitleText, self.inflectional_category, self.paradigm_type, self.definitions)
+        root.ids.screen_manager.switch_to_result_screen(self.index, self.title, self.emojis, self.subtitle, self.defaultTitleText, self.inflectionalCategory, self.paradigm_type, self.definitions)
     
     def on_click_form_of_lemma(self, touch):
         root = App.get_running_app().root
         
         lemma = self.lemma_wordform['text']
         
-        root.ids.screen_manager.launchSpecificResultPageOnLemmaClick(lemma, self.title, self.emojis, self.subtitle, self.defaultLemmaTitleText, self.inflectional_category, self.paradigm_type, self.lemmaParadigmType, self.definitions)
+        root.ids.screen_manager.launchSpecificResultPageOnLemmaClick(lemma, self.title, self.emojis, self.subtitle, self.defaultLemmaTitleText, self.inflectionalCategory, self.paradigm_type, self.lemmaParadigmType, self.definitions)
     
     def play_sound(self, touch):
         audio_fetch_status = get_sound(self.defaultTitleText)
@@ -900,12 +898,12 @@ class SpecificResultMainList(MDList):
         self.emojis = None
         self.subtitle = None
         self.defaultTitleText = None
-        self.inflectional_category = None
+        self.inflectionalCategory = None
         self.paradigm_type = None
         self.lemmaParadigmType = None
         self.definitions = None
     
-    def populate_page(self, title, emojis, subtitle, defaultTitleText, inflectional_category, paradigm_type, lemmaParadigmType, definitions):
+    def populate_page(self, title, emojis, subtitle, defaultTitleText, inflectionalCategory, paradigm_type, lemmaParadigmType, definitions):
         '''
         Populates the second result-specific page
         '''
@@ -913,7 +911,7 @@ class SpecificResultMainList(MDList):
         self.emojis = emojis
         self.subtitle = subtitle
         self.defaultTitleText = defaultTitleText
-        self.inflectional_category = inflectional_category
+        self.inflectionalCategory = inflectionalCategory
         self.paradigm_type = paradigm_type
         self.lemmaParadigmType = lemmaParadigmType
         self.definitions = definitions
@@ -974,9 +972,9 @@ class SpecificResultMainList(MDList):
         
         # Add the inflectional category
         if app.displayInflectionalCategory:
-            inflection_label = Label(text="[size=24]" + self.inflectional_category + "[/size]", markup=True)
+            inflection_label = Label(text="[size=24]" + self.inflectionalCategory + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=24]" + self.inflectional_category + "[/size]", 
+            inflection_label = MDLabel(text="[size=24]" + self.inflectionalCategory + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -1341,7 +1339,7 @@ class MorphodictApp(MDApp):
                                                               specificResultPagePopulationList.emojis, 
                                                               specificResultPagePopulationList.subtitle,
                                                               specificResultPagePopulationList.defaultTitleText,
-                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.inflectionalCategory,
                                                               specificResultPagePopulationList.paradigm_type,
                                                               specificResultPagePopulationList.lemmaParadigmType,
                                                               specificResultPagePopulationList.definitions)
@@ -1393,7 +1391,7 @@ class MorphodictApp(MDApp):
                                                               specificResultPagePopulationList.emojis, 
                                                               app.latestSpecificResultPageMainList[app.latestResultClickIndex]['subtitle'] if app.latestResultClickIndex is not None else "",
                                                               specificResultPagePopulationList.defaultTitleText,
-                                                              specificResultPagePopulationList.inflectional_category,
+                                                              specificResultPagePopulationList.inflectionalCategory,
                                                               specificResultPagePopulationList.paradigm_type,
                                                               specificResultPagePopulationList.lemmaParadigmType,
                                                               specificResultPagePopulationList.definitions)
@@ -1416,9 +1414,6 @@ class MorphodictApp(MDApp):
         def on_release_help(arg):
             webbrowser.open("https://altlab.ualberta.ca/itwewina/#help")
             
-        def on_release_settings(arg):
-            print("Settings pressed!")
-            
         def on_release_legend(arg):
             root = App.get_running_app().root
             root.ids.screen_manager.switch_to_legend_screen()
@@ -1436,7 +1431,6 @@ class MorphodictApp(MDApp):
                              {'text': 'Legend of Abbreviations', 'icon': 'text-box-outline', 'callback': on_release_legend},
                              {'text': 'About', 'icon': "account-group", 'callback': on_release_about},
                              {'text': 'Contact us', 'icon': "email", 'callback': on_release_contact_us},
-                             # {'text': 'Settings', 'icon': "cog", 'callback': on_release_settings}
                             ]
         
         for drawer_item in drawer_items_list:
