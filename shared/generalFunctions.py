@@ -1,3 +1,11 @@
+from enum import Enum
+
+class SoundAPIResponse(Enum):
+    SUCCESSFUL = 1
+    CONNECTION_ERROR = 2
+    NO_AUDIO_AVAILABLE = 3
+    API_NO_HIT = 4 # Possibly server down?
+
 def cells_contains_only_column_labels(cells):
     label_amount = 0
     for cell in cells:
@@ -24,3 +32,4 @@ def replace_hats_to_lines_SRO(string):
     string = string.replace("â", "ā")
     
     return string
+
