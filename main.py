@@ -44,7 +44,7 @@ from cree_sro_syllabics import sro2syllabics
 from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS
-from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO, SoundAPIResponse
 from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
@@ -243,8 +243,6 @@ class ParadigmLabelContent(MDBoxLayout):
         
         paradigm_parameter = ["english", "linguistic", "source_language"]
         
-        # within_paradigm_scrollview = ScrollView(size_hint=(1, None), height="400dp")
-        
         # Prepare the paradigm data and add it to the screen
         for row in self.data['tr_rows']:
             row_box_layout = MDBoxLayout(height="40dp", size_hint = (1, None))
@@ -346,8 +344,6 @@ class MainLayout(BoxLayout):
         root = App.get_running_app().root
         app = App.get_running_app()
         
-        store = JsonStore('store.json')
-        
         current_query = root.ids.input_word.text
         
         if not current_query:
@@ -368,11 +364,14 @@ class MainLayout(BoxLayout):
             output_res = getSearchResultsFromQuery(current_query, ling_mode)
         
         resultToPrint = output_res.copy()
-        self.display_result_list(resultToPrint)
+        self.displayResultList(resultToPrint)
     
-    def display_result_list(self, data_list):
-        result_list_view = MDList()
-        initial_result_list = []
+    def displayResultList(self, data_list):
+        '''
+        This method goes through the output from the backend and serializes
+        it to make it UI-friendly.
+        '''
+        initialSearchResultsList = []
         
         result_id_counter = 0
         
@@ -462,7 +461,7 @@ class MainLayout(BoxLayout):
                 dynamic_tile_height += 20
             
                
-            initial_result_list.append({'index': result_id_counter,
+            initialSearchResultsList.append({'index': result_id_counter,
                                         'defaultTitleText': defaultTitleText,
                                         'height': dp(max(100, dynamic_tile_height)),
                                         'title': title, 
@@ -484,13 +483,13 @@ class MainLayout(BoxLayout):
             
             result_id_counter += 1
         
-        if len(initial_result_list) == 0:
+        if len(initialSearchResultsList) == 0:
             root = App.get_running_app().root
-            initial_result_list.append({'index': -1, 'title': 'No results found!', 'definitions': [root.ids.input_word.text]})
+            initialSearchResultsList.append({'index': -1, 'title': 'No results found!', 'definitions': [root.ids.input_word.text]})
         
         root = App.get_running_app().root
         
-        root.ids.result_list_main.update_data(initial_result_list)
+        root.ids.result_list_main.update_data(initialSearchResultsList)
 
 class ResultView(RecycleView):
     def __init__(self, **kwargs):
@@ -865,17 +864,15 @@ class ResultWidget(RecycleDataViewBehavior, MDBoxLayout):
         root.ids.screen_manager.launchSpecificResultPageOnLemmaClick(lemma, self.title, self.emojis, self.subtitle, self.defaultLemmaTitleText, self.inflectionalCategory, self.paradigm_type, self.lemmaParadigmType, self.definitions)
     
     def play_sound(self, touch):
-        audio_fetch_status = get_sound(self.defaultTitleText)
+        audioFetchStatus = get_sound(self.defaultTitleText)
         
-        if audio_fetch_status == 2:
-            # Connection error
+        if audioFetchStatus == SoundAPIResponse.CONNECTION_ERROR:
             toast("This feature needs a reliable internet connection.")
             return
-        elif audio_fetch_status == 3:
-            # No audio found
+        elif audioFetchStatus == SoundAPIResponse.NO_AUDIO_AVAILABLE:
             toast("No recording available for this word.")
             return
-        elif audio_fetch_status == 4:
+        elif audioFetchStatus == SoundAPIResponse.API_NO_HIT:
             # No audio found
             toast("Audio currently unavailable.")
             return
@@ -1162,20 +1159,17 @@ class SpecificResultMainList(MDList):
     def play_sound(self, *args):
         app = App.get_running_app()
         app.spinner2_active = True
-        audio_fetch_status = get_sound(self.defaultTitleText)
+        audioFetchStatus = get_sound(self.defaultTitleText)
         
-        if audio_fetch_status == 2:
-            # Connection error
+        if audioFetchStatus == SoundAPIResponse.CONNECTION_ERROR:
             app.spinner2_active = False
             toast("This feature needs a reliable internet connection.")
             return
-        elif audio_fetch_status == 3:
-            # No audio found
+        elif audioFetchStatus == SoundAPIResponse.NO_AUDIO_AVAILABLE:
             app.spinner2_active = False
             toast("No recording available for this word.")
             return
-        elif audio_fetch_status == 4:
-            # No audio found
+        elif audioFetchStatus == SoundAPIResponse.API_NO_HIT:
             app.spinner2_active = False
             toast("Audio currently unavailable.")
             return
@@ -1211,7 +1205,7 @@ class MorphodictApp(MDApp):
         self.menu = None
         self.labelTypeIndexSelected = 0
         self.selectedParadigmOptionIndex = 0
-        self.paradigm_labels_menu = None
+        self.paradigmLabelsMenu = None
         self.displayEmojiMode = False
         self.displayInflectionalCategory = False
         self.latestResultClickIndex = None
@@ -1290,7 +1284,7 @@ class MorphodictApp(MDApp):
                                  "on_release": lambda x=f"nêhiyawêwin labels": self.set_item_paradigm(x),
                                  "text_color": (0.543, 0, 0, 1) if self.selectedParadigmOptionIndex == 2 else (0, 0, 0, 1)}]
         
-        self.paradigm_labels_menu = MDDropdownMenu(
+        self.paradigmLabelsMenu = MDDropdownMenu(
             caller=self.root.ids.paradigmSettingsDropdown,
             items=paradigmSettingsItems,
             width_mult=4,
@@ -1381,7 +1375,7 @@ class MorphodictApp(MDApp):
             self.selectedParadigmOptionIndex = 0
             store.put('paradigmLabelsType', selectedParadigmOptionIndex=0)
         
-        self.paradigm_labels_menu.items = paradigmSettingsItems
+        self.paradigmLabelsMenu.items = paradigmSettingsItems
         self.root.ids.paradigmSettingsDropdown.set_item(text_item)
         
         # Make additional callbacks here
@@ -1397,7 +1391,7 @@ class MorphodictApp(MDApp):
                                                               specificResultPagePopulationList.definitions)
         
         
-        self.paradigm_labels_menu.dismiss()
+        self.paradigmLabelsMenu.dismiss()
 
     @mainthread
     def main_loader_spinner_toggle(self):
