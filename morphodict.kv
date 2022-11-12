@@ -32,13 +32,11 @@ MainScreen:
     padding: "5dp"
     canvas.before:
         Color:
-            # rgba: 0.8671875, 0.8671875, 0.8671875, 1
             rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
         Color:
-            # rgba: 0.8671875, 0.8671875, 0.8671875, 1
             rgba: 0.5450, 0, 0, 1
         Line:
             width: 1
@@ -102,21 +100,23 @@ MainScreen:
                         
                     MDTextField:
                         id: input_word
-                        mode: 'rectangle'
-                        multiline: False
-                        size_hint: 0.8, None
-                        height: "35dp"
-                        pos_hint: {"center_x": 0.5}
                         hint_text: "Search in Cree or English"
-                        on_text_validate: 
+                        mode: 'rectangle'
+                        size_hint: 0.8, None
+                        pos_hint: {"center_x": 0.5}
+                        height: "35dp"
+                        on_text_validate:
                             altlab_develop_text_label.height = "0dp"
                             altlab_develop_text_label.text = ""
                             altlab_develop_text_label.size_hint_y = None
                             altlab_develop_text_label.opacity = 0
                             altlab_develop_text_label.disabled = True
                             root.ids.mainBoxLayout.onSubmitWord(self)
-                        line_color_focus: get_color_from_hex("#8B0000")
                         font_name: 'bjcrus.ttf'
+                        color_mode: 'custom'
+                        line_color_focus: get_color_from_hex("#8B0000")
+                        hint_text_color_focus: get_color_from_hex("#8B0000")
+                        text_color_focus: get_color_from_hex("#8B0000")
                     Label:
                         text:''
                         size_hint: 1, 0.05
