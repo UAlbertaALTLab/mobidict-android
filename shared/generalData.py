@@ -68,3 +68,5 @@ LABEL_TYPES = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
 PARADIGM_LABEL_TYPES = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
 
 PARADIGM_PANES_AVAILABLE = ["NA", "VII", "VAI", "NAD", "NI", "NID", "VTA", "VTI"]
+
+MAGENTA_THEME_COLOR = "#8B0000"
