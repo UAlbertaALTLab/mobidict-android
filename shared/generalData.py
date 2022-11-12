@@ -62,3 +62,9 @@ ABOUT_URL_LINKS = {
     "about-12": "https://nrc.canada.ca/en/research-development/research-collaboration/programs/canadian-indigenous-languages-technology-project",
     "about-13": "https://nrc.canada.ca/en"
 }
+
+LABEL_TYPES = ["SRO(êîôâ)", "SRO(ēīōā)", "Syllabics"]
+
+PARADIGM_LABEL_TYPES = ["Plain English Labels", "Linguistic labels", "nêhiyawêwin labels"]
+
+PARADIGM_PANES_AVAILABLE = ["NA", "VII", "VAI", "NAD", "NI", "NID", "VTA", "VTI"]
