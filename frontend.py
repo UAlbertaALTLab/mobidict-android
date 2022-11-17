@@ -265,15 +265,15 @@ class ParadigmLabelContent(MDBoxLayout):
                     if cell['should_suppress_output']:
                         continue
                     elif cell['is_label']:
-                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
+                        paradigmLabelText = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
 
                         if app.selectedParadigmOptionIndex == 2:
-                            paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
-                            paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                            paradigmLabelText = app.get_syllabics_sro_correct_label(paradigmLabelText)
+                            paradigmLabelText = "[font=bjcrus.ttf]" + paradigmLabelText + "[/font]"
                         
-                        paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                        paradigmLabelText = "[i]" + paradigmLabelText + "[/i]"
                         
-                        row_box_layout.add_widget(Label(text = paradigm_label_text,
+                        row_box_layout.add_widget(Label(text = paradigmLabelText,
                                                         markup = True,
                                                         size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
@@ -1039,9 +1039,14 @@ class SpecificResultMainList(MDList):
             is_next_row_after_labels = False
             current_num_cols = 0
             current_panes = []
+            # Some panes have a header row and a subheader row like VTA
+            # | Prs | Ind | Prs | Cnj ...
+            # | 1Sg	| 1Sg | 1Sg | ...
+            # currentHeaderLabels helps record the headers for later rows
+            currentHeaderLabels = []
+            firstNonLabelRowInPane = True
             # Go through every row inside the pane
             for row_idx, tr_row in enumerate(pane['tr_rows']):
-                print("[Test] current row: ", tr_row)
                 # Ignore the row if it's a header row (just contains #NA for eg.)
                 if not tr_row['is_header']:
                     
@@ -1055,6 +1060,10 @@ class SpecificResultMainList(MDList):
                     # If so, record the number of column labels does it contains
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
+                        isNextRowLabelOnly, _ = cells_contains_only_column_labels(pane['tr_rows'][row_idx + 1]['cells'])
+                        if isNextRowLabelOnly:
+                            # Ignore the header row for now - temporary test
+                            continue
                         # If it does contain only column headers, let's add num_cols panes 
                         # as those = number of panes for that "pane" in this for loop
                         current_num_cols = num_cols
@@ -1077,30 +1086,33 @@ class SpecificResultMainList(MDList):
                             # row_span > 1 not considered, we just take the first word found
                             break
                         if cell_idx == 0:
-                            if current_num_cols == 1 and is_next_row_after_labels:
-                                # Whenever looking at something like:
-                                # | Core
-                                #   | Poss
-                                #   ...
-                                #   | Nonposs
-                                #   ...
-                                # Whenever we hit Nonposs, make sure to add the Poss pane 
-                                # to all_panes. 
-                                # This is not required when we have current_num_cols > 1 
-                                # because they don't have only label row in middle of the output
-                                # so can be added in the end
-                                is_next_row_after_labels = False
-                                for current_pane_idx in range(len(current_panes) - 1):
-                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
-                                    all_panes.append(final_pane)
-                                
-                                # Now that current panes so far have been added to all_panes,
-                                # reset the current_panes list to just contain the current row (which is on -1 idx)
-                                if len(current_panes) > 0:
-                                    current_panes_temp = current_panes.copy()
-                                    current_panes = list()
-                                    current_panes.append(current_panes_temp[-1])
-                            
+                            if is_next_row_after_labels:
+                                if not firstNonLabelRowInPane:
+                                    # Whenever looking at something like:
+                                    # | Core
+                                    #   | Poss
+                                    #   ...
+                                    #   | Nonposs
+                                    #   ...
+                                    # Whenever we hit Nonposs, make sure to add the Poss pane 
+                                    # to all_panes. 
+                                    # This is not required when we have current_num_cols > 1 
+                                    # because they don't have only label row in middle of the output
+                                    # so can be added in the end
+                                    is_next_row_after_labels = False
+                                    for current_pane_idx in range(len(current_panes) - 1):
+                                        final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
+                                        all_panes.append(final_pane)
+                                    
+                                    # Now that current panes so far have been added to all_panes,
+                                    # reset the current_panes list to just contain the current row (which is on -1 idx)
+                                    if len(current_panes) > 0:
+                                        current_panes_temp = current_panes.copy()
+                                        current_panes = list()
+                                        current_panes.append(current_panes_temp[-1])
+                                else:
+                                    firstNonLabelRowInPane = False
+                                    is_next_row_after_labels = False
                             
                             # Update the current_pane to include the new cell found in this iteration
                             for current_pane in current_panes:
@@ -1116,7 +1128,6 @@ class SpecificResultMainList(MDList):
                         
                         # Append the index appropriate cell to the pane
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
-                        print("Current panes: ", current_panes)
                     
             # End of a "pane", add all the panes in current_panes to all_panes
             for current_pane in current_panes:
