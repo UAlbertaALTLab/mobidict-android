@@ -1073,7 +1073,7 @@ class SpecificResultMainList(MDList):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
                             if cell_idx != 0:
-                                current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
+                                current_panes.append({'tr_rows': [], 'headerTitle': header if len(currentHeaderLabels) == 0 else relabel(currentHeaderLabels[cell_idx]['label']), "subheaderTitle": relabel(cell['label'])})
                         # Let's look at the next row now that panes have been added
                         continue
 
