@@ -1063,7 +1063,7 @@ class SpecificResultMainList(MDList):
                     if is_row_only_col_labels:
                         isNextRowLabelOnly, _ = cells_contains_only_column_labels(pane['tr_rows'][row_idx + 1]['cells'])
                         if isNextRowLabelOnly:
-                            # TODO: Ignore the header row for now - TEMPORARY!
+                            currentHeaderLabels = tr_row['cells']
                             continue
                         # If it does contain only column headers, let's add num_cols panes 
                         # as those = number of panes for that "pane" in this for loop
