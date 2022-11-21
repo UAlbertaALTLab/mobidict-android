@@ -266,6 +266,7 @@ class ParadigmLabelContent(MDBoxLayout):
                         continue
                     elif cell['is_label']:
                         paradigmLabelText = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
+                        paradigmLabelText = paradigmLabelText.replace("→", "->")
 
                         if app.selectedParadigmOptionIndex == 2:
                             paradigmLabelText = app.get_syllabics_sro_correct_label(paradigmLabelText)
@@ -1060,7 +1061,6 @@ class SpecificResultMainList(MDList):
                     # If so, record the number of column labels does it contains
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
-                        print("ONLY ROW LABELS!!!", num_cols)
                         isNextRowLabelOnly, _ = cells_contains_only_column_labels(pane['tr_rows'][row_idx + 1]['cells'])
                         if isNextRowLabelOnly:
                             # TODO: Ignore the header row for now - TEMPORARY!
@@ -1072,7 +1072,6 @@ class SpecificResultMainList(MDList):
                         for cell_idx, cell in enumerate(tr_row['cells']):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
-                            print("Adding a pane!", current_num_cols)
                             if cell_idx != 0:
                                 current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
                         # Let's look at the next row now that panes have been added
@@ -1109,14 +1108,11 @@ class SpecificResultMainList(MDList):
                                     # Now that current panes so far have been added to all_panes,
                                     # reset the current_panes list to just contain the current row (which is on -1 idx)
                                     if len(current_panes) > 0:
-                                        print("In the wrong place")
                                         current_panes_temp = current_panes.copy()
                                         current_panes = list()
                                         for i in range(current_num_cols, len(current_panes_temp)):
                                             current_panes.append(current_panes_temp[i])
-                                        print("Current panes NOW: ", current_panes)
                                 else:
-                                    print("Setting firstNonLabel row to false")
                                     firstNonLabelRowInPane = False
                                     is_next_row_after_labels = False
                             
@@ -1133,8 +1129,6 @@ class SpecificResultMainList(MDList):
                             continue
                         
                         # Append the index appropriate cell to the pane
-                        print("=" * 80)
-                        print("Cell: ", cell)
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
                     
             # End of a "pane", add all the panes in current_panes to all_panes
@@ -1195,7 +1189,6 @@ class SpecificResultMainList(MDList):
         # Instead of audio URL, play the file just loaded
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
-            print("Playing sound...")
             sound.on_stop = self.stop_loader
             sound.play()
         
