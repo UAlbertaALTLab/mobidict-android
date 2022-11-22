@@ -938,9 +938,9 @@ class SpecificResultMainList(MDList):
         
         txt_main_title = app.get_syllabics_sro_correct_label(title)
         
-        title_label = Label(text="[font=bjcrus.ttf][size=28]" + txt_main_title + "[/font][/size]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][size=20dp]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=28]" + txt_main_title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=20dp]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -953,7 +953,7 @@ class SpecificResultMainList(MDList):
         
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                               icon_size="19dp",
+                                                               icon_size="16dp",
                                                                on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
@@ -969,9 +969,9 @@ class SpecificResultMainList(MDList):
         
         # Add the inflectional category
         if app.displayInflectionalCategory:
-            inflection_label = Label(text="[size=24]" + self.inflectionalCategory + "[/size]", markup=True)
+            inflection_label = Label(text="[size=14dp]" + self.inflectionalCategory + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=24]" + self.inflectionalCategory + "[/size]", 
+            inflection_label = MDLabel(text="[size=14dp]" + self.inflectionalCategory + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -980,14 +980,14 @@ class SpecificResultMainList(MDList):
             
         additional_emoji_margin = 0 if not emojis else 10
         
-        emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=14dp][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=14dp][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
                             markup=True,
                             size_hint=(None, 1),
                             width=emoji_label._label.texture.size[0] + additional_emoji_margin)
     
-        desc_label = MDLabel(text="[size=24]" + subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=14dp]" + subtitle + "[/size]", markup=True)
         
         if app.displayEmojiMode:
             description_box_layout.add_widget(emoji_label)
@@ -997,7 +997,7 @@ class SpecificResultMainList(MDList):
         
         # Add definitions
         for definition in definitions:
-            top_details_box_layout.add_widget(MDLabel(text = definition))
+            top_details_box_layout.add_widget(MDLabel(text = "[size=13dp]" + definition + "[/size]", markup = True))
         
         self.add_widget(top_details_box_layout)
         
