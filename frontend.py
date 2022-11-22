@@ -36,14 +36,14 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.toast import toast
-from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
+from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelOneLine, MDExpansionPanelTwoLine
 
 from cree_sro_syllabics import sro2syllabics
 
 from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS, LABEL_TYPES, PARADIGM_LABEL_TYPES, PARADIGM_PANES_AVAILABLE
-from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO, SoundAPIResponse
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO, getHeaderAndSubheader, SoundAPIResponse
 from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
@@ -1031,7 +1031,6 @@ class SpecificResultMainList(MDList):
         
         # Decide how many panels to add
         all_panes = []
-        header, subheader = None, None
         
         # Go through every pane
         for pane_idx, pane in enumerate(paradigm_data['panes']):
@@ -1040,6 +1039,7 @@ class SpecificResultMainList(MDList):
             is_next_row_after_labels = False
             current_num_cols = 0
             current_panes = []
+            header = ""
             # Some panes have a header row and a subheader row like VTA
             # | Prs | Ind | Prs | Cnj ...
             # | 1Sg	| 1Sg | 1Sg | ...
@@ -1073,7 +1073,8 @@ class SpecificResultMainList(MDList):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
                             if cell_idx != 0:
-                                current_panes.append({'tr_rows': [], 'headerTitle': header if len(currentHeaderLabels) == 0 else relabel(currentHeaderLabels[cell_idx]['label']), "subheaderTitle": relabel(cell['label'])})
+                                currentHeader, currentSubheader = getHeaderAndSubheader(header, relabel(cell['label']), currentHeaderLabels, cell_idx)
+                                current_panes.append({'tr_rows': [], 'headerTitle': currentHeader, "subheaderTitle": currentSubheader})
                         # Let's look at the next row now that panes have been added
                         continue
 
@@ -1140,6 +1141,7 @@ class SpecificResultMainList(MDList):
         
         first_panel_flag = True
         for each_pane in all_panes:
+            panel_class = MDExpansionPanelTwoLine(text= each_pane['header'], secondary_text= each_pane['subheader']) if each_pane['subheader'] is not None else MDExpansionPanelOneLine(text= each_pane['header'])
             if first_panel_flag:
                 # If first pane, we need to open it initially
                 panel = ParadigmExpansionPanel(
@@ -1147,10 +1149,7 @@ class SpecificResultMainList(MDList):
                                 dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 60),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
-                                panel_cls=MDExpansionPanelTwoLine(
-                                    text= each_pane['header'],
-                                    secondary_text= each_pane['subheader']
-                                )
+                                panel_cls=panel_class
                                 )
                 first_panel_flag = False
                 self.add_widget(panel)
@@ -1162,10 +1161,7 @@ class SpecificResultMainList(MDList):
                                 dynamicHeight= 0,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
-                                panel_cls=MDExpansionPanelTwoLine(
-                                    text= each_pane['header'],
-                                    secondary_text= each_pane['subheader']
-                                )
+                                panel_cls=panel_class
                                 ))
         
     def play_sound(self, *args):
