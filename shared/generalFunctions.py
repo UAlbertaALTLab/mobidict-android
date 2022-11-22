@@ -1,4 +1,5 @@
 from enum import Enum
+from backend.frontendShared.relabelling import relabel
 
 class SoundAPIResponse(Enum):
     SUCCESSFUL = 1
@@ -32,4 +33,22 @@ def replace_hats_to_lines_SRO(string):
     string = string.replace("â", "ā")
     
     return string
+
+
+def getHeaderAndSubheader(header, subheader, currentHeaderLabels, cell_idx):
+    finalHeader, finalSubheader = "", ""
+    if header == "Core":
+        finalHeader = "Core"
+        finalSubheader = subheader
+    elif len(currentHeaderLabels) > 0:
+        finalHeader = relabel(currentHeaderLabels[cell_idx]['label'])
+        finalSubheader = subheader
+    elif header == "":
+        finalHeader = subheader
+        finalSubheader = None
+    else:
+        finalHeader = "Core"
+        finalSubheader = None
+
+    return [finalHeader, finalSubheader]
 

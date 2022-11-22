@@ -36,14 +36,14 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.toast import toast
-from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
+from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelOneLine, MDExpansionPanelTwoLine
 
 from cree_sro_syllabics import sro2syllabics
 
 from uiToBackendConnector import getSearchResultsFromQuery
 from api.api import get_sound
 from shared.generalData import SOUND_FILE_NAME, LEGEND_OF_ABBREVIATIONS_TEXT, CONTACT_US_TEXT, HELP_CONTACT_FORM_LINK, ABOUT_TEXT_SOURCE_MATERIALS, ABOUT_TEXT_CREDITS, ABOUT_URL_LINKS, LABEL_TYPES, PARADIGM_LABEL_TYPES, PARADIGM_PANES_AVAILABLE
-from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO, SoundAPIResponse
+from shared.generalFunctions import cells_contains_only_column_labels, is_core_column_header, replace_hats_to_lines_SRO, getHeaderAndSubheader, SoundAPIResponse
 from backend.frontendShared.relabelling import relabel, relabel_source
 
 ######################################################
@@ -265,15 +265,16 @@ class ParadigmLabelContent(MDBoxLayout):
                     if cell['should_suppress_output']:
                         continue
                     elif cell['is_label']:
-                        paradigm_label_text = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
+                        paradigmLabelText = relabel(cell['label'], paradigm_parameter[app.selectedParadigmOptionIndex])
+                        paradigmLabelText = paradigmLabelText.replace("→", "->")
 
                         if app.selectedParadigmOptionIndex == 2:
-                            paradigm_label_text = app.get_syllabics_sro_correct_label(paradigm_label_text)
-                            paradigm_label_text = "[font=bjcrus.ttf]" + paradigm_label_text + "[/font]"
+                            paradigmLabelText = app.get_syllabics_sro_correct_label(paradigmLabelText)
+                            paradigmLabelText = "[font=bjcrus.ttf]" + paradigmLabelText + "[/font]"
                         
-                        paradigm_label_text = "[i]" + paradigm_label_text + "[/i]"
+                        paradigmLabelText = "[i]" + paradigmLabelText + "[/i]"
                         
-                        row_box_layout.add_widget(Label(text = paradigm_label_text,
+                        row_box_layout.add_widget(Label(text = paradigmLabelText,
                                                         markup = True,
                                                         size_hint = (0.05, None), 
                                                         pos_hint = {'center_x': 0.5}, 
@@ -1030,7 +1031,6 @@ class SpecificResultMainList(MDList):
         
         # Decide how many panels to add
         all_panes = []
-        header, subheader = None, None
         
         # Go through every pane
         for pane_idx, pane in enumerate(paradigm_data['panes']):
@@ -1039,9 +1039,15 @@ class SpecificResultMainList(MDList):
             is_next_row_after_labels = False
             current_num_cols = 0
             current_panes = []
+            header = ""
+            # Some panes have a header row and a subheader row like VTA
+            # | Prs | Ind | Prs | Cnj ...
+            # | 1Sg	| 1Sg | 1Sg | ...
+            # currentHeaderLabels helps record the headers for later rows
+            currentHeaderLabels = []
+            firstNonLabelRowInPane = True
             # Go through every row inside the pane
             for row_idx, tr_row in enumerate(pane['tr_rows']):
-                print("[Test] current row: ", tr_row)
                 # Ignore the row if it's a header row (just contains #NA for eg.)
                 if not tr_row['is_header']:
                     
@@ -1055,6 +1061,10 @@ class SpecificResultMainList(MDList):
                     # If so, record the number of column labels does it contains
                     is_row_only_col_labels, num_cols = cells_contains_only_column_labels(tr_row['cells'])
                     if is_row_only_col_labels:
+                        isNextRowLabelOnly, _ = cells_contains_only_column_labels(pane['tr_rows'][row_idx + 1]['cells'])
+                        if isNextRowLabelOnly:
+                            currentHeaderLabels = tr_row['cells']
+                            continue
                         # If it does contain only column headers, let's add num_cols panes 
                         # as those = number of panes for that "pane" in this for loop
                         current_num_cols = num_cols
@@ -1063,7 +1073,8 @@ class SpecificResultMainList(MDList):
                             # Check if it's not the first cell of the cells
                             # as that's usually empty!
                             if cell_idx != 0:
-                                current_panes.append({'tr_rows': [], 'headerTitle': header, "subheaderTitle": relabel(cell['label'])})
+                                currentHeader, currentSubheader = getHeaderAndSubheader(header, relabel(cell['label']), currentHeaderLabels, cell_idx)
+                                current_panes.append({'tr_rows': [], 'headerTitle': currentHeader, "subheaderTitle": currentSubheader})
                         # Let's look at the next row now that panes have been added
                         continue
 
@@ -1077,30 +1088,34 @@ class SpecificResultMainList(MDList):
                             # row_span > 1 not considered, we just take the first word found
                             break
                         if cell_idx == 0:
-                            if current_num_cols == 1 and is_next_row_after_labels:
-                                # Whenever looking at something like:
-                                # | Core
-                                #   | Poss
-                                #   ...
-                                #   | Nonposs
-                                #   ...
-                                # Whenever we hit Nonposs, make sure to add the Poss pane 
-                                # to all_panes. 
-                                # This is not required when we have current_num_cols > 1 
-                                # because they don't have only label row in middle of the output
-                                # so can be added in the end
-                                is_next_row_after_labels = False
-                                for current_pane_idx in range(len(current_panes) - 1):
-                                    final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
-                                    all_panes.append(final_pane)
-                                
-                                # Now that current panes so far have been added to all_panes,
-                                # reset the current_panes list to just contain the current row (which is on -1 idx)
-                                if len(current_panes) > 0:
-                                    current_panes_temp = current_panes.copy()
-                                    current_panes = list()
-                                    current_panes.append(current_panes_temp[-1])
-                            
+                            if is_next_row_after_labels:
+                                if not firstNonLabelRowInPane:
+                                    # Whenever looking at something like:
+                                    # | Core
+                                    #   | Poss
+                                    #   ...
+                                    #   | Nonposs
+                                    #   ...
+                                    # Whenever we hit Nonposs, make sure to add the Poss pane 
+                                    # to all_panes. 
+                                    # This is not required when we have current_num_cols > 1 
+                                    # because they don't have only label row in middle of the output
+                                    # so can be added in the end
+                                    is_next_row_after_labels = False
+                                    for current_pane_idx in range(len(current_panes) - current_num_cols):
+                                        final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
+                                        all_panes.append(final_pane)
+                                    
+                                    # Now that current panes so far have been added to all_panes,
+                                    # reset the current_panes list to just contain the current row (which is on -1 idx)
+                                    if len(current_panes) > 0:
+                                        current_panes_temp = current_panes.copy()
+                                        current_panes = list()
+                                        for i in range(current_num_cols, len(current_panes_temp)):
+                                            current_panes.append(current_panes_temp[i])
+                                else:
+                                    firstNonLabelRowInPane = False
+                                    is_next_row_after_labels = False
                             
                             # Update the current_pane to include the new cell found in this iteration
                             for current_pane in current_panes:
@@ -1116,7 +1131,6 @@ class SpecificResultMainList(MDList):
                         
                         # Append the index appropriate cell to the pane
                         current_panes[cell_idx - 1]['tr_rows'][-1]['cells'].append(cell)
-                        print("Current panes: ", current_panes)
                     
             # End of a "pane", add all the panes in current_panes to all_panes
             for current_pane in current_panes:
@@ -1127,6 +1141,7 @@ class SpecificResultMainList(MDList):
         
         first_panel_flag = True
         for each_pane in all_panes:
+            panel_class = MDExpansionPanelTwoLine(text= each_pane['header'], secondary_text= each_pane['subheader']) if each_pane['subheader'] is not None else MDExpansionPanelOneLine(text= each_pane['header'])
             if first_panel_flag:
                 # If first pane, we need to open it initially
                 panel = ParadigmExpansionPanel(
@@ -1134,10 +1149,7 @@ class SpecificResultMainList(MDList):
                                 dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 60),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
-                                panel_cls=MDExpansionPanelTwoLine(
-                                    text= each_pane['header'],
-                                    secondary_text= each_pane['subheader']
-                                )
+                                panel_cls=panel_class
                                 )
                 first_panel_flag = False
                 self.add_widget(panel)
@@ -1149,10 +1161,7 @@ class SpecificResultMainList(MDList):
                                 dynamicHeight= 0,
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
-                                panel_cls=MDExpansionPanelTwoLine(
-                                    text= each_pane['header'],
-                                    secondary_text= each_pane['subheader']
-                                )
+                                panel_cls=panel_class
                                 ))
         
     def play_sound(self, *args):
@@ -1176,7 +1185,6 @@ class SpecificResultMainList(MDList):
         # Instead of audio URL, play the file just loaded
         sound = SoundLoader.load(SOUND_FILE_NAME)
         if sound:
-            print("Playing sound...")
             sound.on_stop = self.stop_loader
             sound.play()
         
