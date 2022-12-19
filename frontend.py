@@ -938,9 +938,9 @@ class SpecificResultMainList(MDList):
         
         txt_main_title = app.get_syllabics_sro_correct_label(title)
         
-        title_label = Label(text="[font=bjcrus.ttf][size=28]" + txt_main_title + "[/font][/size]", markup=True)
+        title_label = Label(text="[font=bjcrus.ttf][size=20dp]" + txt_main_title + "[/font][/size]", markup=True)
         title_label._label.refresh()
-        title_label = MDLabel(text = "[font=bjcrus.ttf][size=28]" + txt_main_title + "[/size][/font]", 
+        title_label = MDLabel(text = "[font=bjcrus.ttf][size=20dp]" + txt_main_title + "[/size][/font]", 
                               markup=True,
                               valign = "bottom",
                               size_hint=(None, 1),
@@ -953,7 +953,7 @@ class SpecificResultMainList(MDList):
         
         # Get sound playing to work
         title_and_sound_boxlayout.add_widget(InfoTooltipButton(icon="volume-high", 
-                                                               icon_size="19dp",
+                                                               icon_size="16dp",
                                                                on_release=self.play_sound,
                                                                pos_hint={'center_y': 1}))
         
@@ -969,9 +969,9 @@ class SpecificResultMainList(MDList):
         
         # Add the inflectional category
         if app.displayInflectionalCategory:
-            inflection_label = Label(text="[size=24]" + self.inflectionalCategory + "[/size]", markup=True)
+            inflection_label = Label(text="[size=14dp]" + self.inflectionalCategory + "[/size]", markup=True)
             inflection_label._label.refresh()
-            inflection_label = MDLabel(text="[size=24]" + self.inflectionalCategory + "[/size]", 
+            inflection_label = MDLabel(text="[size=14dp]" + self.inflectionalCategory + "[/size]", 
                                 markup=True,
                                 size_hint=(None, 1),
                                 width=inflection_label._label.texture.size[0] + 5)
@@ -980,14 +980,14 @@ class SpecificResultMainList(MDList):
             
         additional_emoji_margin = 0 if not emojis else 10
         
-        emoji_label = Label(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
+        emoji_label = Label(text="[size=14dp][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", markup=True)
         emoji_label._label.refresh()
-        emoji_label = MDLabel(text="[size=24][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
+        emoji_label = MDLabel(text="[size=14dp][font=NotoEmoji-Regular.ttf]" + emojis + "[/font][/size]", 
                             markup=True,
                             size_hint=(None, 1),
                             width=emoji_label._label.texture.size[0] + additional_emoji_margin)
     
-        desc_label = MDLabel(text="[size=24]" + subtitle + "[/size]", markup=True)
+        desc_label = MDLabel(text="[size=14dp]" + subtitle + "[/size]", markup=True)
         
         if app.displayEmojiMode:
             description_box_layout.add_widget(emoji_label)
@@ -997,7 +997,7 @@ class SpecificResultMainList(MDList):
         
         # Add definitions
         for definition in definitions:
-            top_details_box_layout.add_widget(MDLabel(text = definition))
+            top_details_box_layout.add_widget(MDLabel(text = "[size=13dp]" + definition + "[/size]", markup = True))
         
         self.add_widget(top_details_box_layout)
         
@@ -1040,6 +1040,7 @@ class SpecificResultMainList(MDList):
             current_num_cols = 0
             current_panes = []
             header = ""
+            isFirstPaneRow = True
             # Some panes have a header row and a subheader row like VTA
             # | Prs | Ind | Prs | Cnj ...
             # | 1Sg	| 1Sg | 1Sg | ...
@@ -1067,6 +1068,13 @@ class SpecificResultMainList(MDList):
                             continue
                         # If it does contain only column headers, let's add num_cols panes 
                         # as those = number of panes for that "pane" in this for loop
+                        if not isFirstPaneRow:
+                            for cell_idx, cell in enumerate(tr_row['cells']):
+                                if cell_idx != 0:
+                                    current_row = tr_row.copy()
+                                    current_row['cells'] = [cell]
+                                    current_panes[cell_idx - 1]['tr_rows'].append(current_row)
+                            continue
                         current_num_cols = num_cols
                         is_next_row_after_labels = True
                         for cell_idx, cell in enumerate(tr_row['cells']):
@@ -1076,6 +1084,7 @@ class SpecificResultMainList(MDList):
                                 currentHeader, currentSubheader = getHeaderAndSubheader(header, relabel(cell['label']), currentHeaderLabels, cell_idx)
                                 current_panes.append({'tr_rows': [], 'headerTitle': currentHeader, "subheaderTitle": currentSubheader})
                         # Let's look at the next row now that panes have been added
+                        isFirstPaneRow = False
                         continue
 
                     # Immitate the row minus the cells that we will just recreate
@@ -1102,17 +1111,17 @@ class SpecificResultMainList(MDList):
                                     # because they don't have only label row in middle of the output
                                     # so can be added in the end
                                     is_next_row_after_labels = False
-                                    for current_pane_idx in range(len(current_panes) - current_num_cols):
-                                        final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
-                                        all_panes.append(final_pane)
+                                    # for current_pane_idx in range(len(current_panes) - current_num_cols):
+                                    #     final_pane = {'pane': current_panes[current_pane_idx], 'header': current_panes[current_pane_idx]['headerTitle'], 'subheader': current_panes[current_pane_idx]['subheaderTitle']}
+                                    #     all_panes.append(final_pane)
                                     
-                                    # Now that current panes so far have been added to all_panes,
-                                    # reset the current_panes list to just contain the current row (which is on -1 idx)
-                                    if len(current_panes) > 0:
-                                        current_panes_temp = current_panes.copy()
-                                        current_panes = list()
-                                        for i in range(current_num_cols, len(current_panes_temp)):
-                                            current_panes.append(current_panes_temp[i])
+                                    # # Now that current panes so far have been added to all_panes,
+                                    # # reset the current_panes list to just contain the current row (which is on -1 idx)
+                                    # if len(current_panes) > 0:
+                                    #     current_panes_temp = current_panes.copy()
+                                    #     current_panes = list()
+                                    #     for i in range(current_num_cols, len(current_panes_temp)):
+                                    #         current_panes.append(current_panes_temp[i])
                                 else:
                                     firstNonLabelRowInPane = False
                                     is_next_row_after_labels = False
