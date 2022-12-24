@@ -1155,7 +1155,7 @@ class SpecificResultMainList(MDList):
                 # If first pane, we need to open it initially
                 panel = ParadigmExpansionPanel(
                                 isFirst = first_panel_flag,
-                                dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 60),
+                                dynamicHeight= dp(len(each_pane['pane']['tr_rows']) * 45),
                                 icon="bookshelf",
                                 content=ParadigmLabelContent(each_pane['pane']),
                                 panel_cls=panel_class
